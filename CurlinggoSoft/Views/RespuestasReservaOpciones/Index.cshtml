@@ -1,0 +1,22 @@
+@model IEnumerable<CurlinggoSoft.Models.RespuestaReservaOpcion>
+@{ ViewData["Title"] = "Respuestas Reserva Opciones"; }
+<h1>Respuestas de Reserva - Opciones Múltiples</h1>
+<p><a asp-action="Create" class="btn btn-primary">+ Nueva</a></p>
+<table class="table table-striped table-hover">
+    <thead class="table-dark"><tr><th>Respuesta</th><th>Opción</th><th>Acciones</th></tr></thead>
+    <tbody>
+        @foreach (var item in Model)
+        {
+            <tr>
+                <td>@item.RespuestaReserva?.RespuestaReservaID</td>
+                <td>@item.Opcion?.TextoOpcion</td>
+                <td>
+                    <a asp-action="Details" asp-route-id="@item.RespuestaReservaOpcionID" class="btn btn-info btn-sm">Ver</a>
+                    <a asp-action="Edit" asp-route-id="@item.RespuestaReservaOpcionID" class="btn btn-warning btn-sm">Editar</a>
+                    <a asp-action="Delete" asp-route-id="@item.RespuestaReservaOpcionID" class="btn btn-danger btn-sm">Eliminar</a>
+                </td>
+            </tr>
+        }
+    </tbody>
+</table>
+<div><a asp-action="Index" asp-controller="Admin" class="btn btn-secondary mt-3">← Volver al Admin</a></div>

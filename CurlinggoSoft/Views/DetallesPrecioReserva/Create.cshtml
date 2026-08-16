@@ -1,0 +1,15 @@
+@model CurlinggoSoft.Models.DetallePrecioReserva
+@{ ViewData["Title"] = "Crear Detalle de Precio"; }
+<h1>Crear Detalle de Precio de Reserva</h1>
+<div class="row"><div class="col-md-6">
+<form asp-action="Create">
+    <div asp-validation-summary="ModelOnly" class="alert alert-danger"></div>
+    <div class="mb-3"><label asp-for="ReservaID" class="form-label"></label><select asp-for="ReservaID" class="form-select" asp-items="ViewBag.ReservaID"></select></div>
+    <div class="mb-3"><label asp-for="Concepto" class="form-label"></label><input asp-for="Concepto" class="form-control" /></div>
+    <div class="mb-3"><label asp-for="Monto" class="form-label"></label><input asp-for="Monto" class="form-control" /></div>
+    <div class="mb-3"><label asp-for="OpcionPreguntaID" class="form-label"></label><select asp-for="OpcionPreguntaID" class="form-select" asp-items="ViewBag.OpcionPreguntaID"><option value="">-- Ninguna --</option></select></div>
+    <div class="mb-3"><label asp-for="FechaRegistro" class="form-label"></label><input asp-for="FechaRegistro" class="form-control" /></div>
+    <div><button type="submit" class="btn btn-primary">Guardar</button> <a asp-action="Index" class="btn btn-secondary">Cancelar</a></div>
+</form>
+</div></div>
+@section Scripts { @{await Html.RenderPartialAsync("_ValidationScriptsPartial");} }

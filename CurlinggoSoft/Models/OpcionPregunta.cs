@@ -23,6 +23,11 @@ namespace CurlinggoSoft.Models
         [StringLength(100)]
         public string? Valor { get; set; }
 
+        [Required]
+        [Column(TypeName = "decimal(12,2)")]
+        [Display(Name = "Ajuste de Precio")]
+        public decimal AjustePrecio { get; set; } = 0;
+
         [Display(Name = "Orden")]
         public int Orden { get; set; } = 1;
 

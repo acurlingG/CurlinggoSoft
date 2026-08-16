@@ -41,6 +41,9 @@ namespace CurlinggoSoft.Models
         public DbSet<Evaluacion> Evaluaciones { get; set; }
         public DbSet<Auditoria> Auditoria { get; set; }
         public DbSet<LogIntervencionOperativa> LogsIntervencionOperativa { get; set; }
+        public DbSet<RespuestaReservaOpcion> RespuestasReservaOpciones { get; set; }
+        public DbSet<DetallePrecioReserva> DetallesPrecioReserva { get; set; }
+        public DbSet<TecnicoUbicacionActual> TecnicosUbicacionActual { get; set; }
 
         protected override void OnModelCreating(ModelBuilder modelBuilder)
         {

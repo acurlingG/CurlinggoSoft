@@ -1,0 +1,14 @@
+@model CurlinggoSoft.Models.DetallePrecioReserva
+@{ ViewData["Title"] = "Eliminar Detalle"; }
+<h1>Eliminar Detalle de Precio de Reserva</h1>
+<div class="alert alert-warning"><h4>¿Está seguro?</h4></div>
+<dl class="row">
+    <dt class="col-sm-2">Reserva</dt><dd class="col-sm-10">@Model.Reserva?.ReservaID</dd>
+    <dt class="col-sm-2">Concepto</dt><dd class="col-sm-10">@Model.Concepto</dd>
+    <dt class="col-sm-2">Monto</dt><dd class="col-sm-10">@Model.Monto</dd>
+</dl>
+<form asp-action="Delete">
+    <input type="hidden" asp-for="DetallePrecioReservaID" />
+    <button type="submit" class="btn btn-danger">Eliminar</button>
+    <a asp-action="Index" class="btn btn-secondary">Cancelar</a>
+</form>

@@ -29,6 +29,21 @@
                 <input asp-for="MontoBaseCotizado" type="number" step="0.01" class="form-control" />
             </div>
             <div class="mb-3">
+                <label asp-for="MontoAjustes" class="form-label"></label>
+                <input asp-for="MontoAjustes" type="number" step="0.01" class="form-control" />
+            </div>
+            <div class="mb-3">
+                <label asp-for="MontoTotalCotizado" class="form-label"></label>
+                <input asp-for="MontoTotalCotizado" type="number" step="0.01" class="form-control" />
+            </div>
+            <div class="mb-3">
+                <label asp-for="Moneda" class="form-label"></label>
+                <select asp-for="Moneda" class="form-select">
+                    <option value="CRC">CRC</option>
+                    <option value="USD">USD</option>
+                </select>
+            </div>
+            <div class="mb-3">
                 <label asp-for="DuracionEstimadaMinutos" class="form-label"></label>
                 <input asp-for="DuracionEstimadaMinutos" type="number" class="form-control" />
             </div>

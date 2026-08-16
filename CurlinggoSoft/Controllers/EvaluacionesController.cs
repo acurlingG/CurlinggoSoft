@@ -1,5 +1,7 @@
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
+using Microsoft.Data.SqlClient;
+using System.Data;
 using CurlinggoSoft.Models;
 
 public class EvaluacionesController : Controller
@@ -25,11 +27,34 @@ public class EvaluacionesController : Controller
     [ValidateAntiForgeryToken]
     public async Task<IActionResult> Create([Bind("EvaluacionID,ReservaID,EvaluadorUsuarioID,EvaluadoUsuarioID,ServicioID,TipoEvaluacionID,Puntuacion,Comentario,FechaEvaluacion,Activa")] Evaluacion modelo)
     {
+        // Regla de negocio CURLINGgo: la creación de evaluaciones NO debe hacerse
+        // con _context.Add()/SaveChanges(); debe pasar por usp_Evaluacion_Crear
+        // para validar el estado de la reserva y las reglas por tipo de evaluación.
         if (ModelState.IsValid)
         {
-            _context.Add(modelo);
-            await _context.SaveChangesAsync();
-            return RedirectToAction(nameof(Index));
+            await using var connection = new SqlConnection(_context.Database.GetConnectionString());
+            await connection.OpenAsync();
+            await using var command = new SqlCommand("dbo.usp_Evaluacion_Crear", connection)
+            {
+                CommandType = CommandType.StoredProcedure
+            };
+            command.Parameters.Add(new SqlParameter("@ReservaID", SqlDbType.BigInt) { Value = modelo.ReservaID });
+            command.Parameters.Add(new SqlParameter("@EvaluadorUsuarioID", SqlDbType.NVarChar, 450) { Value = modelo.EvaluadorUsuarioID });
+            command.Parameters.Add(new SqlParameter("@EvaluadoUsuarioID", SqlDbType.NVarChar, 450) { Value = (object?)modelo.EvaluadoUsuarioID ?? DBNull.Value });
+            command.Parameters.Add(new SqlParameter("@ServicioID", SqlDbType.Int) { Value = (object?)modelo.ServicioID ?? DBNull.Value });
+            command.Parameters.Add(new SqlParameter("@TipoEvaluacionID", SqlDbType.Int) { Value = modelo.TipoEvaluacionID });
+            command.Parameters.Add(new SqlParameter("@Puntuacion", SqlDbType.TinyInt) { Value = modelo.Puntuacion });
+            command.Parameters.Add(new SqlParameter("@Comentario", SqlDbType.NVarChar, 1000) { Value = (object?)modelo.Comentario ?? DBNull.Value });
+
+            try
+            {
+                await command.ExecuteScalarAsync();
+                return RedirectToAction(nameof(Index));
+            }
+            catch (SqlException ex)
+            {
+                ModelState.AddModelError(string.Empty, ex.Message);
+            }
         }
         ViewData["ReservaID"] = new Microsoft.AspNetCore.Mvc.Rendering.SelectList(_context.SolicitudesReserva, "ReservaID", "DireccionServicio", modelo.ReservaID);
         ViewData["EvaluadorUsuarioID"] = new Microsoft.AspNetCore.Mvc.Rendering.SelectList(_context.Usuarios, "UsuarioID", "Email", modelo.EvaluadorUsuarioID);

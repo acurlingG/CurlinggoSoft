@@ -48,6 +48,21 @@ namespace CurlinggoSoft.Models
         [Display(Name = "Monto Base Cotizado")]
         public decimal MontoBaseCotizado { get; set; }
 
+        [Required]
+        [Column(TypeName = "decimal(12,2)")]
+        [Display(Name = "Monto Ajustes")]
+        public decimal MontoAjustes { get; set; } = 0;
+
+        [Required]
+        [Column(TypeName = "decimal(12,2)")]
+        [Display(Name = "Monto Total Cotizado")]
+        public decimal MontoTotalCotizado { get; set; }
+
+        [Required]
+        [StringLength(3)]
+        [Display(Name = "Moneda")]
+        public string Moneda { get; set; } = "CRC";
+
         [Display(Name = "Duración Estimada (min)")]
         public int DuracionEstimadaMinutos { get; set; } = 60;
 

@@ -1,0 +1,11 @@
+@model CurlinggoSoft.Models.DetallePrecioReserva
+@{ ViewData["Title"] = "Detalles"; }
+<h1>Detalles del Precio de Reserva</h1>
+<dl class="row">
+    <dt class="col-sm-2">Reserva</dt><dd class="col-sm-10">@Model.Reserva?.ReservaID</dd>
+    <dt class="col-sm-2">Concepto</dt><dd class="col-sm-10">@Model.Concepto</dd>
+    <dt class="col-sm-2">Monto</dt><dd class="col-sm-10">@Model.Monto</dd>
+    <dt class="col-sm-2">Opción</dt><dd class="col-sm-10">@Model.Opcion?.TextoOpcion</dd>
+    <dt class="col-sm-2">Fecha</dt><dd class="col-sm-10">@Model.FechaRegistro</dd>
+</dl>
+<div><a asp-action="Edit" asp-route-id="@Model.DetallePrecioReservaID" class="btn btn-warning">Editar</a> <a asp-action="Index" class="btn btn-secondary">Volver</a></div>

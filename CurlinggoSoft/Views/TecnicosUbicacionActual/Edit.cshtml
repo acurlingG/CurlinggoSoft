@@ -1,0 +1,14 @@
+@model CurlinggoSoft.Models.TecnicoUbicacionActual
+@{ ViewData["Title"] = "Editar Ubicación"; }
+<h1>Editar Ubicación Actual de Técnico</h1>
+<div class="row"><div class="col-md-6">
+<form asp-action="Edit">
+    <div asp-validation-summary="ModelOnly" class="alert alert-danger"></div>
+    <input type="hidden" asp-for="TecnicoID" />
+    <div class="mb-3"><label asp-for="Latitud" class="form-label"></label><input asp-for="Latitud" class="form-control" /></div>
+    <div class="mb-3"><label asp-for="Longitud" class="form-label"></label><input asp-for="Longitud" class="form-control" /></div>
+    <div class="mb-3"><label asp-for="FechaActualizacion" class="form-label"></label><input asp-for="FechaActualizacion" class="form-control" /></div>
+    <div><button type="submit" class="btn btn-primary">Guardar</button> <a asp-action="Index" class="btn btn-secondary">Cancelar</a></div>
+</form>
+</div></div>
+@section Scripts { @{await Html.RenderPartialAsync("_ValidationScriptsPartial");} }

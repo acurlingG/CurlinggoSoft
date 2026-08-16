@@ -1,11 +1,44 @@
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
+using Microsoft.Data.SqlClient;
+using System.Data;
 using CurlinggoSoft.Models;
 
 public class SolicitudesReservaController : Controller
 {
     private readonly ApplicationDbContext _context;
     public SolicitudesReservaController(ApplicationDbContext context) => _context = context;
+
+    // Regla de negocio CURLINGgo: los cambios de estado de una reserva NO deben
+    // hacerse con _context.Update(); deben pasar por usp_Reserva_CambiarEstado
+    // para conservar la maquina de estados y el historial transaccional.
+    [HttpPost]
+    [ValidateAntiForgeryToken]
+    public async Task<IActionResult> CambiarEstado(long reservaId, int estadoNuevoId, string usuarioModificadorId, string? observaciones)
+    {
+        await using var connection = new SqlConnection(_context.Database.GetConnectionString());
+        await connection.OpenAsync();
+        await using var command = new SqlCommand("dbo.usp_Reserva_CambiarEstado", connection)
+        {
+            CommandType = CommandType.StoredProcedure
+        };
+        command.Parameters.Add(new SqlParameter("@ReservaID", SqlDbType.BigInt) { Value = reservaId });
+        command.Parameters.Add(new SqlParameter("@EstadoNuevoID", SqlDbType.Int) { Value = estadoNuevoId });
+        command.Parameters.Add(new SqlParameter("@UsuarioModificadorID", SqlDbType.NVarChar, 450) { Value = usuarioModificadorId });
+        command.Parameters.Add(new SqlParameter("@Observaciones", SqlDbType.NVarChar, 500) { Value = (object?)observaciones ?? DBNull.Value });
+
+        try
+        {
+            await command.ExecuteNonQueryAsync();
+        }
+        catch (SqlException ex)
+        {
+            ModelState.AddModelError(string.Empty, ex.Message);
+            return RedirectToAction(nameof(Details), new { id = reservaId });
+        }
+
+        return RedirectToAction(nameof(Details), new { id = reservaId });
+    }
 
     public async Task<IActionResult> Index() => View(await _context.SolicitudesReserva.Include(r => r.Cliente).Include(r => r.Tecnico).Include(r => r.Servicio).Include(r => r.EstadoReserva).OrderByDescending(r => r.FechaHoraSolicitud).ToListAsync());
 
@@ -22,7 +55,7 @@ public class SolicitudesReservaController : Controller
 
     [HttpPost]
     [ValidateAntiForgeryToken]
-    public async Task<IActionResult> Create([Bind("ReservaID,CodigoSeguimiento,ClienteID,TecnicoID,ServicioID,EstadoReservaID,DireccionID,ProvinciaID,CantonID,DistritoID,MontoBaseCotizado,DuracionEstimadaMinutos,FechaHoraProgramada,LatitudServicio,LongitudServicio,FechaHoraSolicitud,FechaHoraCompletada,DireccionServicio,DescripcionProblema,NotasCliente,FechaModificacion")] SolicitudReserva modelo)
+    public async Task<IActionResult> Create([Bind("ReservaID,CodigoSeguimiento,ClienteID,TecnicoID,ServicioID,EstadoReservaID,DireccionID,ProvinciaID,CantonID,DistritoID,MontoBaseCotizado,MontoAjustes,MontoTotalCotizado,Moneda,DuracionEstimadaMinutos,FechaHoraProgramada,LatitudServicio,LongitudServicio,FechaHoraSolicitud,FechaHoraCompletada,DireccionServicio,DescripcionProblema,NotasCliente,FechaModificacion")] SolicitudReserva modelo)
     {
         if (ModelState.IsValid)
         {
@@ -51,7 +84,7 @@ public class SolicitudesReservaController : Controller
 
     [HttpPost]
     [ValidateAntiForgeryToken]
-    public async Task<IActionResult> Edit(long? id, [Bind("ReservaID,CodigoSeguimiento,ClienteID,TecnicoID,ServicioID,EstadoReservaID,DireccionID,ProvinciaID,CantonID,DistritoID,MontoBaseCotizado,DuracionEstimadaMinutos,FechaHoraProgramada,LatitudServicio,LongitudServicio,FechaHoraSolicitud,FechaHoraCompletada,DireccionServicio,DescripcionProblema,NotasCliente,FechaModificacion")] SolicitudReserva modelo)
+    public async Task<IActionResult> Edit(long? id, [Bind("ReservaID,CodigoSeguimiento,ClienteID,TecnicoID,ServicioID,EstadoReservaID,DireccionID,ProvinciaID,CantonID,DistritoID,MontoBaseCotizado,MontoAjustes,MontoTotalCotizado,Moneda,DuracionEstimadaMinutos,FechaHoraProgramada,LatitudServicio,LongitudServicio,FechaHoraSolicitud,FechaHoraCompletada,DireccionServicio,DescripcionProblema,NotasCliente,FechaModificacion")] SolicitudReserva modelo)
     {
         if (id != modelo.ReservaID) return NotFound();
         if (ModelState.IsValid)
