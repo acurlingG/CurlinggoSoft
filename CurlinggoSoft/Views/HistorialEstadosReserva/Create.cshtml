@@ -1,0 +1,28 @@
+@model CurlinggoSoft.Models.HistorialEstadoReserva
+@{ ViewData["Title"] = "Crear Registro Historial"; }
+<h1>Crear Registro de Historial</h1>
+<div class="row">
+    <div class="col-md-6">
+        <form asp-action="Create">
+            <div asp-validation-summary="ModelOnly" class="alert alert-danger"></div>
+            <div class="mb-3">
+                <label asp-for="ReservaID" class="form-label"></label>
+                <select asp-for="ReservaID" class="form-select" asp-items="ViewBag.ReservaID"></select>
+            </div>
+            <div class="mb-3">
+                <label asp-for="EstadoAnteriorID" class="form-label"></label>
+                <select asp-for="EstadoAnteriorID" class="form-select" asp-items="ViewBag.EstadoAnteriorID"><option value="">-- Ninguno --</option></select>
+            </div>
+            <div class="mb-3">
+                <label asp-for="EstadoNuevoID" class="form-label"></label>
+                <select asp-for="EstadoNuevoID" class="form-select" asp-items="ViewBag.EstadoNuevoID"></select>
+            </div>
+            <div class="mb-3">
+                <label asp-for="Observaciones" class="form-label"></label>
+                <textarea asp-for="Observaciones" class="form-control" rows="2"></textarea>
+            </div>
+            <div><button type="submit" class="btn btn-primary">Guardar</button> <a asp-action="Index" class="btn btn-secondary">Cancelar</a></div>
+        </form>
+    </div>
+</div>
+@section Scripts { @{await Html.RenderPartialAsync("_ValidationScriptsPartial");} }

@@ -1,0 +1,12 @@
+@model CurlinggoSoft.Models.Permiso
+@{ ViewData["Title"] = "Detalles Permiso"; }
+<h1>Detalles del Permiso</h1>
+<dl class="row">
+    <dt class="col-sm-2">Código</dt><dd class="col-sm-10">@Model.CodigoPermiso</dd>
+    <dt class="col-sm-2">Nombre</dt><dd class="col-sm-10">@Model.Nombre</dd>
+    <dt class="col-sm-2">Descripción</dt><dd class="col-sm-10">@Model.Descripcion</dd>
+</dl>
+<div>
+    <a asp-action="Edit" asp-route-id="@Model.PermisoID" class="btn btn-warning">Editar</a>
+    <a asp-action="Index" class="btn btn-secondary">Volver</a>
+</div>

@@ -1,0 +1,10 @@
+@model CurlinggoSoft.Models.IntentoPago
+@{ ViewData["Title"] = "Detalles Intento de Pago"; }
+<h1>Detalles de Intento de Pago</h1>
+<dl class="row">
+    <dt class="col-sm-2">Pago</dt><dd class="col-sm-10">@Model.Pago?.PagoID</dd>
+    <dt class="col-sm-2">Método</dt><dd class="col-sm-10">@Model.MetodoPago?.Nombre</dd>
+    <dt class="col-sm-2">Estado</dt><dd class="col-sm-10">@Model.EstadoPago?.Nombre</dd>
+    <dt class="col-sm-2">Monto</dt><dd class="col-sm-10">@Model.MontoIntento</dd>
+</dl>
+<div><a asp-action="Edit" asp-route-id="@Model.IntentoPagoID" class="btn btn-warning">Editar</a> <a asp-action="Index" class="btn btn-secondary">Volver</a></div>

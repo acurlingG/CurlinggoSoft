@@ -1,0 +1,46 @@
+@model CurlinggoSoft.Models.PreguntaServicio
+@{ ViewData["Title"] = "Crear Pregunta"; }
+<h1>Crear Pregunta de Servicio</h1>
+<div class="row">
+    <div class="col-md-6">
+        <form asp-action="Create">
+            <div asp-validation-summary="ModelOnly" class="alert alert-danger"></div>
+            <div class="mb-3">
+                <label asp-for="ServicioID" class="form-label"></label>
+                <select asp-for="ServicioID" class="form-select" asp-items="ViewBag.ServicioID"></select>
+            </div>
+            <div class="mb-3">
+                <label asp-for="TextoPregunta" class="form-label"></label>
+                <textarea asp-for="TextoPregunta" class="form-control" rows="2"></textarea>
+                <span asp-validation-for="TextoPregunta" class="text-danger"></span>
+            </div>
+            <div class="mb-3">
+                <label asp-for="TipoRespuesta" class="form-label"></label>
+                <select asp-for="TipoRespuesta" class="form-select">
+                    <option value="TEXTO">Texto</option>
+                    <option value="NUMERO">Número</option>
+                    <option value="SI_NO">Sí/No</option>
+                    <option value="OPCION">Opción</option>
+                    <option value="MULTIPLE">Múltiple</option>
+                    <option value="FECHA">Fecha</option>
+                </select>
+            </div>
+            <div class="form-check mb-3">
+                <input type="hidden" name="Obligatoria" value="false" />
+                <input asp-for="Obligatoria" type="checkbox" class="form-check-input" />
+                <label class="form-check-label" for="Obligatoria">Obligatoria</label>
+            </div>
+            <div class="mb-3">
+                <label asp-for="Orden" class="form-label"></label>
+                <input asp-for="Orden" type="number" class="form-control" />
+            </div>
+            <div class="form-check mb-3">
+                <input type="hidden" name="Activa" value="false" />
+                <input asp-for="Activa" type="checkbox" class="form-check-input" />
+                <label class="form-check-label" for="Activa">Activa</label>
+            </div>
+            <div><button type="submit" class="btn btn-primary">Guardar</button> <a asp-action="Index" class="btn btn-secondary">Cancelar</a></div>
+        </form>
+    </div>
+</div>
+@section Scripts { @{await Html.RenderPartialAsync("_ValidationScriptsPartial");} }

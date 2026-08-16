@@ -1,0 +1,15 @@
+@model CurlinggoSoft.Models.TecnicoPerfil
+@{ ViewData["Title"] = "Detalles Técnico Perfil"; }
+<h1>Detalles del Perfil de Técnico</h1>
+<dl class="row">
+    <dt class="col-sm-2">Técnico</dt><dd class="col-sm-10">@Model.TecnicoID</dd>
+    <dt class="col-sm-2">Cédula</dt><dd class="col-sm-10">@Model.IdentificacionCedula</dd>
+    <dt class="col-sm-2">Estado</dt><dd class="col-sm-10">@Model.EstadoVerificacion</dd>
+    <dt class="col-sm-2">Calificación</dt><dd class="col-sm-10">@Model.CalificacionPromedio</dd>
+    <dt class="col-sm-2">Disponible</dt><dd class="col-sm-10">@(Model.Disponible ? "Sí" : "No")</dd>
+    <dt class="col-sm-2">Cobertura</dt><dd class="col-sm-10">@Model.ProvinciaCobertura?.Nombre / @Model.CantonCobertura?.Nombre</dd>
+</dl>
+<div>
+    <a asp-action="Edit" asp-route-id="@Model.TecnicoID" class="btn btn-warning">Editar</a>
+    <a asp-action="Index" class="btn btn-secondary">Volver</a>
+</div>

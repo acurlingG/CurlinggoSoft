@@ -1,0 +1,20 @@
+@model CurlinggoSoft.Models.MenuPermiso
+@{ ViewData["Title"] = "Crear Menú Permiso"; }
+<h1>Asignar Permiso a Menú</h1>
+<div class="row">
+    <div class="col-md-6">
+        <form asp-action="Create">
+            <div asp-validation-summary="ModelOnly" class="alert alert-danger"></div>
+            <div class="mb-3">
+                <label asp-for="MenuID" class="form-label"></label>
+                <select asp-for="MenuID" class="form-select" asp-items="ViewBag.MenuID"></select>
+            </div>
+            <div class="mb-3">
+                <label asp-for="PermisoID" class="form-label"></label>
+                <select asp-for="PermisoID" class="form-select" asp-items="ViewBag.PermisoID"></select>
+            </div>
+            <div><button type="submit" class="btn btn-primary">Guardar</button> <a asp-action="Index" class="btn btn-secondary">Cancelar</a></div>
+        </form>
+    </div>
+</div>
+@section Scripts { @{await Html.RenderPartialAsync("_ValidationScriptsPartial");} }

@@ -1,0 +1,10 @@
+@model CurlinggoSoft.Models.EstadoPago
+@{ ViewData["Title"] = "Editar Estado de Pago"; }
+<h1>Editar Estado de Pago</h1>
+<div class="row"><div class="col-md-6"><form asp-action="Edit"><div asp-validation-summary="ModelOnly" class="alert alert-danger"></div>
+<input type="hidden" asp-for="EstadoPagoID" />
+<div class="mb-3"><label asp-for="Codigo" class="form-label"></label><input asp-for="Codigo" class="form-control" /><span asp-validation-for="Codigo" class="text-danger"></span></div>
+<div class="mb-3"><label asp-for="Nombre" class="form-label"></label><input asp-for="Nombre" class="form-control" /><span asp-validation-for="Nombre" class="text-danger"></span></div>
+<div><button type="submit" class="btn btn-warning">Actualizar</button> <a asp-action="Index" class="btn btn-secondary">Cancelar</a></div>
+</form></div></div>
+@section Scripts { @{await Html.RenderPartialAsync("_ValidationScriptsPartial");} }

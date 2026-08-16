@@ -1,0 +1,18 @@
+@model CurlinggoSoft.Models.SolicitudReserva
+@{ ViewData["Title"] = "Detalles Reserva"; }
+<h1>Detalles de Solicitud de Reserva</h1>
+<dl class="row">
+    <dt class="col-sm-2">Código</dt><dd class="col-sm-10">@Model.CodigoSeguimiento</dd>
+    <dt class="col-sm-2">Cliente</dt><dd class="col-sm-10">@Model.Cliente?.ClienteID</dd>
+    <dt class="col-sm-2">Técnico</dt><dd class="col-sm-10">@Model.Tecnico?.IdentificacionCedula</dd>
+    <dt class="col-sm-2">Servicio</dt><dd class="col-sm-10">@Model.Servicio?.NombreServicio</dd>
+    <dt class="col-sm-2">Estado</dt><dd class="col-sm-10">@Model.EstadoReserva?.Nombre</dd>
+    <dt class="col-sm-2">Monto</dt><dd class="col-sm-10">@Model.MontoBaseCotizado</dd>
+    <dt class="col-sm-2">Fecha Programada</dt><dd class="col-sm-10">@Model.FechaHoraProgramada</dd>
+    <dt class="col-sm-2">Dirección</dt><dd class="col-sm-10">@Model.DireccionServicio</dd>
+    <dt class="col-sm-2">Descripción</dt><dd class="col-sm-10">@Model.DescripcionProblema</dd>
+</dl>
+<div>
+    <a asp-action="Edit" asp-route-id="@Model.ReservaID" class="btn btn-warning">Editar</a>
+    <a asp-action="Index" class="btn btn-secondary">Volver</a>
+</div>

@@ -1,0 +1,25 @@
+@model IEnumerable<CurlinggoSoft.Models.IntentoPago>
+@{ ViewData["Title"] = "Intentos de Pago"; }
+<h1>Intentos de Pago</h1>
+<p><a asp-action="Create" class="btn btn-primary">+ Nuevo Intento</a></p>
+<table class="table table-striped table-hover">
+    <thead class="table-dark"><tr><th>Pago</th><th>Método</th><th>Estado</th><th>Monto</th><th>Fecha</th><th>Acciones</th></tr></thead>
+    <tbody>
+        @foreach (var item in Model)
+        {
+            <tr>
+                <td>@item.Pago?.PagoID</td>
+                <td>@item.MetodoPago?.Nombre</td>
+                <td>@item.EstadoPago?.Nombre</td>
+                <td>@item.MontoIntento</td>
+                <td>@item.FechaIntento</td>
+                <td>
+                    <a asp-action="Details" asp-route-id="@item.IntentoPagoID" class="btn btn-info btn-sm">Ver</a>
+                    <a asp-action="Edit" asp-route-id="@item.IntentoPagoID" class="btn btn-warning btn-sm">Editar</a>
+                    <a asp-action="Delete" asp-route-id="@item.IntentoPagoID" class="btn btn-danger btn-sm">Eliminar</a>
+                </td>
+            </tr>
+        }
+    </tbody>
+</table>
+<div><a asp-action="Index" asp-controller="Admin" class="btn btn-secondary mt-3">← Volver al Admin</a></div>

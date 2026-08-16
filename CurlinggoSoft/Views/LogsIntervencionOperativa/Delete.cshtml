@@ -1,0 +1,10 @@
+@model CurlinggoSoft.Models.LogIntervencionOperativa
+@{ ViewData["Title"] = "Eliminar Log"; }
+<h1>Eliminar Log de Intervención Operativa</h1>
+<div class="alert alert-warning"><h4>¿Está seguro?</h4></div>
+<dl class="row"><dt class="col-sm-2">Tipo Evento</dt><dd class="col-sm-10">@Model.TipoEvento</dd></dl>
+<form asp-action="Delete">
+    <input type="hidden" asp-for="LogID" />
+    <button type="submit" class="btn btn-danger">Eliminar</button>
+    <a asp-action="Index" class="btn btn-secondary">Cancelar</a>
+</form>

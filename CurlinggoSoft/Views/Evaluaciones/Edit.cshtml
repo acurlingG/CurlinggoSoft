@@ -1,0 +1,20 @@
+@model CurlinggoSoft.Models.Evaluacion
+@{ ViewData["Title"] = "Editar Evaluación"; }
+<h1>Editar Evaluación</h1>
+<div class="row"><div class="col-md-6">
+<form asp-action="Edit">
+    <div asp-validation-summary="ModelOnly" class="alert alert-danger"></div>
+    <input type="hidden" asp-for="EvaluacionID" />
+    <input type="hidden" asp-for="FechaEvaluacion" />
+    <div class="mb-3"><label asp-for="ReservaID" class="form-label"></label><select asp-for="ReservaID" class="form-select" asp-items="ViewBag.ReservaID"></select></div>
+    <div class="mb-3"><label asp-for="EvaluadorUsuarioID" class="form-label"></label><select asp-for="EvaluadorUsuarioID" class="form-select" asp-items="ViewBag.EvaluadorUsuarioID"></select></div>
+    <div class="mb-3"><label asp-for="EvaluadoUsuarioID" class="form-label"></label><select asp-for="EvaluadoUsuarioID" class="form-select" asp-items="ViewBag.EvaluadoUsuarioID"><option value="">-- Ninguno --</option></select></div>
+    <div class="mb-3"><label asp-for="ServicioID" class="form-label"></label><select asp-for="ServicioID" class="form-select" asp-items="ViewBag.ServicioID"><option value="">-- Ninguno --</option></select></div>
+    <div class="mb-3"><label asp-for="TipoEvaluacionID" class="form-label"></label><select asp-for="TipoEvaluacionID" class="form-select" asp-items="ViewBag.TipoEvaluacionID"></select></div>
+    <div class="mb-3"><label asp-for="Puntuacion" class="form-label"></label><input asp-for="Puntuacion" type="number" min="1" max="5" class="form-control" /></div>
+    <div class="mb-3"><label asp-for="Comentario" class="form-label"></label><textarea asp-for="Comentario" class="form-control"></textarea></div>
+    <div class="form-check mb-3"><input asp-for="Activa" class="form-check-input" /><label asp-for="Activa" class="form-check-label"></label></div>
+    <div><button type="submit" class="btn btn-primary">Guardar</button> <a asp-action="Index" class="btn btn-secondary">Cancelar</a></div>
+</form>
+</div></div>
+@section Scripts { @{await Html.RenderPartialAsync("_ValidationScriptsPartial");} }

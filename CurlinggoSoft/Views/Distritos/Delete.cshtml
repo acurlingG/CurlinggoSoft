@@ -1,0 +1,26 @@
+@model CurlinggoSoft.Models.Distrito
+@{ ViewData["Title"] = "Eliminar Distrito"; }
+<h1>Eliminar Distrito</h1>
+<div class="alert alert-warning"><h4>¿Está seguro de que desea eliminar este distrito?</h4></div>
+<div>
+    <h4>CurlinggoSoft.Models.Distrito</h4>
+    <hr />
+    <dl class="row">
+        <dt class="col-sm-2">Provincia</dt>
+        <dd class="col-sm-10">@Html.DisplayFor(model => model.Canton.Provincia.Nombre)</dd>
+        <dt class="col-sm-2">Cantón</dt>
+        <dd class="col-sm-10">@Html.DisplayFor(model => model.Canton.Nombre)</dd>
+        <dt class="col-sm-2">Nombre</dt>
+        <dd class="col-sm-10">@Html.DisplayFor(model => model.Nombre)</dd>
+        <dt class="col-sm-2">Código DTA</dt>
+        <dd class="col-sm-10">@Html.DisplayFor(model => model.CodigoDTA)</dd>
+        <dt class="col-sm-2">Activo</dt>
+        <dd class="col-sm-10"><span class="badge @(Model.Activo ? "bg-success" : "bg-danger")">@(Model.Activo ? "Activo" : "Inactivo")</span></dd>
+    </dl>
+    <form asp-action="Delete">
+        <input type="hidden" asp-for="DistritoID" />
+        <button type="submit" class="btn btn-danger">Eliminar</button>
+        <a asp-action="Index" class="btn btn-secondary">Cancelar</a>
+    </form>
+</div>
+@section Scripts { @{await Html.RenderPartialAsync("_ValidationScriptsPartial");} }

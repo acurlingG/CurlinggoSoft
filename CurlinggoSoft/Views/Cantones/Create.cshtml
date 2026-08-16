@@ -1,0 +1,56 @@
+@model CurlinggoSoft.Models.Canton
+
+@{
+    ViewData["Title"] = "Crear Cantón";
+}
+
+<h1>Crear Cantón</h1>
+
+<div class="row">
+    <div class="col-md-6">
+        <form asp-action="Create">
+            <div asp-validation-summary="ModelOnly" class="alert alert-danger" role="alert"></div>
+
+            <div class="mb-3">
+                <label asp-for="CantonID" class="form-label"></label>
+                <input asp-for="CantonID" class="form-control" />
+                <span asp-validation-for="CantonID" class="text-danger"></span>
+                <small class="form-text text-muted">ID único del cantón (no es autoincremental)</small>
+            </div>
+
+            <div class="mb-3">
+                <label asp-for="ProvinciaID" class="form-label"></label>
+                <select asp-for="ProvinciaID" class="form-select" asp-items="ViewBag.ProvinciaID"></select>
+                <span asp-validation-for="ProvinciaID" class="text-danger"></span>
+            </div>
+
+            <div class="mb-3">
+                <label asp-for="Nombre" class="form-label"></label>
+                <input asp-for="Nombre" class="form-control" />
+                <span asp-validation-for="Nombre" class="text-danger"></span>
+            </div>
+
+            <div class="mb-3">
+                <label asp-for="CodigoDTA" class="form-label"></label>
+                <input asp-for="CodigoDTA" class="form-control" maxlength="3" />
+                <span asp-validation-for="CodigoDTA" class="text-danger"></span>
+                <small class="form-text text-muted">Código DTA (máximo 3 caracteres)</small>
+            </div>
+
+            <div class="form-check mb-3">
+                <input type="hidden" name="Activo" value="false" />
+                <input asp-for="Activo" type="checkbox" class="form-check-input" id="Activo" />
+                <label class="form-check-label" for="Activo">Activo</label>
+            </div>
+
+            <div class="mb-3">
+                <button type="submit" class="btn btn-primary">Guardar</button>
+                <a asp-action="Index" class="btn btn-secondary">Cancelar</a>
+            </div>
+        </form>
+    </div>
+</div>
+
+@section Scripts {
+    @{await Html.RenderPartialAsync("_ValidationScriptsPartial");}
+}

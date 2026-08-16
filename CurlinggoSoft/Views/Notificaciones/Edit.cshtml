@@ -1,0 +1,20 @@
+@model CurlinggoSoft.Models.Notificacion
+@{ ViewData["Title"] = "Editar Notificación"; }
+<h1>Editar Notificación</h1>
+<div class="row"><div class="col-md-6">
+<form asp-action="Edit">
+    <div asp-validation-summary="ModelOnly" class="alert alert-danger"></div>
+    <input type="hidden" asp-for="NotificacionID" />
+    <input type="hidden" asp-for="FechaCreacion" />
+    <div class="mb-3"><label asp-for="UsuarioID" class="form-label"></label><select asp-for="UsuarioID" class="form-select" asp-items="ViewBag.UsuarioID"></select></div>
+    <div class="mb-3"><label asp-for="ReservaID" class="form-label"></label><select asp-for="ReservaID" class="form-select" asp-items="ViewBag.ReservaID"><option value="">-- Ninguna --</option></select></div>
+    <div class="mb-3"><label asp-for="OfertaTecnicoID" class="form-label"></label><select asp-for="OfertaTecnicoID" class="form-select" asp-items="ViewBag.OfertaTecnicoID"><option value="">-- Ninguna --</option></select></div>
+    <div class="mb-3"><label asp-for="TipoNotificacion" class="form-label"></label><input asp-for="TipoNotificacion" class="form-control" /></div>
+    <div class="mb-3"><label asp-for="Titulo" class="form-label"></label><input asp-for="Titulo" class="form-control" /></div>
+    <div class="mb-3"><label asp-for="Mensaje" class="form-label"></label><textarea asp-for="Mensaje" class="form-control"></textarea></div>
+    <div class="form-check mb-3"><input asp-for="Leida" class="form-check-input" /><label asp-for="Leida" class="form-check-label"></label></div>
+    <div class="mb-3"><label asp-for="FechaLectura" class="form-label"></label><input asp-for="FechaLectura" type="datetime-local" class="form-control" /></div>
+    <div><button type="submit" class="btn btn-primary">Guardar</button> <a asp-action="Index" class="btn btn-secondary">Cancelar</a></div>
+</form>
+</div></div>
+@section Scripts { @{await Html.RenderPartialAsync("_ValidationScriptsPartial");} }

@@ -1,0 +1,43 @@
+@model CurlinggoSoft.Models.Canton
+
+@{
+    ViewData["Title"] = "Eliminar Cantón";
+}
+
+<h1>Eliminar Cantón</h1>
+
+<div class="alert alert-warning" role="alert">
+    <h4>¿Está seguro de que desea eliminar este cantón?</h4>
+</div>
+
+<div>
+    <h4>CurlinggoSoft.Models.Canton</h4>
+    <hr />
+    <dl class="row">
+        <dt class="col-sm-2">Provincia</dt>
+        <dd class="col-sm-10">@Html.DisplayFor(model => model.Provincia.Nombre)</dd>
+
+        <dt class="col-sm-2">@Html.DisplayNameFor(model => model.Nombre)</dt>
+        <dd class="col-sm-10">@Html.DisplayFor(model => model.Nombre)</dd>
+
+        <dt class="col-sm-2">@Html.DisplayNameFor(model => model.CodigoDTA)</dt>
+        <dd class="col-sm-10">@Html.DisplayFor(model => model.CodigoDTA)</dd>
+
+        <dt class="col-sm-2">@Html.DisplayNameFor(model => model.Activo)</dt>
+        <dd class="col-sm-10">
+            <span class="badge @(Model.Activo ? "bg-success" : "bg-danger")">
+                @(Model.Activo ? "Activo" : "Inactivo")
+            </span>
+        </dd>
+    </dl>
+
+    <form asp-action="Delete">
+        <input type="hidden" asp-for="CantonID" />
+        <button type="submit" class="btn btn-danger">Eliminar</button>
+        <a asp-action="Index" class="btn btn-secondary">Cancelar</a>
+    </form>
+</div>
+
+@section Scripts {
+    @{await Html.RenderPartialAsync("_ValidationScriptsPartial");}
+}

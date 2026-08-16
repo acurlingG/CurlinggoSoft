@@ -1,0 +1,13 @@
+@model CurlinggoSoft.Models.PreguntaServicio
+@{ ViewData["Title"] = "Detalles Pregunta"; }
+<h1>Detalles de Pregunta de Servicio</h1>
+<dl class="row">
+    <dt class="col-sm-2">Servicio</dt><dd class="col-sm-10">@Model.Servicio?.NombreServicio</dd>
+    <dt class="col-sm-2">Pregunta</dt><dd class="col-sm-10">@Model.TextoPregunta</dd>
+    <dt class="col-sm-2">Tipo</dt><dd class="col-sm-10">@Model.TipoRespuesta</dd>
+    <dt class="col-sm-2">Obligatoria</dt><dd class="col-sm-10">@(Model.Obligatoria ? "Sí" : "No")</dd>
+</dl>
+<div>
+    <a asp-action="Edit" asp-route-id="@Model.PreguntaServicioID" class="btn btn-warning">Editar</a>
+    <a asp-action="Index" class="btn btn-secondary">Volver</a>
+</div>

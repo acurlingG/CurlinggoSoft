@@ -1,0 +1,48 @@
+@model CurlinggoSoft.Models.TecnicoPerfil
+@{ ViewData["Title"] = "Crear Técnico Perfil"; }
+<h1>Crear Perfil de Técnico</h1>
+<div class="row">
+    <div class="col-md-6">
+        <form asp-action="Create">
+            <div asp-validation-summary="ModelOnly" class="alert alert-danger"></div>
+            <div class="mb-3">
+                <label asp-for="TecnicoID" class="form-label"></label>
+                <input asp-for="TecnicoID" class="form-control" />
+                <span asp-validation-for="TecnicoID" class="text-danger"></span>
+            </div>
+            <div class="mb-3">
+                <label asp-for="IdentificacionCedula" class="form-label"></label>
+                <input asp-for="IdentificacionCedula" class="form-control" />
+                <span asp-validation-for="IdentificacionCedula" class="text-danger"></span>
+            </div>
+            <div class="mb-3">
+                <label asp-for="EstadoVerificacion" class="form-label"></label>
+                <select asp-for="EstadoVerificacion" class="form-select">
+                    <option value="Pendiente">Pendiente</option>
+                    <option value="Aprobado">Aprobado</option>
+                    <option value="Rechazado">Rechazado</option>
+                    <option value="Suspendido">Suspendido</option>
+                </select>
+            </div>
+            <div class="mb-3">
+                <label asp-for="CalificacionPromedio" class="form-label"></label>
+                <input asp-for="CalificacionPromedio" type="number" step="0.01" class="form-control" />
+            </div>
+            <div class="form-check mb-3">
+                <input type="hidden" name="Disponible" value="false" />
+                <input asp-for="Disponible" type="checkbox" class="form-check-input" />
+                <label class="form-check-label" for="Disponible">Disponible</label>
+            </div>
+            <div class="mb-3">
+                <label asp-for="ProvinciaCoberturaID" class="form-label"></label>
+                <select asp-for="ProvinciaCoberturaID" class="form-select" asp-items="ViewBag.ProvinciaCoberturaID"><option value="">-- Ninguna --</option></select>
+            </div>
+            <div class="mb-3">
+                <label asp-for="CantonCoberturaID" class="form-label"></label>
+                <select asp-for="CantonCoberturaID" class="form-select" asp-items="ViewBag.CantonCoberturaID"><option value="">-- Ninguno --</option></select>
+            </div>
+            <div><button type="submit" class="btn btn-primary">Guardar</button> <a asp-action="Index" class="btn btn-secondary">Cancelar</a></div>
+        </form>
+    </div>
+</div>
+@section Scripts { @{await Html.RenderPartialAsync("_ValidationScriptsPartial");} }

@@ -1,0 +1,23 @@
+@model IEnumerable<CurlinggoSoft.Models.LogIntervencionOperativa>
+@{ ViewData["Title"] = "Logs Intervención Operativa"; }
+<h1>Logs de Intervención Operativa</h1>
+<p><a asp-action="Create" class="btn btn-primary">+ Nuevo Registro</a></p>
+<table class="table table-striped table-hover">
+    <thead class="table-dark"><tr><th>Reserva</th><th>Tipo Evento</th><th>Decisión</th><th>Fecha</th><th>Acciones</th></tr></thead>
+    <tbody>
+        @foreach (var item in Model)
+        {
+            <tr>
+                <td>@item.Reserva?.ReservaID</td>
+                <td>@item.TipoEvento</td>
+                <td>@item.DecisionTomada</td>
+                <td>@item.FechaRegistro</td>
+                <td>
+                    <a asp-action="Details" asp-route-id="@item.LogID" class="btn btn-info btn-sm">Ver</a>
+                    <a asp-action="Delete" asp-route-id="@item.LogID" class="btn btn-danger btn-sm">Eliminar</a>
+                </td>
+            </tr>
+        }
+    </tbody>
+</table>
+<div><a asp-action="Index" asp-controller="Admin" class="btn btn-secondary mt-3">← Volver al Admin</a></div>

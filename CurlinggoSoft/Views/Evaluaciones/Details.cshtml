@@ -1,0 +1,13 @@
+@model CurlinggoSoft.Models.Evaluacion
+@{ ViewData["Title"] = "Detalles Evaluación"; }
+<h1>Detalles de Evaluación</h1>
+<dl class="row">
+    <dt class="col-sm-2">Reserva</dt><dd class="col-sm-10">@Model.Reserva?.ReservaID</dd>
+    <dt class="col-sm-2">Evaluador</dt><dd class="col-sm-10">@Model.Evaluador?.Email</dd>
+    <dt class="col-sm-2">Evaluado</dt><dd class="col-sm-10">@Model.Evaluado?.Email</dd>
+    <dt class="col-sm-2">Servicio</dt><dd class="col-sm-10">@Model.Servicio?.NombreServicio</dd>
+    <dt class="col-sm-2">Tipo</dt><dd class="col-sm-10">@Model.TipoEvaluacion?.Nombre</dd>
+    <dt class="col-sm-2">Puntuación</dt><dd class="col-sm-10">@Model.Puntuacion</dd>
+    <dt class="col-sm-2">Comentario</dt><dd class="col-sm-10">@Model.Comentario</dd>
+</dl>
+<div><a asp-action="Edit" asp-route-id="@Model.EvaluacionID" class="btn btn-warning">Editar</a> <a asp-action="Index" class="btn btn-secondary">Volver</a></div>

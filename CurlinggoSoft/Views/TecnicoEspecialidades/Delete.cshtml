@@ -1,0 +1,14 @@
+@model CurlinggoSoft.Models.TecnicoEspecialidad
+@{ ViewData["Title"] = "Eliminar Especialidad"; }
+<h1>Eliminar Especialidad de Técnico</h1>
+<div class="alert alert-warning"><h4>¿Está seguro?</h4></div>
+<dl class="row">
+    <dt class="col-sm-2">Técnico</dt><dd class="col-sm-10">@Model.Tecnico?.IdentificacionCedula</dd>
+    <dt class="col-sm-2">Servicio</dt><dd class="col-sm-10">@Model.Servicio?.NombreServicio</dd>
+</dl>
+<form asp-action="Delete">
+    <input type="hidden" name="tecnicoId" value="@Model.TecnicoID" />
+    <input type="hidden" name="servicioId" value="@Model.ServicioID" />
+    <button type="submit" class="btn btn-danger">Eliminar</button>
+    <a asp-action="Index" class="btn btn-secondary">Cancelar</a>
+</form>

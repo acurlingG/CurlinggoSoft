@@ -1,0 +1,47 @@
+@model IEnumerable<CurlinggoSoft.Models.Provincia>
+
+@{
+    ViewData["Title"] = "Index";
+}
+
+<h1>Index</h1>
+
+<p>
+    <a asp-action="Create">Create New</a>
+</p>
+<table class="table">
+    <thead>
+        <tr>
+            <th>
+                @Html.DisplayNameFor(model => model.Nombre)
+            </th>
+            <th>
+                @Html.DisplayNameFor(model => model.CodigoDTA)
+            </th>
+            <th>
+                @Html.DisplayNameFor(model => model.Activa)
+            </th>
+            <th></th>
+        </tr>
+    </thead>
+    <tbody>
+@foreach (var item in Model) {
+        <tr>
+            <td>
+                @Html.DisplayFor(model => item.Nombre)
+            </td>
+            <td>
+                @Html.DisplayFor(model => item.CodigoDTA)
+            </td>
+            <td>
+                @Html.DisplayFor(model => item.Activa)
+            </td>
+            <td>
+                <a asp-action="Edit" asp-route-provinciaid="@item.ProvinciaID">Edit</a> |
+                <a asp-action="Details" asp-route-provinciaid="@item.ProvinciaID">Details</a> |
+                <a asp-action="Delete" asp-route-provinciaid="@item.ProvinciaID">Delete</a>
+            </td>
+        </tr>
+}
+    </tbody>
+</table>

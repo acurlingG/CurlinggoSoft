@@ -1,0 +1,37 @@
+@model CurlinggoSoft.Models.Distrito
+@{ ViewData["Title"] = "Crear Distrito"; }
+<h1>Crear Distrito</h1>
+<div class="row">
+    <div class="col-md-6">
+        <form asp-action="Create">
+            <div asp-validation-summary="ModelOnly" class="alert alert-danger"></div>
+            <div class="mb-3">
+                <label asp-for="DistritoID" class="form-label"></label>
+                <input asp-for="DistritoID" class="form-control" />
+                <span asp-validation-for="DistritoID" class="text-danger"></span>
+            </div>
+            <div class="mb-3">
+                <label asp-for="CantonID" class="form-label"></label>
+                <select asp-for="CantonID" class="form-select" asp-items="ViewBag.CantonID"></select>
+                <span asp-validation-for="CantonID" class="text-danger"></span>
+            </div>
+            <div class="mb-3">
+                <label asp-for="Nombre" class="form-label"></label>
+                <input asp-for="Nombre" class="form-control" />
+                <span asp-validation-for="Nombre" class="text-danger"></span>
+            </div>
+            <div class="mb-3">
+                <label asp-for="CodigoDTA" class="form-label"></label>
+                <input asp-for="CodigoDTA" class="form-control" maxlength="5" />
+                <span asp-validation-for="CodigoDTA" class="text-danger"></span>
+            </div>
+            <div class="form-check mb-3">
+                <input type="hidden" name="Activo" value="false" />
+                <input asp-for="Activo" type="checkbox" class="form-check-input" />
+                <label class="form-check-label" for="Activo">Activo</label>
+            </div>
+            <div><button type="submit" class="btn btn-primary">Guardar</button> <a asp-action="Index" class="btn btn-secondary">Cancelar</a></div>
+        </form>
+    </div>
+</div>
+@section Scripts { @{await Html.RenderPartialAsync("_ValidationScriptsPartial");} }

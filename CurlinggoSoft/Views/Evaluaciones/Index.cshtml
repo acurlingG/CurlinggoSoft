@@ -1,0 +1,25 @@
+@model IEnumerable<CurlinggoSoft.Models.Evaluacion>
+@{ ViewData["Title"] = "Evaluaciones"; }
+<h1>Evaluaciones</h1>
+<p><a asp-action="Create" class="btn btn-primary">+ Nueva Evaluación</a></p>
+<table class="table table-striped table-hover">
+    <thead class="table-dark"><tr><th>Reserva</th><th>Evaluador</th><th>Tipo</th><th>Puntuación</th><th>Fecha</th><th>Acciones</th></tr></thead>
+    <tbody>
+        @foreach (var item in Model)
+        {
+            <tr>
+                <td>@item.Reserva?.ReservaID</td>
+                <td>@item.Evaluador?.Email</td>
+                <td>@item.TipoEvaluacion?.Nombre</td>
+                <td>@item.Puntuacion</td>
+                <td>@item.FechaEvaluacion</td>
+                <td>
+                    <a asp-action="Details" asp-route-id="@item.EvaluacionID" class="btn btn-info btn-sm">Ver</a>
+                    <a asp-action="Edit" asp-route-id="@item.EvaluacionID" class="btn btn-warning btn-sm">Editar</a>
+                    <a asp-action="Delete" asp-route-id="@item.EvaluacionID" class="btn btn-danger btn-sm">Eliminar</a>
+                </td>
+            </tr>
+        }
+    </tbody>
+</table>
+<div><a asp-action="Index" asp-controller="Admin" class="btn btn-secondary mt-3">← Volver al Admin</a></div>

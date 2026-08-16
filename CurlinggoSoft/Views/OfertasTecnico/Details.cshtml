@@ -1,0 +1,12 @@
+@model CurlinggoSoft.Models.OfertaTecnico
+@{ ViewData["Title"] = "Detalles Oferta"; }
+<h1>Detalles de Oferta</h1>
+<dl class="row">
+    <dt class="col-sm-2">Reserva</dt><dd class="col-sm-10">@Model.Reserva?.ReservaID</dd>
+    <dt class="col-sm-2">Técnico</dt><dd class="col-sm-10">@Model.Tecnico?.IdentificacionCedula</dd>
+    <dt class="col-sm-2">Estado</dt><dd class="col-sm-10">@Model.EstadoOferta?.Nombre</dd>
+    <dt class="col-sm-2">Distancia</dt><dd class="col-sm-10">@Model.DistanciaMetros</dd>
+    <dt class="col-sm-2">Fecha Envío</dt><dd class="col-sm-10">@Model.FechaEnvio</dd>
+    <dt class="col-sm-2">Mensaje</dt><dd class="col-sm-10">@Model.Mensaje</dd>
+</dl>
+<div><a asp-action="Edit" asp-route-id="@Model.OfertaTecnicoID" class="btn btn-warning">Editar</a> <a asp-action="Index" class="btn btn-secondary">Volver</a></div>

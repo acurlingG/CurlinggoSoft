@@ -1,0 +1,44 @@
+@model CurlinggoSoft.Models.CategoriaServicio
+
+@{
+    ViewData["Title"] = "Editar Categoría de Servicio";
+}
+
+<h1>Editar Categoría de Servicio</h1>
+
+<div class="row">
+    <div class="col-md-6">
+        <form asp-action="Edit">
+            <div asp-validation-summary="ModelOnly" class="alert alert-danger" role="alert"></div>
+
+            <input type="hidden" asp-for="CategoriaID" />
+
+            <div class="mb-3">
+                <label asp-for="NombreCategoria" class="form-label"></label>
+                <input asp-for="NombreCategoria" class="form-control" />
+                <span asp-validation-for="NombreCategoria" class="text-danger"></span>
+            </div>
+
+            <div class="mb-3">
+                <label asp-for="Descripcion" class="form-label"></label>
+                <textarea asp-for="Descripcion" class="form-control" rows="3"></textarea>
+                <span asp-validation-for="Descripcion" class="text-danger"></span>
+            </div>
+
+            <div class="form-check mb-3">
+                <input type="hidden" name="Activa" value="false" />
+                <input asp-for="Activa" type="checkbox" class="form-check-input" id="Activa" />
+                <label class="form-check-label" for="Activa">Activa</label>
+            </div>
+
+            <div class="mb-3">
+                <button type="submit" class="btn btn-warning">Actualizar</button>
+                <a asp-action="Index" class="btn btn-secondary">Cancelar</a>
+            </div>
+        </form>
+    </div>
+</div>
+
+@section Scripts {
+    @{await Html.RenderPartialAsync("_ValidationScriptsPartial");}
+}

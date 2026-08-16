@@ -1,0 +1,16 @@
+@model CurlinggoSoft.Models.Distrito
+@{ ViewData["Title"] = "Detalles de Distrito"; }
+<h1>Detalles</h1>
+<div><h4>CurlinggoSoft.Models.Distrito</h4><hr />
+    <dl class="row">
+        <dt class="col-sm-2">Provincia</dt>
+        <dd class="col-sm-10">@Html.DisplayFor(model => model.Canton.Provincia.Nombre)</dd>
+        <dt class="col-sm-2">Cantón</dt>
+        <dd class="col-sm-10">@Html.DisplayFor(model => model.Canton.Nombre)</dd>
+        <dt class="col-sm-2">Nombre</dt>
+        <dd class="col-sm-10">@Html.DisplayFor(model => model.Nombre)</dd>
+        <dt class="col-sm-2">Código DTA</dt>
+        <dd class="col-sm-10">@Html.DisplayFor(model => model.CodigoDTA)</dd>
+    </dl>
+</div>
+<div><a asp-action="Edit" asp-route-distritoid="@Model.DistritoID" class="btn btn-warning">Editar</a> <a asp-action="Index" class="btn btn-secondary">Volver</a></div>

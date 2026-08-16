@@ -1,0 +1,10 @@
+@model CurlinggoSoft.Models.Evaluacion
+@{ ViewData["Title"] = "Eliminar Evaluación"; }
+<h1>Eliminar Evaluación</h1>
+<div class="alert alert-warning"><h4>¿Está seguro?</h4></div>
+<dl class="row"><dt class="col-sm-2">Puntuación</dt><dd class="col-sm-10">@Model.Puntuacion</dd></dl>
+<form asp-action="Delete">
+    <input type="hidden" asp-for="EvaluacionID" />
+    <button type="submit" class="btn btn-danger">Eliminar</button>
+    <a asp-action="Index" class="btn btn-secondary">Cancelar</a>
+</form>

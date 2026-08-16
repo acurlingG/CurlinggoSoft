@@ -1,0 +1,55 @@
+@model CurlinggoSoft.Models.DireccionCliente
+@{ ViewData["Title"] = "Editar Dirección"; }
+<h1>Editar Dirección de Cliente</h1>
+<div class="row">
+    <div class="col-md-6">
+        <form asp-action="Edit">
+            <div asp-validation-summary="ModelOnly" class="alert alert-danger"></div>
+            <input type="hidden" asp-for="DireccionID" />
+            <div class="mb-3">
+                <label asp-for="ClienteID" class="form-label"></label>
+                <select asp-for="ClienteID" class="form-select" asp-items="ViewBag.ClienteID"></select>
+            </div>
+            <div class="mb-3">
+                <label asp-for="NombreDireccion" class="form-label"></label>
+                <input asp-for="NombreDireccion" class="form-control" />
+            </div>
+            <div class="mb-3">
+                <label asp-for="ProvinciaID" class="form-label"></label>
+                <select asp-for="ProvinciaID" class="form-select" asp-items="ViewBag.ProvinciaID"></select>
+            </div>
+            <div class="mb-3">
+                <label asp-for="CantonID" class="form-label"></label>
+                <select asp-for="CantonID" class="form-select" asp-items="ViewBag.CantonID"></select>
+            </div>
+            <div class="mb-3">
+                <label asp-for="DistritoID" class="form-label"></label>
+                <select asp-for="DistritoID" class="form-select" asp-items="ViewBag.DistritoID"></select>
+            </div>
+            <div class="mb-3">
+                <label asp-for="DireccionExacta" class="form-label"></label>
+                <input asp-for="DireccionExacta" class="form-control" />
+            </div>
+            <div class="mb-3">
+                <label asp-for="Latitud" class="form-label"></label>
+                <input asp-for="Latitud" type="number" step="0.000001" class="form-control" />
+            </div>
+            <div class="mb-3">
+                <label asp-for="Longitud" class="form-label"></label>
+                <input asp-for="Longitud" type="number" step="0.000001" class="form-control" />
+            </div>
+            <div class="form-check mb-3">
+                <input type="hidden" name="EsPrincipal" value="false" />
+                <input asp-for="EsPrincipal" type="checkbox" class="form-check-input" />
+                <label class="form-check-label" for="EsPrincipal">Es Principal</label>
+            </div>
+            <div class="form-check mb-3">
+                <input type="hidden" name="Activa" value="false" />
+                <input asp-for="Activa" type="checkbox" class="form-check-input" />
+                <label class="form-check-label" for="Activa">Activa</label>
+            </div>
+            <div><button type="submit" class="btn btn-primary">Guardar</button> <a asp-action="Index" class="btn btn-secondary">Cancelar</a></div>
+        </form>
+    </div>
+</div>
+@section Scripts { @{await Html.RenderPartialAsync("_ValidationScriptsPartial");} }

@@ -1,0 +1,18 @@
+@model CurlinggoSoft.Models.Pago
+@{ ViewData["Title"] = "Editar Pago"; }
+<h1>Editar Pago</h1>
+<div class="row"><div class="col-md-6">
+<form asp-action="Edit">
+    <div asp-validation-summary="ModelOnly" class="alert alert-danger"></div>
+    <input type="hidden" asp-for="PagoID" />
+    <input type="hidden" asp-for="FechaCreacion" />
+    <div class="mb-3"><label asp-for="ReservaID" class="form-label"></label><select asp-for="ReservaID" class="form-select" asp-items="ViewBag.ReservaID"></select></div>
+    <div class="mb-3"><label asp-for="MontoTotal" class="form-label"></label><input asp-for="MontoTotal" type="number" step="0.01" class="form-control" /></div>
+    <div class="mb-3"><label asp-for="ComisionPlataforma" class="form-label"></label><input asp-for="ComisionPlataforma" type="number" step="0.01" class="form-control" /></div>
+    <div class="mb-3"><label asp-for="MontoNetoTecnico" class="form-label"></label><input asp-for="MontoNetoTecnico" type="number" step="0.01" class="form-control" /></div>
+    <div class="mb-3"><label asp-for="Moneda" class="form-label"></label><input asp-for="Moneda" class="form-control" /></div>
+    <div class="mb-3"><label asp-for="ProveedorPago" class="form-label"></label><input asp-for="ProveedorPago" class="form-control" /></div>
+    <div><button type="submit" class="btn btn-primary">Guardar</button> <a asp-action="Index" class="btn btn-secondary">Cancelar</a></div>
+</form>
+</div></div>
+@section Scripts { @{await Html.RenderPartialAsync("_ValidationScriptsPartial");} }

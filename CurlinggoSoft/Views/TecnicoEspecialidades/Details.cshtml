@@ -1,0 +1,9 @@
+@model CurlinggoSoft.Models.TecnicoEspecialidad
+@{ ViewData["Title"] = "Detalles Especialidad"; }
+<h1>Detalles de Especialidad</h1>
+<dl class="row">
+    <dt class="col-sm-2">Técnico</dt><dd class="col-sm-10">@Model.Tecnico?.IdentificacionCedula</dd>
+    <dt class="col-sm-2">Servicio</dt><dd class="col-sm-10">@Model.Servicio?.NombreServicio</dd>
+    <dt class="col-sm-2">Años Experiencia</dt><dd class="col-sm-10">@Model.AniosExperiencia</dd>
+</dl>
+<div><a asp-action="Index" class="btn btn-secondary">Volver</a></div>

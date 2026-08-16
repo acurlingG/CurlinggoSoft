@@ -1,0 +1,17 @@
+@model CurlinggoSoft.Models.Auditoria
+@{ ViewData["Title"] = "Crear Registro de Auditoría"; }
+<h1>Crear Registro de Auditoría</h1>
+<div class="row"><div class="col-md-6">
+<form asp-action="Create">
+    <div asp-validation-summary="ModelOnly" class="alert alert-danger"></div>
+    <div class="mb-3"><label asp-for="UsuarioID" class="form-label"></label><select asp-for="UsuarioID" class="form-select" asp-items="ViewBag.UsuarioID"><option value="">-- Ninguno --</option></select></div>
+    <div class="mb-3"><label asp-for="TablaAfectada" class="form-label"></label><input asp-for="TablaAfectada" class="form-control" /></div>
+    <div class="mb-3"><label asp-for="RegistroID" class="form-label"></label><input asp-for="RegistroID" class="form-control" /></div>
+    <div class="mb-3"><label asp-for="Operacion" class="form-label"></label><input asp-for="Operacion" class="form-control" /></div>
+    <div class="mb-3"><label asp-for="ValoresAnterioresJson" class="form-label"></label><textarea asp-for="ValoresAnterioresJson" class="form-control"></textarea></div>
+    <div class="mb-3"><label asp-for="ValoresNuevosJson" class="form-label"></label><textarea asp-for="ValoresNuevosJson" class="form-control"></textarea></div>
+    <div class="mb-3"><label asp-for="DireccionIP" class="form-label"></label><input asp-for="DireccionIP" class="form-control" /></div>
+    <div><button type="submit" class="btn btn-primary">Guardar</button> <a asp-action="Index" class="btn btn-secondary">Cancelar</a></div>
+</form>
+</div></div>
+@section Scripts { @{await Html.RenderPartialAsync("_ValidationScriptsPartial");} }

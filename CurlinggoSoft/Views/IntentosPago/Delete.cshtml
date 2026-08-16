@@ -1,0 +1,10 @@
+@model CurlinggoSoft.Models.IntentoPago
+@{ ViewData["Title"] = "Eliminar Intento de Pago"; }
+<h1>Eliminar Intento de Pago</h1>
+<div class="alert alert-warning"><h4>¿Está seguro?</h4></div>
+<dl class="row"><dt class="col-sm-2">Monto</dt><dd class="col-sm-10">@Model.MontoIntento</dd></dl>
+<form asp-action="Delete">
+    <input type="hidden" asp-for="IntentoPagoID" />
+    <button type="submit" class="btn btn-danger">Eliminar</button>
+    <a asp-action="Index" class="btn btn-secondary">Cancelar</a>
+</form>

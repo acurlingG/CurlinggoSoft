@@ -1,0 +1,13 @@
+@model CurlinggoSoft.Models.DisponibilidadTecnico
+@{ ViewData["Title"] = "Detalles Disponibilidad"; }
+<h1>Detalles de Disponibilidad</h1>
+<dl class="row">
+    <dt class="col-sm-2">Técnico</dt><dd class="col-sm-10">@Model.Tecnico?.IdentificacionCedula</dd>
+    <dt class="col-sm-2">Día</dt><dd class="col-sm-10">@Model.DiaSemana</dd>
+    <dt class="col-sm-2">Hora Inicio</dt><dd class="col-sm-10">@Model.HoraInicio</dd>
+    <dt class="col-sm-2">Hora Fin</dt><dd class="col-sm-10">@Model.HoraFin</dd>
+</dl>
+<div>
+    <a asp-action="Edit" asp-route-id="@Model.DisponibilidadID" class="btn btn-warning">Editar</a>
+    <a asp-action="Index" class="btn btn-secondary">Volver</a>
+</div>

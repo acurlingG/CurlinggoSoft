@@ -1,0 +1,13 @@
+@model CurlinggoSoft.Models.ClientePerfil
+@{ ViewData["Title"] = "Eliminar Cliente Perfil"; }
+<h1>Eliminar Perfil de Cliente</h1>
+<div class="alert alert-warning"><h4>¿Está seguro?</h4></div>
+<dl class="row">
+    <dt class="col-sm-2">Cliente</dt><dd class="col-sm-10">@Model.ClienteID</dd>
+    <dt class="col-sm-2">Dirección</dt><dd class="col-sm-10">@Model.DireccionExacta</dd>
+</dl>
+<form asp-action="Delete">
+    <input type="hidden" asp-for="ClienteID" />
+    <button type="submit" class="btn btn-danger">Eliminar</button>
+    <a asp-action="Index" class="btn btn-secondary">Cancelar</a>
+</form>

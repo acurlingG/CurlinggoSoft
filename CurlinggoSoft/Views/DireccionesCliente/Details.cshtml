@@ -1,0 +1,16 @@
+@model CurlinggoSoft.Models.DireccionCliente
+@{ ViewData["Title"] = "Detalles Dirección"; }
+<h1>Detalles de Dirección de Cliente</h1>
+<dl class="row">
+    <dt class="col-sm-2">Cliente</dt><dd class="col-sm-10">@Model.ClienteID</dd>
+    <dt class="col-sm-2">Nombre</dt><dd class="col-sm-10">@Model.NombreDireccion</dd>
+    <dt class="col-sm-2">Provincia</dt><dd class="col-sm-10">@Model.Provincia?.Nombre</dd>
+    <dt class="col-sm-2">Cantón</dt><dd class="col-sm-10">@Model.Canton?.Nombre</dd>
+    <dt class="col-sm-2">Distrito</dt><dd class="col-sm-10">@Model.Distrito?.Nombre</dd>
+    <dt class="col-sm-2">Dirección</dt><dd class="col-sm-10">@Model.DireccionExacta</dd>
+    <dt class="col-sm-2">Principal</dt><dd class="col-sm-10">@(Model.EsPrincipal ? "Sí" : "No")</dd>
+</dl>
+<div>
+    <a asp-action="Edit" asp-route-id="@Model.DireccionID" class="btn btn-warning">Editar</a>
+    <a asp-action="Index" class="btn btn-secondary">Volver</a>
+</div>

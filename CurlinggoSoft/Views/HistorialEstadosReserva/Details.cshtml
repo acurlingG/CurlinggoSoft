@@ -1,0 +1,11 @@
+@model CurlinggoSoft.Models.HistorialEstadoReserva
+@{ ViewData["Title"] = "Detalles Historial"; }
+<h1>Detalles del Historial</h1>
+<dl class="row">
+    <dt class="col-sm-2">Reserva</dt><dd class="col-sm-10">@Model.ReservaID</dd>
+    <dt class="col-sm-2">Estado Anterior</dt><dd class="col-sm-10">@Model.EstadoAnterior?.Nombre</dd>
+    <dt class="col-sm-2">Estado Nuevo</dt><dd class="col-sm-10">@Model.EstadoNuevo?.Nombre</dd>
+    <dt class="col-sm-2">Fecha Cambio</dt><dd class="col-sm-10">@Model.FechaCambio</dd>
+    <dt class="col-sm-2">Observaciones</dt><dd class="col-sm-10">@Model.Observaciones</dd>
+</dl>
+<div><a asp-action="Index" class="btn btn-secondary">Volver</a></div>

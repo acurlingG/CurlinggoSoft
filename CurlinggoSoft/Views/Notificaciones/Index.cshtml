@@ -1,0 +1,25 @@
+@model IEnumerable<CurlinggoSoft.Models.Notificacion>
+@{ ViewData["Title"] = "Notificaciones"; }
+<h1>Notificaciones</h1>
+<p><a asp-action="Create" class="btn btn-primary">+ Nueva Notificación</a></p>
+<table class="table table-striped table-hover">
+    <thead class="table-dark"><tr><th>Usuario</th><th>Tipo</th><th>Título</th><th>Leída</th><th>Fecha</th><th>Acciones</th></tr></thead>
+    <tbody>
+        @foreach (var item in Model)
+        {
+            <tr>
+                <td>@item.Usuario?.Email</td>
+                <td>@item.TipoNotificacion</td>
+                <td>@item.Titulo</td>
+                <td>@(item.Leida ? "Sí" : "No")</td>
+                <td>@item.FechaCreacion</td>
+                <td>
+                    <a asp-action="Details" asp-route-id="@item.NotificacionID" class="btn btn-info btn-sm">Ver</a>
+                    <a asp-action="Edit" asp-route-id="@item.NotificacionID" class="btn btn-warning btn-sm">Editar</a>
+                    <a asp-action="Delete" asp-route-id="@item.NotificacionID" class="btn btn-danger btn-sm">Eliminar</a>
+                </td>
+            </tr>
+        }
+    </tbody>
+</table>
+<div><a asp-action="Index" asp-controller="Admin" class="btn btn-secondary mt-3">← Volver al Admin</a></div>
