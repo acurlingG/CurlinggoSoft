@@ -1,8 +1,10 @@
-﻿using Microsoft.EntityFrameworkCore;
+﻿using Microsoft.AspNetCore.Identity;
+using Microsoft.AspNetCore.Identity.EntityFrameworkCore;
+using Microsoft.EntityFrameworkCore;
 
 namespace CurlinggoSoft.Models
 {
-    public class ApplicationDbContext : DbContext
+    public class ApplicationDbContext : IdentityDbContext<IdentityUser>
     {
         public ApplicationDbContext(DbContextOptions<ApplicationDbContext> options)
             : base(options)
@@ -48,7 +50,6 @@ namespace CurlinggoSoft.Models
         protected override void OnModelCreating(ModelBuilder modelBuilder)
         {
             base.OnModelCreating(modelBuilder);
-
             modelBuilder.Entity<MenuPermiso>().HasKey(mp => new { mp.MenuID, mp.PermisoID });
             modelBuilder.Entity<TecnicoEspecialidad>().HasKey(te => new { te.TecnicoID, te.ServicioID });
 
@@ -193,6 +194,14 @@ namespace CurlinggoSoft.Models
                 .WithMany(sc => sc.Servicios)
                 .HasForeignKey(s => s.SubcategoriaID)
                 .OnDelete(DeleteBehavior.Restrict);
+
+            // Relacion 1 a 1 entre dbo.Usuarios (UsuarioID) y AspNetUsers (Id) de Identity
+            modelBuilder.Entity<Usuario>()
+                .HasOne<IdentityUser>()
+                .WithOne()
+                .HasForeignKey<Usuario>(u => u.UsuarioID)
+                .HasPrincipalKey<IdentityUser>(iu => iu.Id)
+                .OnDelete(DeleteBehavior.Cascade);
         }
     }
 }

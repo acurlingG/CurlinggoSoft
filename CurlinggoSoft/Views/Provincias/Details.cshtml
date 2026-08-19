@@ -1,38 +1,35 @@
 @model CurlinggoSoft.Models.Provincia
 
 @{
-    ViewData["Title"] = "Details";
+    ViewData["Title"] = "Detalles de Provincia";
 }
 
-<h1>Details</h1>
+<h1>Detalles de Provincia</h1>
 
 <div>
-    <h4>Provincia</h4>
+    <h4>CurlinggoSoft.Models.Provincia</h4>
     <hr />
     <dl class="row">
-        <dt class = "col-sm-2">
-            @Html.DisplayNameFor(model => model.Nombre)
-        </dt>
-        <dd class = "col-sm-10">
-            @Html.DisplayFor(model => model.Nombre)
-        </dd>
-    </dl>
-        <dt class = "col-sm-2">
-            @Html.DisplayNameFor(model => model.CodigoDTA)
-        </dt>
-        <dd class = "col-sm-10">
-            @Html.DisplayFor(model => model.CodigoDTA)
-        </dd>
-    </dl>
-        <dt class = "col-sm-2">
-            @Html.DisplayNameFor(model => model.Activa)
-        </dt>
-        <dd class = "col-sm-10">
-            @Html.DisplayFor(model => model.Activa)
+        <dt class="col-sm-2">@Html.DisplayNameFor(model => model.Nombre)</dt>
+        <dd class="col-sm-10">@Html.DisplayFor(model => model.Nombre)</dd>
+
+        <dt class="col-sm-2">@Html.DisplayNameFor(model => model.CodigoDTA)</dt>
+        <dd class="col-sm-10">@Html.DisplayFor(model => model.CodigoDTA)</dd>
+
+        <dt class="col-sm-2">@Html.DisplayNameFor(model => model.Activa)</dt>
+        <dd class="col-sm-10">
+            <span class="badge @(Model.Activa ? "bg-success" : "bg-danger")">
+                @(Model.Activa ? "Activo" : "Inactivo")
+            </span>
         </dd>
     </dl>
 </div>
+
 <div>
-    <a asp-action="Edit" asp-route-id="@Model?.ProvinciaID">Edit</a> |
-    <a asp-action="Index">Back to List</a>
+    <a asp-action="Edit" asp-route-provinciaid="@Model.ProvinciaID" class="btn btn-warning">Editar</a>
+    <a asp-action="Index" class="btn btn-secondary">Volver a la lista</a>
 </div>
+
+@section Scripts {
+    @{await Html.RenderPartialAsync("_ValidationScriptsPartial");}
+}
