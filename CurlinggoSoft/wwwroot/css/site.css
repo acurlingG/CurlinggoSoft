@@ -20,6 +20,7 @@ html {
     --brand-orange: #E33B19; /* color principal de botones (HSL 10, 80%, 49%) */
     --brand-orange-dark: #C22F12; /* hover/active del naranja (misma tonalidad, más oscuro) */
     --brand-orange-light: #FDECE7; /* fondos suaves / badges */
+    --brand-body: #0398fe33;
 }
 
 .btn:focus, .btn:active:focus, .btn-link.nav-link:focus, .form-control:focus, .form-check-input:focus {
@@ -34,6 +35,7 @@ body {
     display: flex;
     flex-direction: column;
     min-height: 100vh;
+    background-color: var(--brand-body)
 }
 
 main {

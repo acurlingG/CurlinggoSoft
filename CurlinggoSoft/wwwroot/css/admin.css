@@ -1,0 +1,113 @@
+﻿/* ============================================
+   NAVBAR DE ADMINISTRACIÓN
+   Antes vivía como <style> inline dentro de
+   _AdminMenuPartial.cshtml — movido aquí para
+   mantener HTML y CSS separados.
+   ============================================ */
+
+.navbar-custom {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    flex-wrap: wrap;
+    background-color: var(--brand-navy);
+    font-family: Arial, Helvetica, sans-serif;
+}
+
+.navbar-custom-left,
+.navbar-custom-right {
+    display: flex;
+    align-items: center;
+    flex-wrap: wrap;
+}
+
+.navbar-custom a {
+    font-size: 16px;
+    color: #fff;
+    text-align: center;
+    padding: 14px 16px;
+    text-decoration: none;
+}
+
+.dropdown-custom {
+    position: relative;
+}
+
+    .dropdown-custom .dropbtn {
+        cursor: pointer;
+        font-size: 16px;
+        border: none;
+        outline: none;
+        color: #fff;
+        padding: 14px 16px;
+        background-color: inherit;
+        font-family: inherit;
+        margin: 0;
+    }
+
+        .navbar-custom a:hover,
+        .dropdown-custom:hover .dropbtn,
+        .dropdown-custom .dropbtn:focus {
+            background-color: var(--brand-orange);
+        }
+
+.dropdown-content {
+    display: none;
+    position: absolute;
+    top: 100%;
+    left: 0;
+    background-color: #f9f9f9;
+    min-width: 220px;
+    box-shadow: 0 8px 16px 0 rgba(0, 0, 0, 0.2);
+    z-index: 1000;
+}
+
+    .dropdown-content a {
+        float: none;
+        color: #212529;
+        padding: 12px 16px;
+        text-decoration: none;
+        display: block;
+        text-align: left;
+    }
+
+        .dropdown-content a:hover {
+            background-color: #eee;
+            color: var(--brand-orange);
+        }
+
+    .dropdown-content.show {
+        display: block !important;
+    }
+
+/* Saludo + botón de cerrar sesión, a la derecha del navbar de admin */
+.navbar-custom-right .admin-user-greeting {
+    color: #fff;
+    padding: 14px 12px 14px 16px;
+    font-size: 15px;
+    opacity: 0.9;
+}
+
+.navbar-custom-right .btn-logout {
+    background: transparent;
+    border: 1px solid rgba(255, 255, 255, 0.5);
+    color: #fff;
+    padding: 6px 14px;
+    border-radius: 4px;
+    font-size: 14px;
+    margin-right: 12px;
+}
+
+    .navbar-custom-right .btn-logout:hover {
+        background-color: var(--brand-orange);
+        border-color: var(--brand-orange);
+        color: #fff;
+    }
+
+main {
+    flex: 1 0 auto; /* el contenido crece y empuja el footer hacia abajo */
+}
+
+footer {
+    flex-shrink: 0;
+}

@@ -8,6 +8,7 @@
     <link rel="stylesheet" href="~/lib/bootstrap/dist/css/bootstrap.min.css" />
     <link rel="stylesheet" href="~/css/site.css" asp-append-version="true" />
     <link rel="stylesheet" href="~/CurlinggoSoft.styles.css" asp-append-version="true" />
+    @await RenderSectionAsync("Styles", required: false)
 </head>
 <body>
     <header>
@@ -60,7 +61,7 @@
             </div>
         </nav>
     </header>
-    @if (ViewData["HideAdminMenu"] == null && User.Identity != null && User.Identity.IsAuthenticated)
+    @if (ViewData["HideAdminMenu"] == null && User.Identity != null && User.Identity.IsAuthenticated && !User.IsInRole("Admin"))
     {
         <div class="site-container my-3">
             <partial name="_AdminMenuPartial" />
