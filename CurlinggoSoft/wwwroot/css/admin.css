@@ -4,7 +4,6 @@
    _AdminMenuPartial.cshtml — movido aquí para
    mantener HTML y CSS separados.
    ============================================ */
-
 .navbar-custom {
     display: flex;
     align-items: center;
