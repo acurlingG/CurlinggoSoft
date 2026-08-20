@@ -52,7 +52,15 @@ builder.Services.AddAuthentication(CookieAuthenticationDefaults.AuthenticationSc
     });
 
 builder.Services.AddAuthorization();
-builder.Services.AddSession();
+
+// Session: se necesita el cache en memoria + el registro de AddSession.
+builder.Services.AddDistributedMemoryCache();
+builder.Services.AddSession(options =>
+{
+    options.IdleTimeout = TimeSpan.FromMinutes(30);
+    options.Cookie.HttpOnly = true;
+    options.Cookie.IsEssential = true;
+});
 
 var app = builder.Build();
 
@@ -62,6 +70,10 @@ if (!app.Environment.IsDevelopment())
     app.UseExceptionHandler("/Home/Error");
 }
 app.UseRouting();
+
+// El middleware de Session debe ir después de UseRouting y antes de
+// Authentication/Authorization (y antes de cualquier controlador que use HttpContext.Session).
+app.UseSession();
 
 app.UseAuthentication();
 app.UseAuthorization();

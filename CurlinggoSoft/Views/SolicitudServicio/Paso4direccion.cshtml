@@ -1,0 +1,148 @@
+﻿@model object
+@{
+    ViewData["Title"] = "Solicitar Servicio - Paso 4";
+    var provincias = ViewBag.Provincias as List<CurlinggoSoft.Models.Provincia> ?? new List<CurlinggoSoft.Models.Provincia>();
+}
+
+<link rel="stylesheet" href="~/css/wizard-servicio.css" />
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.css" />
+
+<div class="wizard-container">
+
+    <!-- Encabezado tipo app CURLINGgo -->
+    <div class="wizard-header">
+        <span class="brand"><span class="brand-curling">CURLING</span><span class="brand-go">go</span></span>
+    </div>
+
+    <!-- Indicador de pasos (4 de 5) -->
+    <div class="step-indicator">
+        <div class="step done"><span><i class="bi bi-check-lg"></i></span><small>Servicio</small></div>
+        <div class="step-line done"></div>
+        <div class="step done"><span><i class="bi bi-check-lg"></i></span><small>Detalle</small></div>
+        <div class="step-line done"></div>
+        <div class="step done"><span><i class="bi bi-check-lg"></i></span><small>Horario</small></div>
+        <div class="step-line done"></div>
+        <div class="step active"><span>4</span><small>Dirección</small></div>
+        <div class="step-line"></div>
+        <div class="step"><span>5</span><small>Pago</small></div>
+    </div>
+
+    @if (TempData["Error"] != null)
+    {
+        <div class="alert alert-danger">@TempData["Error"]</div>
+    }
+
+    <h5 class="wizard-question">¿Dónde te brindamos el servicio?</h5>
+
+    <form asp-action="SeleccionarDireccion" method="post" id="formDireccion" class="direccion-form">
+        @Html.AntiForgeryToken()
+
+        <div class="campo">
+            <label for="provinciaSelect">Provincia</label>
+            <select id="provinciaSelect" name="provinciaId" class="form-select" required>
+                <option value="">-- Selecciona --</option>
+                @foreach (var p in provincias)
+                {
+                    <option value="@p.ProvinciaID">@p.Nombre</option>
+                }
+            </select>
+        </div>
+
+        <div class="campo">
+            <label for="cantonSelect">Cantón</label>
+            <select id="cantonSelect" name="cantonId" class="form-select" required disabled>
+                <option value="">-- Selecciona primero la provincia --</option>
+            </select>
+        </div>
+
+        <div class="campo">
+            <label for="distritoSelect">Distrito</label>
+            <select id="distritoSelect" name="distritoId" class="form-select" required disabled>
+                <option value="">-- Selecciona primero el cantón --</option>
+            </select>
+        </div>
+
+        <div class="campo">
+            <label for="direccionExacta">Dirección exacta (con referencias)</label>
+            <textarea id="direccionExacta" name="direccionExacta" class="form-control" rows="2"
+                      placeholder="Ej: 200m norte de la iglesia, casa portón negro" required></textarea>
+        </div>
+
+        <div class="campo">
+            <label for="nombreContacto">Nombre de contacto</label>
+            <input type="text" id="nombreContacto" name="nombreContacto" class="form-control" required />
+        </div>
+
+        <div class="campo">
+            <label for="whatsapp">WhatsApp</label>
+            <input type="tel" id="whatsapp" name="whatsapp" class="form-control"
+                   placeholder="Ej: 8888-8888" required />
+        </div>
+
+        <button type="submit" class="btn-continuar w-100 mt-2">Continuar</button>
+    </form>
+
+    <div class="wizard-nav">
+        <a asp-action="Paso3Calendario" class="link-volver">
+            <i class="bi bi-arrow-left"></i> Regresar
+        </a>
+    </div>
+
+</div>
+
+@section Scripts {
+    <script>
+        const cantonSelect = document.getElementById('cantonSelect');
+        const distritoSelect = document.getElementById('distritoSelect');
+
+        document.getElementById('provinciaSelect').addEventListener('change', async function() {
+            const provinciaId = this.value;
+
+            cantonSelect.innerHTML = '<option value="">Cargando...</option>';
+            cantonSelect.disabled = true;
+            distritoSelect.innerHTML = '<option value="">-- Selecciona primero el cantón --</option>';
+            distritoSelect.disabled = true;
+
+            if (!provinciaId) {
+                cantonSelect.innerHTML = '<option value="">-- Selecciona primero la provincia --</option>';
+                return;
+            }
+
+            const resp = await fetch(`/SolicitudServicio/GetCantones?provinciaId=${provinciaId}`);
+            const cantones = await resp.json();
+
+            cantonSelect.innerHTML = '<option value="">-- Selecciona --</option>';
+            cantones.forEach(c => {
+                const opt = document.createElement('option');
+                opt.value = c.id;
+                opt.textContent = c.nombre;
+                cantonSelect.appendChild(opt);
+            });
+            cantonSelect.disabled = false;
+        });
+
+        cantonSelect.addEventListener('change', async function() {
+            const cantonId = this.value;
+
+            distritoSelect.innerHTML = '<option value="">Cargando...</option>';
+            distritoSelect.disabled = true;
+
+            if (!cantonId) {
+                distritoSelect.innerHTML = '<option value="">-- Selecciona primero el cantón --</option>';
+                return;
+            }
+
+            const resp = await fetch(`/SolicitudServicio/GetDistritos?cantonId=${cantonId}`);
+            const distritos = await resp.json();
+
+            distritoSelect.innerHTML = '<option value="">-- Selecciona --</option>';
+            distritos.forEach(d => {
+                const opt = document.createElement('option');
+                opt.value = d.id;
+                opt.textContent = d.nombre;
+                distritoSelect.appendChild(opt);
+            });
+            distritoSelect.disabled = false;
+        });
+    </script>
+}

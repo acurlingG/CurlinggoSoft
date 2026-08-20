@@ -1,0 +1,84 @@
+﻿@model List<CurlinggoSoft.Models.SubcategoriaServicio>
+@{
+    ViewData["Title"] = "Solicitar Servicio - Paso 2";
+    var nombreCategoria = ViewBag.NombreCategoria as string;
+    var categoriaId = (int)ViewBag.CategoriaID;
+}
+
+<link rel="stylesheet" href="~/css/wizard-servicio.css" />
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.css" />
+
+<div class="wizard-container">
+
+    <!-- Encabezado tipo app CURLINGgo -->
+    <div class="wizard-header">
+        <span class="brand"><span class="brand-curling">CURLING</span><span class="brand-go">go</span></span>
+    </div>
+
+    <!-- Indicador de pasos (2 de 5) -->
+    <div class="step-indicator">
+        <div class="step done"><span><i class="bi bi-check-lg"></i></span><small>Servicio</small></div>
+        <div class="step-line done"></div>
+        <div class="step active"><span>2</span><small>Detalle</small></div>
+        <div class="step-line"></div>
+        <div class="step"><span>3</span><small>Horario</small></div>
+        <div class="step-line"></div>
+        <div class="step"><span>4</span><small>Dirección</small></div>
+        <div class="step-line"></div>
+        <div class="step"><span>5</span><small>Pago</small></div>
+    </div>
+
+    @if (TempData["Error"] != null)
+    {
+        <div class="alert alert-danger">@TempData["Error"]</div>
+    }
+
+    <h5 class="wizard-question">
+        @nombreCategoria &mdash; ¿qué necesitas exactamente?
+    </h5>
+
+    @if (Model.Any())
+    {
+        <form asp-action="SeleccionarSubcategoria" method="post" id="formSubcategoria">
+            @Html.AntiForgeryToken()
+            <input type="hidden" name="categoriaId" value="@categoriaId" />
+            <input type="hidden" name="subcategoriaId" id="subcategoriaIdInput" value="" />
+
+            <div class="servicio-grid">
+                @foreach (var sub in Model)
+                {
+                    <button type="submit"
+                            class="servicio-card"
+                            data-id="@sub.SubcategoriaID"
+                            onclick="document.getElementById('subcategoriaIdInput').value='@sub.SubcategoriaID';">
+                        <span class="servicio-icono">
+                            <i class="bi bi-check2-square"></i>
+                        </span>
+                        <span class="servicio-nombre">@sub.NombreSubcategoria</span>
+                        @if (!string.IsNullOrWhiteSpace(sub.Descripcion))
+                        {
+                            <span class="servicio-desc">@sub.Descripcion</span>
+                        }
+                    </button>
+                }
+            </div>
+        </form>
+    }
+    else
+    {
+        <p class="text-muted text-center mt-3">
+            Este servicio no tiene subcategorías configuradas todavía.
+        </p>
+        <form asp-action="OmitirSubcategoria" method="post" class="text-center">
+            @Html.AntiForgeryToken()
+            <button type="submit" class="btn-continuar">Continuar de todas formas</button>
+        </form>
+    }
+
+    <div class="wizard-nav">
+        <a asp-action="Paso1Servicio" class="link-volver">
+            <i class="bi bi-arrow-left"></i> Cambiar servicio
+        </a>
+    </div>
+
+</div>

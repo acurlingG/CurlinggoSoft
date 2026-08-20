@@ -1,0 +1,121 @@
+﻿@{
+    ViewData["Title"] = "Solicitar Servicio - Paso 5";
+    var montoBase = (decimal)(ViewBag.MontoBase ?? 0m);
+    var iva = (decimal)(ViewBag.Iva ?? 0m);
+    var montoTotal = (decimal)(ViewBag.MontoTotal ?? 0m);
+}
+
+<link rel="stylesheet" href="~/css/wizard-servicio.css" />
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.css" />
+
+<div class="wizard-container">
+
+    <div class="wizard-header">
+        <span class="brand"><span class="brand-curling">CURLING</span><span class="brand-go">go</span></span>
+    </div>
+
+    <div class="step-indicator">
+        <div class="step done"><span><i class="bi bi-check-lg"></i></span><small>Servicio</small></div>
+        <div class="step-line done"></div>
+        <div class="step done"><span><i class="bi bi-check-lg"></i></span><small>Detalle</small></div>
+        <div class="step-line done"></div>
+        <div class="step done"><span><i class="bi bi-check-lg"></i></span><small>Horario</small></div>
+        <div class="step-line done"></div>
+        <div class="step done"><span><i class="bi bi-check-lg"></i></span><small>Dirección</small></div>
+        <div class="step-line done"></div>
+        <div class="step active"><span>5</span><small>Pago</small></div>
+    </div>
+
+    @if (TempData["Error"] != null)
+    {
+        <div class="alert alert-danger mx-3">@TempData["Error"]</div>
+    }
+
+    <form asp-action="ConfirmarYPagar" method="post" id="formPago">
+        @Html.AntiForgeryToken()
+
+        <div class="resumen-card">
+            <h6 class="resumen-titulo"><i class="bi bi-receipt"></i> Servicio Summary</h6>
+            <div class="resumen-item">
+                <span class="label">Servicio</span>
+                <span class="val">@ViewBag.CategoriaNombre - @ViewBag.ServicioNombre</span>
+            </div>
+            <div class="resumen-item">
+                <span class="label">Time</span>
+                <span class="val">@ViewBag.Fecha (@ViewBag.HoraInicio - @ViewBag.HoraFin)</span>
+            </div>
+            <div class="resumen-item">
+                <span class="label">Ubicación</span>
+                <span class="val">@ViewBag.UbicacionTexto (@ViewBag.DireccionExacta)</span>
+            </div>
+        </div>
+
+        <div class="campo-problema">
+            <label for="descripcionProblema">Descripción del problema <span class="text-danger">*</span></label>
+            <textarea id="descripcionProblema" name="descripcionProblema" class="form-control" rows="3"
+                      placeholder="Escribe brevemente el fallo o detalle del trabajo que necesitas..." required></textarea>
+        </div>
+
+        <div class="resumen-pago">
+            <h6 class="resumen-titulo">Resumen de Pago</h6>
+            <div class="pago-linea">
+                <span>Base</span>
+                <span>₡@montoBase.ToString("N0")</span>
+            </div>
+            <div class="pago-linea">
+                <span>IVA 13%</span>
+                <span>₡@iva.ToString("N0")</span>
+            </div>
+            <div class="pago-linea total">
+                <span>Total</span>
+                <span>₡@montoTotal.ToString("N0")</span>
+            </div>
+        </div>
+
+        <div class="metodos-pago">
+            <label class="metodo-option">
+                <input type="radio" name="metodoPago" value="SINPE" checked id="radioSinpe" />
+                <div class="metodo-box">
+                    <span><i class="bi bi-qr-code"></i> SINPE Móvil</span>
+                </div>
+            </label>
+
+            <div class="sinpe-info" id="sinpeSection">
+                <p class="sinpe-instrucciones">¡SINPE es rápido y fácil! Transfiere al <strong>8888-8888</strong> e ingresa el comprobante.</p>
+                <input type="text" name="comprobante" class="form-control" placeholder="Comprobante" />
+            </div>
+
+            <label class="metodo-option mt-2">
+                <input type="radio" name="metodoPago" value="TARJETA" id="radioTarjeta" />
+                <div class="metodo-box">
+                    <span><i class="bi bi-credit-card"></i> Tarjeta</span>
+                </div>
+            </label>
+        </div>
+
+        <button type="submit" class="btn-continuar w-100 mt-3">Confirmar y Pagar</button>
+    </form>
+
+    <div class="mascota-tip">
+        <img src="~/images/nano-banana.png" alt="Nano" onerror="this.style.display='none'" />
+        <div class="bubble">¡SINPE es rápido y fácil!</div>
+    </div>
+
+    <div class="wizard-nav">
+        <a asp-action="Paso4Direccion" class="link-volver">
+            <i class="bi bi-arrow-left"></i> Regresar
+        </a>
+    </div>
+
+</div>
+
+@section Scripts {
+    <script>
+        const radioSinpe = document.getElementById('radioSinpe');
+        const radioTarjeta = document.getElementById('radioTarjeta');
+        const sinpeSection = document.getElementById('sinpeSection');
+
+        radioSinpe.addEventListener('change', () => sinpeSection.style.display = 'block');
+        radioTarjeta.addEventListener('change', () => sinpeSection.style.display = 'none');
+    </script>
+}

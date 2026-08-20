@@ -1,0 +1,83 @@
+﻿@model List<CurlinggoSoft.Models.CategoriaServicio>
+@{
+    ViewData["Title"] = "Solicitar Servicio - Paso 1";
+    Layout = "_Layout"; // ajusta si tu layout tiene otro nombre
+
+    // Mapa simple de ícono (Bootstrap Icons) según el nombre de la categoría.
+    // Si agregas categorías nuevas, solo añade una entrada aquí; si no hay match,
+    // se usa un ícono genérico (bi-tools).
+    Func<string, string> IconoPara = (nombre) =>
+    {
+        var n = nombre.ToLower();
+        if (n.Contains("computo") || n.Contains("cómputo") || n.Contains("redes")) return "bi-laptop";
+        if (n.Contains("fontan")) return "bi-droplet-fill";
+        if (n.Contains("electricidad")) return "bi-lightning-charge-fill";
+        if (n.Contains("energ")) return "bi-plug-fill";
+        if (n.Contains("electrodom")) return "bi-basket3-fill";
+        if (n.Contains("handyman") || n.Contains("mantenimiento general")) return "bi-tools";
+        return "bi-wrench-adjustable";
+    };
+}
+
+<link rel="stylesheet" href="~/css/wizard-servicio.css" />
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.css" />
+
+<div class="wizard-container">
+
+    <!-- Encabezado tipo app CURLINGgo -->
+    <div class="wizard-header">
+        <span class="brand"><span class="brand-curling">CURLING</span><span class="brand-go">go</span></span>
+    </div>
+
+    <!-- Indicador de pasos (1 de 5) -->
+    <div class="step-indicator">
+        <div class="step active"><span>1</span><small>Servicio</small></div>
+        <div class="step-line"></div>
+        <div class="step"><span>2</span><small>Detalle</small></div>
+        <div class="step-line"></div>
+        <div class="step"><span>3</span><small>Horario</small></div>
+        <div class="step-line"></div>
+        <div class="step"><span>4</span><small>Dirección</small></div>
+        <div class="step-line"></div>
+        <div class="step"><span>5</span><small>Pago</small></div>
+    </div>
+
+    @if (TempData["Error"] != null)
+    {
+        <div class="alert alert-danger">@TempData["Error"]</div>
+    }
+
+    <h5 class="wizard-question">¿Qué servicio necesitas hoy?</h5>
+
+    <form asp-action="SeleccionarServicio" method="post" id="formServicio">
+        @Html.AntiForgeryToken()
+        <input type="hidden" name="categoriaId" id="categoriaIdInput" value="" />
+
+        <div class="servicio-grid">
+            @foreach (var categoria in Model)
+            {
+                <button type="submit"
+                        class="servicio-card"
+                        data-id="@categoria.CategoriaID"
+                        onclick="document.getElementById('categoriaIdInput').value='@categoria.CategoriaID';">
+                    <span class="servicio-icono">
+                        <i class="bi @IconoPara(categoria.NombreCategoria)"></i>
+                    </span>
+                    <span class="servicio-nombre">@categoria.NombreCategoria</span>
+                </button>
+            }
+        </div>
+    </form>
+
+    @if (!Model.Any())
+    {
+        <p class="text-muted text-center mt-4">No hay servicios activos en este momento.</p>
+    }
+
+    <!-- Mascota / guía (opcional, reemplaza la ruta por tu asset del banano) -->
+    <div class="mascota-tip">
+        <img src="~/images/nano-banana.png" alt="Nano" onerror="this.style.display='none'" />
+        <div class="bubble">¡Elegí tu categoría, Nano te guía!</div>
+    </div>
+
+</div>

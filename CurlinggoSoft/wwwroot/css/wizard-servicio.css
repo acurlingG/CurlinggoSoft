@@ -1,0 +1,581 @@
+﻿:root {
+    --curling-navy: #0d2b4e;
+    --curling-blue: #1565c0;
+    --curling-blue-light: #e8f1fc;
+    --curling-border: #d7e0ea;
+    --curling-text: #1b2733;
+}
+
+.wizard-container {
+    max-width: 480px;
+    margin: 0 auto;
+    padding: 0 0 40px 0;
+    font-family: "Segoe UI", Roboto, Arial, sans-serif;
+    color: var(--curling-text);
+}
+
+/* Encabezado */
+.wizard-header {
+    background: var(--curling-navy);
+    padding: 18px 20px;
+    border-radius: 0 0 10px 10px;
+    margin-bottom: 18px;
+}
+
+.brand {
+    color: #fff;
+    font-weight: 700;
+    font-size: 1.15rem;
+    letter-spacing: 0.5px;
+}
+
+.brand-go {
+    color: #4fa3ff;
+}
+
+/* Indicador de pasos */
+.step-indicator {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    margin: 0 auto 24px auto;
+    padding: 0 12px;
+}
+
+.step {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    min-width: 34px;
+}
+
+    .step span {
+        width: 26px;
+        height: 26px;
+        border-radius: 50%;
+        background: #eef1f5;
+        color: #9aa5b1;
+        font-size: 0.8rem;
+        font-weight: 600;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        margin-bottom: 4px;
+    }
+
+    .step small {
+        font-size: 0.62rem;
+        color: #9aa5b1;
+        white-space: nowrap;
+    }
+
+    .step.active span {
+        background: var(--curling-blue);
+        color: #fff;
+    }
+
+    .step.active small {
+        color: var(--curling-blue);
+        font-weight: 600;
+    }
+
+.step-line {
+    flex: 1;
+    height: 2px;
+    background: #eef1f5;
+    margin-bottom: 16px;
+}
+
+.step.done span {
+    background: var(--curling-blue);
+    color: #fff;
+}
+
+.step.done small {
+    color: var(--curling-blue);
+}
+
+.step-line.done {
+    background: var(--curling-blue);
+}
+
+/* Título de la pregunta */
+.wizard-question {
+    text-align: center;
+    font-weight: 600;
+    margin-bottom: 18px;
+    padding: 0 20px;
+}
+
+/* Grid de tarjetas (Pasos 1 y 2) */
+.servicio-grid {
+    display: grid;
+    grid-template-columns: repeat(2, 1fr);
+    gap: 14px;
+    padding: 0 20px;
+}
+
+.servicio-card {
+    background: #fff;
+    border: 1.5px solid var(--curling-border);
+    border-radius: 12px;
+    padding: 18px 10px;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 10px;
+    cursor: pointer;
+    transition: border-color 0.15s ease, background 0.15s ease, transform 0.1s ease;
+}
+
+    .servicio-card:hover {
+        border-color: var(--curling-blue);
+        background: var(--curling-blue-light);
+        transform: translateY(-2px);
+    }
+
+    .servicio-card:active {
+        transform: translateY(0);
+    }
+
+.servicio-icono {
+    width: 52px;
+    height: 52px;
+    border-radius: 50%;
+    background: var(--curling-blue-light);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 1.5rem;
+    color: var(--curling-blue);
+}
+
+.servicio-nombre {
+    font-size: 0.85rem;
+    font-weight: 600;
+    text-align: center;
+    color: var(--curling-text);
+}
+
+.servicio-desc {
+    font-size: 0.7rem;
+    color: #6b7683;
+    text-align: center;
+    line-height: 1.2;
+}
+
+/* Mascota / tip compartida */
+.mascota-tip {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    margin: 28px 20px 0 20px;
+}
+
+    .mascota-tip img {
+        width: 56px;
+        height: auto;
+    }
+
+    .mascota-tip .bubble {
+        background: var(--curling-blue-light);
+        border: 1px solid var(--curling-border);
+        border-radius: 14px;
+        padding: 10px 14px;
+        font-size: 0.8rem;
+        color: var(--curling-text);
+    }
+
+/* Botón general */
+.btn-continuar {
+    background: var(--curling-blue);
+    color: #fff;
+    border: none;
+    border-radius: 8px;
+    padding: 12px 22px;
+    font-weight: 600;
+    font-size: 0.88rem;
+    margin-top: 10px;
+    cursor: pointer;
+}
+
+    .btn-continuar:hover {
+        background: #104e93;
+    }
+
+/* Navegación inferior */
+.wizard-nav {
+    text-align: center;
+    margin-top: 26px;
+    padding: 0 20px;
+}
+
+.link-volver {
+    font-size: 0.82rem;
+    color: #6b7683;
+    text-decoration: none;
+}
+
+    .link-volver:hover {
+        color: var(--curling-blue);
+        text-decoration: underline;
+    }
+
+/* Paso 3: Fecha y Franjas */
+.fecha-box {
+    padding: 0 20px;
+    margin-bottom: 22px;
+}
+
+.fecha-label {
+    display: block;
+    font-size: 0.8rem;
+    font-weight: 600;
+    color: var(--curling-text);
+    margin-bottom: 8px;
+}
+
+.fecha-input {
+    width: 100%;
+    padding: 12px 14px;
+    border: 1.5px solid var(--curling-border);
+    border-radius: 10px;
+    font-size: 0.9rem;
+    color: var(--curling-text);
+}
+
+    .fecha-input:focus {
+        outline: none;
+        border-color: var(--curling-blue);
+    }
+
+.franjas-label {
+    font-size: 0.8rem;
+    font-weight: 600;
+    color: var(--curling-text);
+    padding: 0 20px;
+    margin-bottom: 10px;
+}
+
+.franjas-grid {
+    display: grid;
+    grid-template-columns: repeat(2, 1fr);
+    gap: 12px;
+    padding: 0 20px;
+}
+
+.franja-card {
+    background: #fff;
+    border: 1.5px solid var(--curling-border);
+    border-radius: 10px;
+    padding: 14px 8px;
+    font-size: 0.82rem;
+    font-weight: 600;
+    color: var(--curling-text);
+    text-align: center;
+    cursor: pointer;
+    transition: border-color 0.15s ease, background 0.15s ease;
+}
+
+    .franja-card:hover {
+        border-color: var(--curling-blue);
+        background: var(--curling-blue-light);
+    }
+
+    .franja-card:active {
+        background: var(--curling-blue);
+        color: #fff;
+    }
+
+/* Paso 4: Dirección */
+.direccion-form {
+    padding: 0 20px;
+}
+
+    .direccion-form .campo {
+        margin-bottom: 16px;
+    }
+
+    .direccion-form label {
+        display: block;
+        font-size: 0.8rem;
+        font-weight: 600;
+        color: var(--curling-text);
+        margin-bottom: 6px;
+    }
+
+    .direccion-form .form-select,
+    .direccion-form .form-control {
+        width: 100%;
+        padding: 11px 12px;
+        border: 1.5px solid var(--curling-border);
+        border-radius: 10px;
+        font-size: 0.88rem;
+        color: var(--curling-text);
+        background: #fff;
+    }
+
+        .direccion-form .form-select:focus,
+        .direccion-form .form-control:focus {
+            outline: none;
+            border-color: var(--curling-blue);
+        }
+
+        .direccion-form .form-select:disabled {
+            background: #f4f6f8;
+            color: #9aa5b1;
+        }
+
+/* Paso 5: Resumen y Pago */
+.resumen-card, .resumen-pago {
+    background: #fff;
+    border: 1.5px solid var(--curling-border);
+    border-radius: 12px;
+    padding: 16px;
+    margin: 0 20px 16px 20px;
+}
+
+.resumen-titulo {
+    font-size: 0.9rem;
+    font-weight: 700;
+    color: var(--curling-navy);
+    margin-bottom: 12px;
+    border-bottom: 1px solid var(--curling-border);
+    padding-bottom: 6px;
+}
+
+.resumen-item {
+    display: flex;
+    flex-direction: column;
+    margin-bottom: 8px;
+}
+
+    .resumen-item .label {
+        font-size: 0.72rem;
+        color: #6b7683;
+        font-weight: 600;
+    }
+
+    .resumen-item .val {
+        font-size: 0.85rem;
+        color: var(--curling-text);
+        font-weight: 500;
+    }
+
+.campo-problema {
+    padding: 0 20px;
+    margin-bottom: 16px;
+}
+
+    .campo-problema label {
+        font-size: 0.8rem;
+        font-weight: 600;
+        color: var(--curling-text);
+        margin-bottom: 6px;
+        display: block;
+    }
+
+    .campo-problema .form-control {
+        width: 100%;
+        padding: 11px 12px;
+        border: 1.5px solid var(--curling-border);
+        border-radius: 10px;
+        font-size: 0.88rem;
+        color: var(--curling-text);
+        background: #fff;
+    }
+
+        .campo-problema .form-control:focus {
+            outline: none;
+            border-color: var(--curling-blue);
+        }
+
+.pago-linea {
+    display: flex;
+    justify-content: space-between;
+    font-size: 0.85rem;
+    margin-bottom: 6px;
+    color: #505a64;
+}
+
+    .pago-linea.total {
+        font-weight: 700;
+        font-size: 1rem;
+        color: var(--curling-navy);
+        border-top: 1px dashed var(--curling-border);
+        padding-top: 8px;
+        margin-top: 8px;
+    }
+
+.metodos-pago {
+    padding: 0 20px;
+    margin-bottom: 16px;
+}
+
+.metodo-option {
+    display: block;
+    cursor: pointer;
+}
+
+    .metodo-option input {
+        display: none;
+    }
+
+.metodo-box {
+    background: #fff;
+    border: 1.5px solid var(--curling-border);
+    border-radius: 10px;
+    padding: 12px 14px;
+    font-size: 0.88rem;
+    font-weight: 600;
+    transition: all 0.2s ease;
+}
+
+.metodo-option input:checked + .metodo-box {
+    border-color: var(--curling-blue);
+    background: var(--curling-blue-light);
+    color: var(--curling-blue);
+}
+
+.sinpe-info {
+    background: #f8fafc;
+    border: 1px solid var(--curling-border);
+    border-radius: 8px;
+    padding: 12px;
+    margin-top: 8px;
+}
+
+.sinpe-instrucciones {
+    font-size: 0.78rem;
+    color: #4a5568;
+    margin-bottom: 8px;
+}
+
+.sinpe-info .form-control {
+    width: 100%;
+    padding: 8px 12px;
+    border: 1.5px solid var(--curling-border);
+    border-radius: 8px;
+    font-size: 0.85rem;
+}
+
+/* Paso 6: Confirmación Exitosa */
+.confirmacion-wrapper {
+    padding: 20px 30px;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+}
+
+.confirmacion-titulo {
+    font-size: 1.5rem;
+    font-weight: 700;
+    color: var(--curling-navy);
+    margin-bottom: 4px;
+}
+
+.orden-numero {
+    font-size: 0.95rem;
+    color: #6b7683;
+    font-weight: 500;
+    margin-bottom: 24px;
+}
+
+.status-box {
+    margin-bottom: 20px;
+    text-align: center;
+}
+
+.status-label {
+    display: block;
+    font-size: 0.85rem;
+    color: var(--curling-text);
+    font-weight: 600;
+    margin-bottom: 4px;
+}
+
+.status-texto {
+    font-size: 1.25rem;
+    font-weight: 700;
+    color: var(--curling-blue);
+}
+
+.mascota-confirmacion {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 12px;
+}
+
+    .mascota-confirmacion img {
+        width: 80px;
+        height: auto;
+    }
+
+.bubble-confirmacion {
+    background: var(--curling-blue-light);
+    border: 1.5px solid var(--curling-border);
+    border-radius: 14px;
+    padding: 12px 18px;
+    font-size: 0.85rem;
+    color: var(--curling-text);
+    font-weight: 600;
+    text-align: center;
+    position: relative;
+}
+
+.tracking-box {
+    width: 100%;
+}
+
+.tracking-label {
+    display: block;
+    font-size: 0.85rem;
+    font-weight: 600;
+    color: var(--curling-text);
+    margin-bottom: 8px;
+    text-align: left;
+}
+
+.tracking-bar {
+    height: 12px;
+    border-radius: 10px;
+    background-color: #eef1f5;
+    border: 1px solid var(--curling-border);
+}
+
+    .tracking-bar .progress-bar {
+        border-radius: 10px;
+        background-color: var(--curling-blue) !important;
+    }
+
+/* Responsivo */
+.w-100 {
+    width: 100%;
+}
+
+.mt-2 {
+    margin-top: 8px;
+}
+
+.mt-3 {
+    margin-top: 16px;
+}
+
+.mt-4 {
+    margin-top: 24px;
+}
+
+.mt-5 {
+    margin-top: 32px;
+}
+
+@media (min-width: 500px) {
+    .servicio-grid {
+        grid-template-columns: repeat(3, 1fr);
+    }
+
+    .franjas-grid {
+        grid-template-columns: repeat(3, 1fr);
+    }
+}

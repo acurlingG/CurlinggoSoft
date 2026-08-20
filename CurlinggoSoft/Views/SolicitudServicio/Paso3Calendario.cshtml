@@ -1,0 +1,74 @@
+﻿@model object
+@using CurlinggoSoft.Controllers
+@{
+    ViewData["Title"] = "Solicitar Servicio - Paso 3";
+    var franjas = ViewBag.Franjas as List<FranjaHoraria> ?? new List<FranjaHoraria>();
+    var hoy = DateTime.Today.ToString("yyyy-MM-dd");
+}
+
+<link rel="stylesheet" href="~/css/wizard-servicio.css" />
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.css" />
+
+<div class="wizard-container">
+
+    <!-- Encabezado tipo app CURLINGgo -->
+    <div class="wizard-header">
+        <span class="brand"><span class="brand-curling">CURLING</span><span class="brand-go">go</span></span>
+    </div>
+
+    <!-- Indicador de pasos (3 de 5) -->
+    <div class="step-indicator">
+        <div class="step done"><span><i class="bi bi-check-lg"></i></span><small>Servicio</small></div>
+        <div class="step-line done"></div>
+        <div class="step done"><span><i class="bi bi-check-lg"></i></span><small>Detalle</small></div>
+        <div class="step-line done"></div>
+        <div class="step active"><span>3</span><small>Horario</small></div>
+        <div class="step-line"></div>
+        <div class="step"><span>4</span><small>Dirección</small></div>
+        <div class="step-line"></div>
+        <div class="step"><span>5</span><small>Pago</small></div>
+    </div>
+
+    @if (TempData["Error"] != null)
+    {
+        <div class="alert alert-danger">@TempData["Error"]</div>
+    }
+
+    <h5 class="wizard-question">¿Cuándo necesitas el servicio?</h5>
+
+    <form asp-action="SeleccionarHorario" method="post" id="formHorario">
+        @Html.AntiForgeryToken()
+        <input type="hidden" name="horaInicio" id="horaInicioInput" value="" />
+        <input type="hidden" name="horaFin" id="horaFinInput" value="" />
+
+        <!-- Fecha -->
+        <div class="fecha-box">
+            <label for="fechaInput" class="fecha-label">
+                <i class="bi bi-calendar3"></i> Fecha del servicio
+            </label>
+            <input type="date" id="fechaInput" name="fecha" class="fecha-input" min="@hoy" value="@hoy" required />
+        </div>
+
+        <!-- Franjas horarias -->
+        <div class="franjas-label">Horario preferido</div>
+        <div class="franjas-grid" id="franjasGrid">
+            @foreach (var franja in franjas)
+            {
+                <button type="submit"
+                        class="franja-card"
+                        data-inicio="@franja.HoraInicio"
+                        data-fin="@franja.HoraFin"
+                        onclick="document.getElementById('horaInicioInput').value='@franja.HoraInicio'; document.getElementById('horaFinInput').value='@franja.HoraFin';">
+                    @franja.Etiqueta
+                </button>
+            }
+        </div>
+    </form>
+
+    <div class="wizard-nav">
+        <a asp-action="Paso2Subcategoria" class="link-volver">
+            <i class="bi bi-arrow-left"></i> Regresar
+        </a>
+    </div>
+
+</div>
