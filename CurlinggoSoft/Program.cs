@@ -14,6 +14,9 @@ builder.Services.AddDbContext<ApplicationDbContext>(options =>
 
 
 
+// Registrar el motor de asignación
+builder.Services.AddScoped<CurlinggoSoft.Services.IDispatchEngineService, CurlinggoSoft.Services.DispatchEngineService>();
+
 // Configuración de ASP.NET Core Identity con roles
 builder.Services.AddIdentity<IdentityUser, IdentityRole>(options =>
 {
@@ -91,5 +94,6 @@ using (var scope = app.Services.CreateScope())
     await DbInitializer.SeedRolesAsync(scope.ServiceProvider);
     await DbInitializer.SeedAdminUserAsync(scope.ServiceProvider);
 }
+
 
 app.Run();

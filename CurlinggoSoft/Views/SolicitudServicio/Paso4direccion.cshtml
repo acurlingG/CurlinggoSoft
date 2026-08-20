@@ -90,6 +90,9 @@
 
 </div>
 
+<input type="hidden" id="LatitudServicio" name="latitud" />
+<input type="hidden" id="LongitudServicio" name="longitud" />
+
 @section Scripts {
     <script>
         const cantonSelect = document.getElementById('cantonSelect');
@@ -145,4 +148,23 @@
             distritoSelect.disabled = false;
         });
     </script>
+
+    <script>
+        document.addEventListener("DOMContentLoaded", function() {
+            if (navigator.geolocation) {
+                navigator.geolocation.getCurrentPosition(
+                    function(position) {
+                        document.getElementById("LatitudServicio").value = position.coords.latitude;
+                        document.getElementById("LongitudServicio").value = position.coords.longitude;
+                    },
+                    function(error) {
+                        console.warn("El usuario denegó la geolocalización o no está disponible:", error.message);
+                        // Opcional: podrías dejarlo en blanco para que el sistema use el respaldo por distrito
+                    },
+                    { enableHighAccuracy: true, timeout: 10000, maximumAge: 0 }
+                );
+            }
+        });
+    </script>
+
 }

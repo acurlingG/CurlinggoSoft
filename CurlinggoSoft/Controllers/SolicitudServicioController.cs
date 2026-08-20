@@ -1,5 +1,7 @@
 ﻿using CurlinggoSoft.Models;
+using CurlinggoSoft.Services;
 using Microsoft.AspNetCore.Authorization;
+using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 
@@ -9,7 +11,18 @@ namespace CurlinggoSoft.Controllers
     public class SolicitudServicioController : Controller
     {
         private readonly ApplicationDbContext _context;
-        public SolicitudServicioController(ApplicationDbContext context) => _context = context;
+        private readonly IDispatchEngineService _dispatchEngine;
+        private readonly UserManager<IdentityUser> _userManager;
+
+        // Inyectamos el contexto, el motor de asignación y UserManager (para leer
+        // Email/UserName del usuario logueado y poder crear su fila en dbo.Usuarios).
+        public SolicitudServicioController(ApplicationDbContext context, IDispatchEngineService dispatchEngine,
+            UserManager<IdentityUser> userManager)
+        {
+            _context = context;
+            _dispatchEngine = dispatchEngine;
+            _userManager = userManager;
+        }
 
         // GET: /SolicitudServicio/Paso1Servicio
         [HttpGet]
@@ -185,7 +198,7 @@ namespace CurlinggoSoft.Controllers
         [HttpPost]
         [ValidateAntiForgeryToken]
         public IActionResult SeleccionarDireccion(int provinciaId, int cantonId, int distritoId,
-            string direccionExacta, string nombreContacto, string whatsapp)
+             string direccionExacta, string nombreContacto, string whatsapp, decimal? latitud, decimal? longitud)
         {
             if (provinciaId <= 0 || cantonId <= 0 || distritoId <= 0)
             {
@@ -207,6 +220,18 @@ namespace CurlinggoSoft.Controllers
             HttpContext.Session.SetString("DireccionExacta", direccionExacta.Trim());
             HttpContext.Session.SetString("NombreContacto", nombreContacto.Trim());
             HttpContext.Session.SetString("WhatsApp", whatsapp.Trim());
+
+            // Guardar latitud y longitud en sesión (si el navegador las proveyó)
+            if (latitud.HasValue && longitud.HasValue)
+            {
+                HttpContext.Session.SetString("LatitudServicio", latitud.Value.ToString(System.Globalization.CultureInfo.InvariantCulture));
+                HttpContext.Session.SetString("LongitudServicio", longitud.Value.ToString(System.Globalization.CultureInfo.InvariantCulture));
+            }
+            else
+            {
+                HttpContext.Session.Remove("LatitudServicio");
+                HttpContext.Session.Remove("LongitudServicio");
+            }
 
             return RedirectToAction("Paso5Resumen", "SolicitudServicio");
         }
@@ -300,7 +325,8 @@ namespace CurlinggoSoft.Controllers
             using var transaction = await _context.Database.BeginTransactionAsync();
             try
             {
-                // Entidad ClientePerfil en singular
+                await AsegurarUsuarioAsync(clienteId);
+
                 var perfilCliente = await _context.ClientesPerfil.FindAsync(clienteId);
                 if (perfilCliente == null)
                 {
@@ -317,30 +343,66 @@ namespace CurlinggoSoft.Controllers
                     await _context.SaveChangesAsync();
                 }
 
-                // Entidad DireccionCliente en singular
-                var nuevaDireccion = new DireccionCliente
+                const string nombreDireccionServicio = "Dirección de Servicio";
+
+                var nuevaDireccion = await _context.DireccionesCliente
+                    .FirstOrDefaultAsync(d => d.ClienteID == clienteId &&
+                                               d.NombreDireccion == nombreDireccionServicio);
+
+                if (nuevaDireccion == null)
                 {
-                    ClienteID = clienteId,
-                    NombreDireccion = "Dirección de Servicio",
-                    ProvinciaID = provinciaId.Value,
-                    CantonID = cantonId.Value,
-                    DistritoID = distritoId.Value,
-                    DireccionExacta = direccionExacta ?? "",
-                    EsPrincipal = false,
-                    Activa = true,
-                    FechaCreacion = DateTime.Now
-                };
-                _context.DireccionesCliente.Add(nuevaDireccion);
+                    nuevaDireccion = new DireccionCliente
+                    {
+                        ClienteID = clienteId,
+                        NombreDireccion = nombreDireccionServicio,
+                        ProvinciaID = provinciaId.Value,
+                        CantonID = cantonId.Value,
+                        DistritoID = distritoId.Value,
+                        DireccionExacta = direccionExacta ?? "",
+                        EsPrincipal = false,
+                        Activa = true,
+                        FechaCreacion = DateTime.Now
+                    };
+                    _context.DireccionesCliente.Add(nuevaDireccion);
+                }
+                else
+                {
+                    nuevaDireccion.ProvinciaID = provinciaId.Value;
+                    nuevaDireccion.CantonID = cantonId.Value;
+                    nuevaDireccion.DistritoID = distritoId.Value;
+                    nuevaDireccion.DireccionExacta = direccionExacta ?? "";
+                    nuevaDireccion.Activa = true;
+                }
+
                 await _context.SaveChangesAsync();
 
                 var estadoSolicitada = await _context.EstadosReserva.FirstOrDefaultAsync(e => e.Codigo == "SOLICITADA");
                 var servicio = await _context.Servicios.FindAsync(servicioId.Value);
 
+                if (estadoSolicitada == null)
+                {
+                    throw new InvalidOperationException(
+                        "No existe un EstadoReserva con Codigo='SOLICITADA'. Revisa el seed de dbo.EstadosReserva.");
+                }
+                if (servicio == null)
+                {
+                    throw new InvalidOperationException(
+                        $"El ServicioID={servicioId.Value} de la sesión ya no existe o está inactivo.");
+                }
+
                 var fechaStr = HttpContext.Session.GetString("FechaProgramada");
                 var horaInicioStr = HttpContext.Session.GetString("HoraInicio");
                 DateTime fechaHoraProgramada = DateTime.Parse($"{fechaStr} {horaInicioStr}");
 
-                // Entidad SolicitudReserva en singular
+                decimal? latServicio = null;
+                decimal? lonServicio = null;
+
+                if (decimal.TryParse(HttpContext.Session.GetString("LatitudServicio"), System.Globalization.NumberStyles.Any, System.Globalization.CultureInfo.InvariantCulture, out var latVal))
+                    latServicio = latVal;
+
+                if (decimal.TryParse(HttpContext.Session.GetString("LongitudServicio"), System.Globalization.NumberStyles.Any, System.Globalization.CultureInfo.InvariantCulture, out var lonVal))
+                    lonServicio = lonVal;
+
                 var reserva = new SolicitudReserva
                 {
                     CodigoSeguimiento = Guid.NewGuid(),
@@ -351,6 +413,8 @@ namespace CurlinggoSoft.Controllers
                     ProvinciaID = provinciaId,
                     CantonID = cantonId,
                     DistritoID = distritoId,
+                    LatitudServicio = latServicio,
+                    LongitudServicio = lonServicio,
                     MontoBaseCotizado = servicio.TarifaDiagnosticoBase,
                     MontoAjustes = 0,
                     MontoTotalCotizado = servicio.TarifaDiagnosticoBase * 1.13m,
@@ -373,14 +437,45 @@ namespace CurlinggoSoft.Controllers
                 HttpContext.Session.Remove("HoraInicio");
                 HttpContext.Session.Remove("HoraFin");
 
+                try
+                {
+                    await _dispatchEngine.GenerarOfertasLoteInicialAsync(reserva.ReservaID, tamanoLote: 3);
+                }
+                catch (Exception dispatchEx)
+                {
+                    System.Diagnostics.Debug.WriteLine(
+                        $"[DispatchEngine] Falló la asignación inicial para ReservaID={reserva.ReservaID}: {dispatchEx}");
+                }
+
                 return RedirectToAction("Paso6ConfirmacionExitosa", new { id = reserva.ReservaID });
             }
             catch (Exception ex)
             {
                 await transaction.RollbackAsync();
-                TempData["Error"] = "Ocurrió un error al procesar la reserva: " + ex.Message;
+                var mensajeReal = ex.InnerException?.Message ?? ex.Message;
+                TempData["Error"] = "Ocurrió un error al procesar la reserva: " + mensajeReal;
                 return RedirectToAction("Paso5Resumen");
             }
+        }
+
+        private async Task AsegurarUsuarioAsync(string usuarioId)
+        {
+            var yaExiste = await _context.Usuarios.FindAsync(usuarioId);
+            if (yaExiste != null) return;
+
+            var identityUser = await _userManager.FindByIdAsync(usuarioId);
+            var email = identityUser?.Email ?? identityUser?.UserName ?? $"{usuarioId}@curlinggo.local";
+
+            _context.Usuarios.Add(new Usuario
+            {
+                UsuarioID = usuarioId,
+                Email = email,
+                Nombre = identityUser?.UserName ?? "Cliente",
+                Apellidos = "",
+                EstadoUsuario = "ACTIVO",
+                FechaCreacion = DateTime.Now
+            });
+            await _context.SaveChangesAsync();
         }
 
         // GET: /SolicitudServicio/Paso6ConfirmacionExitosa/5
@@ -389,7 +484,7 @@ namespace CurlinggoSoft.Controllers
         {
             if (!User.Identity.IsAuthenticated)
             {
-                return RedirectToAction("Login", "Account");
+                return RedirectToAction("Login", "Account", new { returnUrl = Url.Action("Paso6ConfirmacionExitosa", "SolicitudServicio", new { id }) });
             }
 
             var clienteId = User.FindFirst(System.Security.Claims.ClaimTypes.NameIdentifier)?.Value;

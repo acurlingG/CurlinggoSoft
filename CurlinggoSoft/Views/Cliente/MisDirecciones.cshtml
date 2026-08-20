@@ -1,0 +1,31 @@
+﻿@model IEnumerable<CurlinggoSoft.Models.DireccionCliente>
+
+@{
+    ViewData["Title"] = "Mis Direcciones";
+}
+
+<div class="container my-4">
+    <h2 class="fw-bold mb-3"><i class="fa fa-map-marker"></i> Mis Direcciones Guardadas</h2>
+
+    @if (!Model.Any())
+    {
+        <div class="alert alert-warning">No tienes direcciones registradas todavía. Se guardarán automáticamente cuando solicites un servicio.</div>
+    }
+    else
+    {
+        <div class="row">
+            @foreach (var dir in Model)
+            {
+                <div class="col-md-4 mb-3">
+                    <div class="card shadow-sm h-100">
+                        <div class="card-body">
+                            <h5 class="card-title fw-bold">@dir.NombreDireccion</h5>
+                            <p class="card-text text-muted small mb-1"><strong>Provincia/Cantón/Distrito:</strong> ID: @dir.ProvinciaID / @dir.CantonID / @dir.DistritoID</p>
+                            <p class="card-text">@dir.DireccionExacta</p>
+                        </div>
+                    </div>
+                </div>
+            }
+        </div>
+    }
+</div>

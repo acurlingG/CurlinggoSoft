@@ -1,0 +1,46 @@
+﻿@model IEnumerable<CurlinggoSoft.Models.OfertaTecnico>
+
+@{
+    ViewData["Title"] = "Ofertas Disponibles";
+}
+
+<div class="container my-4">
+    <h2 class="fw-bold mb-3"><i class="fa fa-list"></i> Solicitudes y Ofertas Cercanas</h2>
+    <p class="text-muted mb-4">Estas son las solicitudes de servicio en tu zona de cobertura esperando respuesta.</p>
+
+    @if (!Model.Any())
+    {
+        <div class="alert alert-info">No hay ofertas pendientes en este momento. Vuelve a revisar más tarde.</div>
+    }
+    else
+    {
+        <div class="table-responsive">
+            <table class="table table-hover align-middle">
+                <thead class="table-dark">
+                    <tr>
+                        <th>Servicio</th>
+                        <th>Descripción del Problema</th>
+                        <th>Distancia Aprox.</th>
+                        <th>Expira en</th>
+                        <th>Acción</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    @foreach (var oferta in Model)
+                    {
+                        <tr>
+                            <td><strong>@(oferta.Reserva?.Servicio?.NombreServicio ?? "Servicio Técnico")</strong></td>
+                            <td>@oferta.Reserva?.DescripcionProblema</td>
+                            <td>@(oferta.DistanciaMetros.HasValue ? $"{oferta.DistanciaMetros.Value / 1000:N1} km" : "Zona asignada")</td>
+                            <td>@(oferta.FechaExpiracion?.ToString("HH:mm:ss") ?? "Sin límite")</td>
+                            <td>
+                                <!-- Aquí puedes conectar con tu SP usp_OfertaTecnico_Aceptar si creas un botón de acción -->
+                                <span class="badge bg-success">Disponible</span>
+                            </td>
+                        </tr>
+                    }
+                </tbody>
+            </table>
+        </div>
+    }
+</div>

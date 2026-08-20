@@ -1,9 +1,9 @@
-@* Menú principal de administración - usado en _AdminLayout (Admin) y como sección extra en _Layout (Cliente/Tecnico) *@
+@* Menú principal - usado en _AdminLayout (Admin) y como sección extra en _Layout (Cliente/Tecnico) *@
 <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/4.7.0/css/font-awesome.min.css">
 
 <div class="navbar-custom mb-3">
     <div class="navbar-custom-left">
-        <!-- Home / Inicio -->
+        <!-- Home / Inicio común -->
         <a asp-controller="Home" asp-action="Index"><i class="fa fa-home"></i> Inicio</a>
 
         @if (User.IsInRole("Admin"))
@@ -108,18 +108,18 @@
 
         @if (User.IsInRole("Cliente"))
         {
-            <a asp-controller="Home" asp-action="Index"><i class="fa fa-dashboard"></i> Dashboard</a>
-            <a asp-controller="SolicitudesReserva" asp-action="Create"><i class="fa fa-plus-circle"></i> Solicitar Servicio</a>
-            <a asp-controller="SolicitudesReserva" asp-action="Index"><i class="fa fa-calendar"></i> Mis Reservas</a>
+            <a asp-controller="Cliente" asp-action="Index"><i class="fa fa-dashboard"></i> Mi Dashboard</a>
+            <a asp-controller="SolicitudServicio" asp-action="Paso1Servicio"><i class="fa fa-plus-circle"></i> Solicitar Servicio</a>
+            <a asp-controller="Cliente" asp-action="MisReservas"><i class="fa fa-calendar"></i> Mis Reservas</a>
+            <a asp-controller="Cliente" asp-action="MisDirecciones"><i class="fa fa-map-marker"></i> Mis Direcciones</a>
             <a asp-controller="Servicios" asp-action="Index"><i class="fa fa-wrench"></i> Catálogo de Servicios</a>
         }
 
         @if (User.IsInRole("Tecnico"))
         {
-            <a asp-controller="Home" asp-action="Index"><i class="fa fa-dashboard"></i> Dashboard</a>
-            <a asp-controller="OfertasTecnico" asp-action="Index"><i class="fa fa-list"></i> Solicitudes Disponibles</a>
-            <a asp-controller="SolicitudesReserva" asp-action="Index"><i class="fa fa-briefcase"></i> Trabajos Asignados</a>
-            <a asp-controller="DisponibilidadTecnico" asp-action="Index"><i class="fa fa-clock-o"></i> Disponibilidad</a>
+            <a asp-controller="Tecnico" asp-action="Index"><i class="fa fa-dashboard"></i> Mi Panel</a>
+            <a asp-controller="Tecnico" asp-action="OfertasDisponibles"><i class="fa fa-list"></i> Ofertas de Servicio</a>
+            <a asp-controller="DisponibilidadTecnico" asp-action="Index"><i class="fa fa-clock-o"></i> Mi Disponibilidad</a>
         }
     </div>
 

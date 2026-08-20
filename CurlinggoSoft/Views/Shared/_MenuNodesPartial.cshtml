@@ -1,0 +1,33 @@
+﻿@model List<CurlinggoSoft.Models.MenuNodeVM>
+@*
+    Se llama a sí mismo para cada nivel de hijos, así que soporta cualquier
+    profundidad de submenús aunque hoy solo uses 2 niveles (grupo > item).
+*@
+@foreach (var nodo in Model)
+{
+    if (nodo.Hijos.Any())
+    {
+        <div class="dropdown-custom">
+            <button class="dropbtn" onclick="toggleMenu('menu-@nodo.MenuID')">
+                @if (!string.IsNullOrEmpty(nodo.Icono))
+                {
+                    <i class="fa @nodo.Icono"></i>
+                }
+                @nodo.Nombre <i class="fa fa-caret-down"></i>
+            </button>
+            <div class="dropdown-content" id="menu-@nodo.MenuID">
+                <partial name="_MenuNodesPartial" model="nodo.Hijos" />
+            </div>
+        </div>
+    }
+    else
+    {
+        <a href="@nodo.Url">
+            @if (!string.IsNullOrEmpty(nodo.Icono))
+            {
+                <i class="fa @nodo.Icono"></i>
+            }
+            @nodo.Nombre
+        </a>
+    }
+}

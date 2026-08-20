@@ -1,0 +1,32 @@
+﻿@{
+    ViewData["Title"] = "Mi Panel - Cliente";
+}
+
+<div class="container my-4">
+    <h2 class="fw-bold mb-3"><i class="fa fa-dashboard"></i> Bienvenido a tu Panel, @User.Identity.Name</h2>
+    <p class="text-muted mb-4">Desde aquí puedes solicitar nuevos servicios técnicos y dar seguimiento a tus reservas activas.</p>
+
+    <div class="row mb-4">
+        <div class="col-md-4">
+            <div class="card shadow-sm p-3 text-center">
+                <h5>Total de Reservas</h5>
+                <h3 class="text-primary fw-bold">@ViewBag.TotalReservas</h3>
+                <a asp-action="MisReservas" class="btn btn-outline-primary btn-sm mt-2">Ver Historial</a>
+            </div>
+        </div>
+        <div class="col-md-4">
+            <div class="card shadow-sm p-3 text-center">
+                <h5>¿Necesitas ayuda técnica?</h5>
+                <p class="text-muted small">Cotiza y agenda un especialista en minutos.</p>
+                <a asp-controller="SolicitudServicio" asp-action="Paso1Servicio" class="btn btn-success btn-sm mt-1">Solicitar Servicio</a>
+            </div>
+        </div>
+        <div class="col-md-4">
+            <div class="card shadow-sm p-3 text-center">
+                <h5>Mis Direcciones</h5>
+                <p class="text-muted small">Administra tus ubicaciones de servicio.</p>
+                <a asp-action="MisDirecciones" class="btn btn-outline-secondary btn-sm mt-1">Gestionar Direcciones</a>
+            </div>
+        </div>
+    </div>
+</div>

@@ -1,0 +1,63 @@
+﻿@model IEnumerable<CurlinggoSoft.Models.SolicitudReserva>
+
+@{
+    ViewData["Title"] = "Panel de Técnico";
+}
+
+<div class="container my-4">
+    <h2 class="fw-bold mb-3"><i class="fa fa-briefcase"></i> Panel de Control - Técnico</h2>
+    <p class="text-muted mb-4">Revisa tus trabajos asignados y mantén actualizada tu disponibilidad.</p>
+
+    <div class="row mb-4">
+        <div class="col-md-6">
+            <div class="card shadow-sm p-3 text-center">
+                <h5>Radar de Ofertas</h5>
+                <p class="text-muted small">Consulta solicitudes cercanas pendientes de aceptar.</p>
+                <a asp-action="OfertasDisponibles" class="btn btn-primary btn-sm">Ver Ofertas Disponibles</a>
+            </div>
+        </div>
+        <div class="col-md-6">
+            <div class="card shadow-sm p-3 text-center">
+                <h5>Mi Disponibilidad Horaria</h5>
+                <p class="text-muted small">Configura los días y horas que laboras.</p>
+                <a asp-controller="DisponibilidadTecnico" asp-action="Index" class="btn btn-outline-secondary btn-sm">Configurar Horarios</a>
+            </div>
+        </div>
+    </div>
+
+    <h3 class="fw-bold mt-4 mb-3">Mis Trabajos Asignados</h3>
+    @if (!Model.Any())
+    {
+        <div class="alert alert-info">No tienes trabajos asignados en este momento. Revisa las ofertas disponibles.</div>
+    }
+    else
+    {
+        <div class="table-responsive">
+            <table class="table table-striped align-middle">
+                <thead class="table-dark">
+                    <tr>
+                        <th>Fecha</th>
+                        <th>Servicio</th>
+                        <th>Dirección</th>
+                        <th>Estado</th>
+                        <th>Acción</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    @foreach (var trabajo in Model)
+                    {
+                        <tr>
+                            <td>@trabajo.FechaHoraProgramada.ToString("dd/MM/yyyy HH:mm")</td>
+                            <td>@(trabajo.Servicio?.NombreServicio ?? "N/A")</td>
+                            <td>@trabajo.DireccionServicio</td>
+                            <td><span class="badge bg-warning text-dark">@(trabajo.EstadoReserva?.Nombre ?? "Asignada")</span></td>
+                            <td>
+                                <span class="text-muted small">En progreso</span>
+                            </td>
+                        </tr>
+                    }
+                </tbody>
+            </table>
+        </div>
+    }
+</div>
