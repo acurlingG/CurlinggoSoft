@@ -1,5 +1,8 @@
 html {
     font-size: 14px;
+    position: relative;
+    min-height: 100%;
+    overflow-x: hidden;
 }
 
 @media (min-width: 768px) {
@@ -29,13 +32,14 @@ html {
 
 html, body {
     min-height: 100%;
+    margin: 0;
 }
 
 body {
     display: flex;
     flex-direction: column;
     min-height: 100vh;
-    background-color: var(--brand-body)
+    
 }
 
 main {
@@ -102,4 +106,8 @@ main {
 
 footer {
     flex-shrink: 0;
+    background-color: var(--brand-navy-dark);
 }
+    footer p {
+        color: #fff;
+    }
