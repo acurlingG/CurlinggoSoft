@@ -1,6 +1,7 @@
+using CurlinggoSoft.Models;
+using Microsoft.AspNetCore.Authentication.Cookies;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.EntityFrameworkCore;
-using CurlinggoSoft.Models;
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -27,14 +28,31 @@ builder.Services.AddIdentity<IdentityUser, IdentityRole>(options =>
     .AddDefaultTokenProviders();
 
 // Configuración de la cookie de autenticación
-builder.Services.ConfigureApplicationCookie(options =>
-{
-    options.LoginPath = "/Login/Index";
-    options.LogoutPath = "/Login/Logout";
-    options.AccessDeniedPath = "/Login/Index";
-    options.ExpireTimeSpan = TimeSpan.FromMinutes(60);
-    options.SlidingExpiration = true;
-});
+//builder.Services.ConfigureApplicationCookie(options =>
+//{
+//    options.LoginPath = "/Login/Index";
+//    options.LogoutPath = "/Login/Logout";
+//    options.AccessDeniedPath = "/Login/Index";
+//    options.ExpireTimeSpan = TimeSpan.FromMinutes(60);
+//    options.SlidingExpiration = true;
+//});
+builder.Services.AddAuthentication(CookieAuthenticationDefaults.AuthenticationScheme)
+    .AddCookie(options =>
+    {
+        options.LoginPath = "/Login/Index"; // Redirige a la página de inicio de sesión si el usuario no está autenticado
+        options.LogoutPath = "/Home/Index"; // Redirige a la página de inicio después de cerrar sesión
+        options.ExpireTimeSpan = TimeSpan.FromMinutes(10); // Tiempo de inactividad
+        options.SlidingExpiration = true;                  // Renueva si hay actividad
+        options.Cookie.IsEssential = true;
+        options.Cookie.HttpOnly = true;
+        options.Cookie.SecurePolicy = CookieSecurePolicy.Always;
+
+        // ❗ Esto hace que la cookie NO sea persistente
+        options.Cookie.MaxAge = null;
+    });
+
+builder.Services.AddAuthorization();
+builder.Services.AddSession();
 
 var app = builder.Build();
 

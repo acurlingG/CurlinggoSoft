@@ -1,31 +1,105 @@
 html {
-  font-size: 14px;
+    font-size: 14px;
 }
 
 @media (min-width: 768px) {
-  html {
-    font-size: 16px;
-  }
+    html {
+        font-size: 16px;
+    }
+}
+
+/* ============================================
+   PALETA DE MARCA CURLINGgo
+   Basada en el logo (azul marino / celeste) +
+   color de acento naranja definido por el cliente
+   ============================================ */
+:root {
+    --brand-navy: #02225F; /* azul marino del logo (texto "CURLING") */
+    --brand-navy-dark: #011533; /* variante más oscura, para hovers/footers */
+    --brand-blue: #0398FE; /* celeste del logo (texto "go") */
+    --brand-orange: #E33B19; /* color principal de botones (HSL 10, 80%, 49%) */
+    --brand-orange-dark: #C22F12; /* hover/active del naranja (misma tonalidad, más oscuro) */
+    --brand-orange-light: #FDECE7; /* fondos suaves / badges */
+    --brand-body: #0398fe33;
 }
 
 .btn:focus, .btn:active:focus, .btn-link.nav-link:focus, .form-control:focus, .form-check-input:focus {
-  box-shadow: 0 0 0 0.1rem white, 0 0 0 0.25rem #258cfb;
+    box-shadow: 0 0 0 0.1rem white, 0 0 0 0.25rem #258cfb;
 }
 
-html {
-  position: relative;
-  min-height: 100%;
+html, body {
+    min-height: 100%;
 }
 
 body {
-  margin-bottom: 60px;
+    display: flex;
+    flex-direction: column;
+    min-height: 100vh;
+    background-color: var(--brand-body)
 }
 
+main {
+    flex: 1 0 auto; /* el contenido crece y empuja el footer hacia abajo */
+}
+
+/* ============================================
+   ANCHO COMPLETO
+   Sustituye el .container centrado de Bootstrap
+   (que deja franjas blancas grandes en pantallas
+   anchas) por un contenedor de ancho completo con
+   un padding lateral moderado y responsivo.
+   ============================================ */
+.site-container {
+    width: 100%;
+    padding-left: 1rem;
+    padding-right: 1rem;
+}
+
+@media (min-width: 576px) {
+    .site-container {
+        padding-left: 1.5rem;
+        padding-right: 1.5rem;
+    }
+}
+
+@media (min-width: 992px) {
+    .site-container {
+        padding-left: 3rem;
+        padding-right: 3rem;
+    }
+}
+
+/* Logo en el navbar */
+.navbar-brand img {
+    height: 40px;
+    width: auto;
+}
+
+/* Botón de marca (naranja) reutilizable para toda la app */
+.btn-brand {
+    background-color: var(--brand-orange);
+    border-color: var(--brand-orange);
+    color: #fff;
+    font-weight: 600;
+}
+
+    .btn-brand:hover,
+    .btn-brand:focus,
+    .btn-brand:active {
+        background-color: var(--brand-orange-dark) !important;
+        border-color: var(--brand-orange-dark) !important;
+        color: #fff !important;
+    }
+
 .form-floating > .form-control-plaintext::placeholder, .form-floating > .form-control::placeholder {
-  color: var(--bs-secondary-color);
-  text-align: end;
+    color: var(--bs-secondary-color);
+    text-align: end;
 }
 
 .form-floating > .form-control-plaintext:focus::placeholder, .form-floating > .form-control:focus::placeholder {
-  text-align: start;
+    text-align: start;
+}
+
+footer {
+    flex-shrink: 0;
 }

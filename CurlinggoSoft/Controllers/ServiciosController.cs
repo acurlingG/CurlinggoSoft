@@ -1,7 +1,9 @@
+using CurlinggoSoft.Models;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
-using CurlinggoSoft.Models;
 
+[Authorize(Roles = "ADMIN, TECNICO")]
 public class ServiciosController : Controller
 {
     private readonly ApplicationDbContext _context;

@@ -1,3 +1,7 @@
-﻿@{
-    Layout = "_Layout";
+﻿﻿@{
+// Un usuario autenticado con rol Admin usa el layout de administración
+// (solo navbar oscuro + logout, sin el header público).
+// Cualquier otro caso (visitante, Cliente, Tecnico) usa el _Layout público.
+bool esAdmin = User.Identity != null && User.Identity.IsAuthenticated && User.IsInRole("Admin");
+Layout = esAdmin ? "_AdminLayout" : "_Layout";
 }

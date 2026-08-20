@@ -1,0 +1,108 @@
+﻿/* ============================================
+   HOME - HERO
+   Fondo en degradé con la paleta de marca mientras
+   no haya foto final. Cuando tengas la foto real,
+   solo cambia la url() de .hero-section por la
+   ruta de tu imagen (ej: ~/images/hero-tecnico.jpg)
+   y podés quitar el degradé o dejarlo como overlay.
+   ============================================ */
+.hero-section {
+    position: relative;
+    min-height: 560px;
+    display: flex;
+    align-items: flex-end;
+    background: linear-gradient(135deg, var(--brand-navy) 0%, var(--brand-navy-dark) 55%, #041c46 100%);
+    background-size: cover;
+    background-position: center;
+    overflow: hidden;
+    margin-bottom: 3rem;
+}
+
+    /* Textura sutil para que el degradé no se vea plano mientras no hay foto */
+    .hero-section::before {
+        content: "";
+        position: absolute;
+        inset: 0;
+        background-image: radial-gradient(circle at 80% 20%, rgba(3, 152, 254, 0.35), transparent 45%), radial-gradient(circle at 15% 85%, rgba(227, 59, 25, 0.25), transparent 40%);
+        pointer-events: none;
+    }
+
+.hero-content {
+    position: relative;
+    z-index: 1;
+    padding: 3rem 0 3.5rem;
+    max-width: 620px;
+    color: #fff;
+}
+
+    .hero-content h1 {
+        font-weight: 800;
+        font-size: clamp(2rem, 4vw, 3rem);
+        line-height: 1.15;
+        margin-bottom: 1rem;
+    }
+
+    .hero-content p {
+        font-size: 1.1rem;
+        color: rgba(255, 255, 255, 0.88);
+        margin-bottom: 1.75rem;
+    }
+
+/* ============================================
+   HOME - SERVICIOS DESTACADOS
+   ============================================ */
+.services-section {
+    margin-bottom: 3rem;
+}
+
+    .services-section h2 {
+        font-weight: 800;
+        color: var(--brand-navy);
+        margin-bottom: 1.75rem;
+    }
+
+.service-card {
+    height: 100%;
+    border: 1px solid #e9ecef;
+    border-radius: 12px;
+    padding: 1.75rem 1.5rem;
+    background: #fff;
+    transition: transform .15s ease, box-shadow .15s ease;
+}
+
+    .service-card:hover {
+        transform: translateY(-4px);
+        box-shadow: 0 12px 24px rgba(2, 34, 95, 0.1);
+    }
+
+    .service-card .service-icon {
+        width: 56px;
+        height: 56px;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        border-radius: 10px;
+        background: var(--brand-orange-light);
+        color: var(--brand-orange);
+        font-size: 1.5rem;
+        margin-bottom: 1rem;
+    }
+
+    .service-card h3 {
+        font-size: 1.15rem;
+        font-weight: 700;
+        color: var(--brand-navy);
+        margin-bottom: .5rem;
+    }
+
+    .service-card p {
+        color: #6c757d;
+        font-size: .92rem;
+        min-height: 3.2em;
+    }
+
+    .service-card .service-price {
+        font-weight: 700;
+        color: var(--brand-navy);
+        margin: .75rem 0 1rem;
+    }
