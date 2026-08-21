@@ -1,31 +1,29 @@
 ﻿/* ============================================
    HOME - HERO
-   Fondo en degradé con la paleta de marca mientras
-   no haya foto final. Cuando tengas la foto real,
-   solo cambia la url() de .hero-section por la
-   ruta de tu imagen (ej: ~/images/hero-tecnico.jpg)
-   y podés quitar el degradé o dejarlo como overlay.
    ============================================ */
 .hero-section {
     position: relative;
     min-height: 560px;
     display: flex;
     align-items: flex-end;
-    background: linear-gradient(135deg, var(--brand-navy) 0%, var(--brand-navy-dark) 55%, #041c46 100%);
+    background-image: url('/images/hero-tecnico.jpeg');
     background-size: cover;
-    background-position: center;
+    /* Punto de enfoque: el primer valor mueve horizontal (50% = centro),
+       el segundo mueve vertical (0% = arriba de la foto, 100% = abajo).
+       Ajusta el segundo número hasta que el técnico se vea completo. */
+    background-position: center 25%;
     overflow: hidden;
     margin-bottom: 3rem;
 }
 
-    /* Textura sutil para que el degradé no se vea plano mientras no hay foto */
-    .hero-section::before {
-        content: "";
-        position: absolute;
-        inset: 0;
-        background-image: radial-gradient(circle at 80% 20%, rgba(3, 152, 254, 0.35), transparent 45%), radial-gradient(circle at 15% 85%, rgba(227, 59, 25, 0.25), transparent 40%);
-        pointer-events: none;
+/* En pantallas angostas el hero es más bajo, así que recorta distinto.
+   Si en mobile también se ve mal, ajusta este 25% por separado. */
+@media (max-width: 767.98px) {
+    .hero-section {
+        min-height: 420px;
+        background-position: center 15%;
     }
+}
 
 .hero-content {
     position: relative;
@@ -40,12 +38,14 @@
         font-size: clamp(2rem, 4vw, 3rem);
         line-height: 1.15;
         margin-bottom: 1rem;
+        text-shadow: 0 2px 10px rgba(0, 0, 0, 0.55);
     }
 
     .hero-content p {
         font-size: 1.1rem;
-        color: rgba(255, 255, 255, 0.88);
+        color: rgba(255, 255, 255, 0.92);
         margin-bottom: 1.75rem;
+        text-shadow: 0 1px 6px rgba(0, 0, 0, 0.55);
     }
 
 /* ============================================
@@ -63,6 +63,8 @@
 
 .service-card {
     height: 100%;
+    display: flex;
+    flex-direction: column;
     border: 1px solid #e9ecef;
     border-radius: 12px;
     padding: 1.75rem 1.5rem;
@@ -86,6 +88,7 @@
         color: var(--brand-orange);
         font-size: 1.5rem;
         margin-bottom: 1rem;
+        flex-shrink: 0;
     }
 
     .service-card h3 {
@@ -98,11 +101,15 @@
     .service-card p {
         color: #6c757d;
         font-size: .92rem;
-        min-height: 3.2em;
     }
 
+    /* Empuja precio + botón al fondo de la tarjeta, sin importar
+       cuántas líneas ocupen el título o la descripción arriba.
+       Esto es lo que alinea los botones entre tarjetas. */
     .service-card .service-price {
         font-weight: 700;
         color: var(--brand-navy);
-        margin: .75rem 0 1rem;
+        margin-top: auto;
+        padding-top: .75rem;
+        margin-bottom: 1rem;
     }
