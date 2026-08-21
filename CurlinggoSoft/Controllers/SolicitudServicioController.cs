@@ -198,7 +198,8 @@ namespace CurlinggoSoft.Controllers
         [HttpPost]
         [ValidateAntiForgeryToken]
         public IActionResult SeleccionarDireccion(int provinciaId, int cantonId, int distritoId,
-             string direccionExacta, string nombreContacto, string whatsapp, decimal? latitud, decimal? longitud)
+            string direccionExacta, string nombreContacto, string whatsapp,
+            string? latitud, string? longitud)
         {
             if (provinciaId <= 0 || cantonId <= 0 || distritoId <= 0)
             {
@@ -214,6 +215,23 @@ namespace CurlinggoSoft.Controllers
                 return RedirectToAction(nameof(Paso4Direccion));
             }
 
+            // Coordenadas capturadas por JS en el Paso 4. Se reciben como STRING
+            // a propósito, no como decimal?: el model binding automático de MVC
+            // usa la cultura regional del servidor para parsear decimales, y este
+            // servidor corre en pt-BR (coma como separador decimal, punto como
+            // separador de miles). El navegador manda "9.838721" con punto — bajo
+            // pt-BR ese punto se lee como separador de miles y se descarta,
+            // convirtiendo la latitud en el entero 9838721 (el bug real detrás
+            // del error "Valor de parâmetro está fora do intervalo"). Parseamos
+            // manualmente con InvariantCulture para evitar ese problema.
+            decimal? latParsed = null, lonParsed = null;
+            if (decimal.TryParse(latitud, System.Globalization.NumberStyles.Any, System.Globalization.CultureInfo.InvariantCulture, out var latVal) &&
+                decimal.TryParse(longitud, System.Globalization.NumberStyles.Any, System.Globalization.CultureInfo.InvariantCulture, out var lonVal))
+            {
+                latParsed = latVal;
+                lonParsed = lonVal;
+            }
+
             HttpContext.Session.SetInt32("ProvinciaID", provinciaId);
             HttpContext.Session.SetInt32("CantonID", cantonId);
             HttpContext.Session.SetInt32("DistritoID", distritoId);
@@ -221,11 +239,10 @@ namespace CurlinggoSoft.Controllers
             HttpContext.Session.SetString("NombreContacto", nombreContacto.Trim());
             HttpContext.Session.SetString("WhatsApp", whatsapp.Trim());
 
-            // Guardar latitud y longitud en sesión (si el navegador las proveyó)
-            if (latitud.HasValue && longitud.HasValue)
+            if (latParsed.HasValue && lonParsed.HasValue)
             {
-                HttpContext.Session.SetString("LatitudServicio", latitud.Value.ToString(System.Globalization.CultureInfo.InvariantCulture));
-                HttpContext.Session.SetString("LongitudServicio", longitud.Value.ToString(System.Globalization.CultureInfo.InvariantCulture));
+                HttpContext.Session.SetString("LatitudServicio", latParsed.Value.ToString(System.Globalization.CultureInfo.InvariantCulture));
+                HttpContext.Session.SetString("LongitudServicio", lonParsed.Value.ToString(System.Globalization.CultureInfo.InvariantCulture));
             }
             else
             {
@@ -325,8 +342,12 @@ namespace CurlinggoSoft.Controllers
             using var transaction = await _context.Database.BeginTransactionAsync();
             try
             {
+                // FK_ClientesPerfil_Usuarios exige que ya exista una fila en dbo.Usuarios
+                // con este mismo Id. Como AspNetUsers (Identity) y dbo.Usuarios son tablas
+                // separadas sin sincronización automática, la creamos aquí si falta.
                 await AsegurarUsuarioAsync(clienteId);
 
+                // Entidad ClientePerfil en singular
                 var perfilCliente = await _context.ClientesPerfil.FindAsync(clienteId);
                 if (perfilCliente == null)
                 {
@@ -343,6 +364,11 @@ namespace CurlinggoSoft.Controllers
                     await _context.SaveChangesAsync();
                 }
 
+                // Buscamos si el cliente ya tiene una dirección guardada con ese mismo
+                // nombre (UQ_Direcciones_Cliente_Nombre exige ClienteID+NombreDireccion
+                // único). Si existe, la reusamos/actualizamos en vez de insertar de
+                // nuevo; si no existe, la creamos. Esto evita el choque de llave
+                // duplicada cuando el mismo cliente hace una segunda solicitud.
                 const string nombreDireccionServicio = "Dirección de Servicio";
 
                 var nuevaDireccion = await _context.DireccionesCliente
@@ -367,6 +393,8 @@ namespace CurlinggoSoft.Controllers
                 }
                 else
                 {
+                    // Actualizamos con los datos de esta solicitud, ya que la
+                    // dirección exacta pudo haber cambiado desde la última vez.
                     nuevaDireccion.ProvinciaID = provinciaId.Value;
                     nuevaDireccion.CantonID = cantonId.Value;
                     nuevaDireccion.DistritoID = distritoId.Value;
@@ -394,15 +422,27 @@ namespace CurlinggoSoft.Controllers
                 var horaInicioStr = HttpContext.Session.GetString("HoraInicio");
                 DateTime fechaHoraProgramada = DateTime.Parse($"{fechaStr} {horaInicioStr}");
 
-                decimal? latServicio = null;
-                decimal? lonServicio = null;
+                // Coordenadas capturadas en el Paso 4. Si el cliente negó el
+                // permiso de ubicación, estas quedan null — eso es esperado y NO
+                // debe bloquear la reserva. Lo que sí hace es que
+                // usp_Reserva_BuscarTecnicosDisponibles no va a poder calcular
+                // distancia (columna calculada UbicacionGeoServicio queda NULL),
+                // así que el dispatch por radio geográfico fallará más adelante.
+                // TODO: cuando se implemente el fallback por zona
+                // (ProvinciaCoberturaID/CantonCoberturaID de TecnicosPerfil), este
+                // es el punto donde decidir cuál camino tomar.
+                decimal? latitudServicio = null;
+                decimal? longitudServicio = null;
+                var latStr = HttpContext.Session.GetString("LatitudServicio");
+                var lonStr = HttpContext.Session.GetString("LongitudServicio");
+                if (decimal.TryParse(latStr, System.Globalization.NumberStyles.Any, System.Globalization.CultureInfo.InvariantCulture, out var latParsed) &&
+                    decimal.TryParse(lonStr, System.Globalization.NumberStyles.Any, System.Globalization.CultureInfo.InvariantCulture, out var lonParsed))
+                {
+                    latitudServicio = latParsed;
+                    longitudServicio = lonParsed;
+                }
 
-                if (decimal.TryParse(HttpContext.Session.GetString("LatitudServicio"), System.Globalization.NumberStyles.Any, System.Globalization.CultureInfo.InvariantCulture, out var latVal))
-                    latServicio = latVal;
-
-                if (decimal.TryParse(HttpContext.Session.GetString("LongitudServicio"), System.Globalization.NumberStyles.Any, System.Globalization.CultureInfo.InvariantCulture, out var lonVal))
-                    lonServicio = lonVal;
-
+                // Entidad SolicitudReserva en singular
                 var reserva = new SolicitudReserva
                 {
                     CodigoSeguimiento = Guid.NewGuid(),
@@ -413,8 +453,8 @@ namespace CurlinggoSoft.Controllers
                     ProvinciaID = provinciaId,
                     CantonID = cantonId,
                     DistritoID = distritoId,
-                    LatitudServicio = latServicio,
-                    LongitudServicio = lonServicio,
+                    LatitudServicio = latitudServicio,
+                    LongitudServicio = longitudServicio,
                     MontoBaseCotizado = servicio.TarifaDiagnosticoBase,
                     MontoAjustes = 0,
                     MontoTotalCotizado = servicio.TarifaDiagnosticoBase * 1.13m,
@@ -436,13 +476,30 @@ namespace CurlinggoSoft.Controllers
                 HttpContext.Session.Remove("FechaProgramada");
                 HttpContext.Session.Remove("HoraInicio");
                 HttpContext.Session.Remove("HoraFin");
+                HttpContext.Session.Remove("LatitudServicio");
+                HttpContext.Session.Remove("LongitudServicio");
 
+                // DISPARAR EL MOTOR DE ASIGNACIÓN (Pulse / Uber Style)
+                // Se envía la alerta a los 3 mejores técnicos de la zona en este instante.
+                // IMPORTANTE: esto va FUERA del try/catch transaccional. La reserva ya
+                // quedó guardada (commit exitoso arriba); si el dispatch engine falla
+                // (ej. no hay técnicos disponibles en la zona), no debe:
+                //   a) hacer rollback de una transacción que ya se comprometió
+                //      (eso causa el error "This SqlTransaction has completed" /
+                //      "Este SqlTransaction foi concluído" que estabas viendo), ni
+                //   b) mostrarle al cliente un error como si su reserva no se hubiera
+                //      creado, cuando en realidad sí se creó.
+                // Si falla, lo registramos pero igual mandamos al cliente a la
+                // pantalla de confirmación; el reintento de asignación se puede
+                // manejar con un job en background más adelante.
                 try
                 {
                     await _dispatchEngine.GenerarOfertasLoteInicialAsync(reserva.ReservaID, tamanoLote: 3);
                 }
                 catch (Exception dispatchEx)
                 {
+                    // TODO: reemplazar por ILogger<SolicitudServicioController> cuando
+                    // lo tengas inyectado. Por ahora al menos no perdemos el error.
                     System.Diagnostics.Debug.WriteLine(
                         $"[DispatchEngine] Falló la asignación inicial para ReservaID={reserva.ReservaID}: {dispatchEx}");
                 }
@@ -452,12 +509,17 @@ namespace CurlinggoSoft.Controllers
             catch (Exception ex)
             {
                 await transaction.RollbackAsync();
+                // ex.Message solo trae el mensaje genérico de EF Core ("...See the inner
+                // exception..."). El motivo real (constraint, columna, etc.) vive en InnerException.
                 var mensajeReal = ex.InnerException?.Message ?? ex.Message;
                 TempData["Error"] = "Ocurrió un error al procesar la reserva: " + mensajeReal;
                 return RedirectToAction("Paso5Resumen");
             }
         }
 
+        // FK_ClientesPerfil_Usuarios exige que exista una fila en dbo.Usuarios con el mismo Id
+        // que en AspNetUsers. Como no hay sincronización automática entre ambas tablas, la
+        // creamos (o completamos, si faltan Nombre/Apellidos) justo antes de usarla.
         private async Task AsegurarUsuarioAsync(string usuarioId)
         {
             var yaExiste = await _context.Usuarios.FindAsync(usuarioId);
@@ -470,6 +532,8 @@ namespace CurlinggoSoft.Controllers
             {
                 UsuarioID = usuarioId,
                 Email = email,
+                // TODO: si más adelante capturas Nombre/Apellidos reales en el registro,
+                // reemplaza este placeholder por los datos verdaderos del cliente.
                 Nombre = identityUser?.UserName ?? "Cliente",
                 Apellidos = "",
                 EstadoUsuario = "ACTIVO",
@@ -484,7 +548,7 @@ namespace CurlinggoSoft.Controllers
         {
             if (!User.Identity.IsAuthenticated)
             {
-                return RedirectToAction("Login", "Account", new { returnUrl = Url.Action("Paso6ConfirmacionExitosa", "SolicitudServicio", new { id }) });
+                return RedirectToAction("Login", "Account");
             }
 
             var clienteId = User.FindFirst(System.Security.Claims.ClaimTypes.NameIdentifier)?.Value;

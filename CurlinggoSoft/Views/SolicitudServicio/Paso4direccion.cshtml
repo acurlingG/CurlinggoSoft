@@ -34,8 +34,19 @@
 
     <h5 class="wizard-question">¿Dónde te brindamos el servicio?</h5>
 
+    <p class="text-muted small" id="estadoUbicacion">
+        <i class="bi bi-geo-alt"></i> Detectando tu ubicación para asignarte un técnico cercano...
+    </p>
+
     <form asp-action="SeleccionarDireccion" method="post" id="formDireccion" class="direccion-form">
         @Html.AntiForgeryToken()
+
+        <!-- Coordenadas capturadas por JS al cargar la página (ver Scripts abajo).
+             Pueden quedar vacías si el navegador no soporta geolocalización o si
+             el cliente niega el permiso — el formulario NO se bloquea por eso,
+             ver la nota de contingencia en el controlador. -->
+        <input type="hidden" id="latitud" name="latitud" />
+        <input type="hidden" id="longitud" name="longitud" />
 
         <div class="campo">
             <label for="provinciaSelect">Provincia</label>
@@ -90,11 +101,38 @@
 
 </div>
 
-<input type="hidden" id="LatitudServicio" name="latitud" />
-<input type="hidden" id="LongitudServicio" name="longitud" />
-
 @section Scripts {
     <script>
+        // --- Captura silenciosa de ubicación al cargar el Paso 4 ---
+        // No bloquea el formulario en ningún caso: si el navegador no soporta
+        // geolocalización, si el cliente niega el permiso, o si se agota el
+        // tiempo de espera, los campos "latitud"/"longitud" quedan vacíos y el
+        // formulario se puede enviar igual. El fallback de qué hacer sin
+        // coordenadas se maneja en el servidor (ConfirmarYPagar), no aquí.
+        const estadoUbicacion = document.getElementById('estadoUbicacion');
+        const inputLat = document.getElementById('latitud');
+        const inputLon = document.getElementById('longitud');
+
+        function capturarUbicacion() {
+            if (!navigator.geolocation) {
+                estadoUbicacion.innerHTML = '<i class="bi bi-geo-alt text-warning"></i> Tu navegador no soporta geolocalización. Buscaremos un técnico por tu zona general.';
+                return;
+            }
+
+            navigator.geolocation.getCurrentPosition(
+                function (position) {
+                    inputLat.value = position.coords.latitude;
+                    inputLon.value = position.coords.longitude;
+                    estadoUbicacion.innerHTML = '<i class="bi bi-geo-alt-fill text-success"></i> Ubicación detectada. Te asignaremos un técnico cercano.';
+                },
+                function () {
+                    estadoUbicacion.innerHTML = '<i class="bi bi-geo-alt text-warning"></i> No se pudo obtener tu ubicación exacta. Buscaremos un técnico por tu zona general.';
+                },
+                { enableHighAccuracy: false, timeout: 8000, maximumAge: 60000 }
+            );
+        }
+        capturarUbicacion();
+
         const cantonSelect = document.getElementById('cantonSelect');
         const distritoSelect = document.getElementById('distritoSelect');
 
@@ -148,23 +186,4 @@
             distritoSelect.disabled = false;
         });
     </script>
-
-    <script>
-        document.addEventListener("DOMContentLoaded", function() {
-            if (navigator.geolocation) {
-                navigator.geolocation.getCurrentPosition(
-                    function(position) {
-                        document.getElementById("LatitudServicio").value = position.coords.latitude;
-                        document.getElementById("LongitudServicio").value = position.coords.longitude;
-                    },
-                    function(error) {
-                        console.warn("El usuario denegó la geolocalización o no está disponible:", error.message);
-                        // Opcional: podrías dejarlo en blanco para que el sistema use el respaldo por distrito
-                    },
-                    { enableHighAccuracy: true, timeout: 10000, maximumAge: 0 }
-                );
-            }
-        });
-    </script>
-
 }

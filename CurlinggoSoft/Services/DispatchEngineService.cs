@@ -1,28 +1,28 @@
-﻿using CurlinggoSoft.Models;
+using CurlinggoSoft.Hubs;
+using CurlinggoSoft.Models;
+using Microsoft.AspNetCore.SignalR;
 using Microsoft.Data.SqlClient;
 using Microsoft.EntityFrameworkCore;
-using System.Data;
 
 namespace CurlinggoSoft.Services
 {
     public class DispatchEngineService : IDispatchEngineService
     {
         private readonly ApplicationDbContext _context;
+        private readonly IHubContext<NotificacionesHub> _hub;
 
-        public DispatchEngineService(ApplicationDbContext context)
+        public DispatchEngineService(ApplicationDbContext context, IHubContext<NotificacionesHub> hub)
         {
             _context = context;
+            _hub = hub;
         }
 
         public async Task<bool> GenerarOfertasLoteInicialAsync(long reservaId, int tamanoLote = 3)
         {
-            // 1. Ejecutar el Match Predictivo (Filtro por especialidad, radio, horario y ranking)
-            // Se utiliza el procedimiento almacenado existente en la base de datos.
             var reservaIdParam = new SqlParameter("@ReservaID", reservaId);
-            var radioParam = new SqlParameter("@RadioKm", 20.00m); // Radio configurable
+            var radioParam = new SqlParameter("@RadioKm", 20.00m);
             var maxTecnicosParam = new SqlParameter("@MaxTecnicos", tamanoLote);
 
-            // Creamos un modelo anónimo o DTO temporal para recibir los datos del SP
             var tecnicosCandidatos = await _context.Database
                 .SqlQueryRaw<TecnicoCandidatoDto>(
                     "EXEC dbo.usp_Reserva_BuscarTecnicosDisponibles @ReservaID, @RadioKm, @MaxTecnicos",
@@ -31,30 +31,46 @@ namespace CurlinggoSoft.Services
 
             if (!tecnicosCandidatos.Any())
             {
-                // No hay técnicos disponibles en este momento
                 return false;
             }
 
-            // 2. Generar el "Lote" de Ofertas (El Ping)
-            // Por cada técnico que pasó el filtro, le creamos una oferta en la base de datos.
+            var reserva = await _context.SolicitudesReserva
+                .Include(r => r.Servicio)
+                .FirstOrDefaultAsync(r => r.ReservaID == reservaId);
+
+            var fechaExpiracion = DateTime.Now.AddSeconds(45);
+
             foreach (var tecnico in tecnicosCandidatos)
             {
                 var pReserva = new SqlParameter("@ReservaID", reservaId);
                 var pTecnico = new SqlParameter("@TecnicoID", tecnico.TecnicoID);
                 var pDistancia = new SqlParameter("@DistanciaMetros", tecnico.DistanciaMetros);
-                var pExpiracion = new SqlParameter("@FechaExpiracion", DateTime.Now.AddSeconds(45)); // Tienen 45 seg para aceptar
+                var pExpiracion = new SqlParameter("@FechaExpiracion", fechaExpiracion);
                 var pMensaje = new SqlParameter("@Mensaje", "¡Nuevo servicio disponible cerca de ti!");
 
                 await _context.Database.ExecuteSqlRawAsync(
                     "EXEC dbo.usp_OfertaTecnico_Crear @ReservaID, @TecnicoID, @DistanciaMetros, @FechaExpiracion, @Mensaje",
                     pReserva, pTecnico, pDistancia, pExpiracion, pMensaje);
+
+                // PUSH en tiempo real: el técnico se entera al instante, sin
+                // esperar al próximo ciclo de polling. Payload liviano a
+                // propósito — el cliente lo usa solo como disparador para
+                // refrescar contra el servidor, que sigue siendo la fuente
+                // de verdad.
+                await _hub.Clients.Group(NotificacionesHub.GrupoTecnico(tecnico.TecnicoID))
+                    .SendAsync("NuevaOferta", new
+                    {
+                        reservaId,
+                        servicio = reserva?.Servicio?.NombreServicio ?? "Servicio técnico",
+                        distanciaMetros = tecnico.DistanciaMetros,
+                        expiraEn = fechaExpiracion.ToString("O")
+                    });
             }
 
             return true;
         }
     }
 
-    // DTO Interno para mapear el resultado del Procedimiento Almacenado
     public class TecnicoCandidatoDto
     {
         public string TecnicoID { get; set; } = string.Empty;

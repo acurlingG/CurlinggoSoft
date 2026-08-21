@@ -1,7 +1,9 @@
 using CurlinggoSoft.Models;
 using Microsoft.AspNetCore.Authentication.Cookies;
 using Microsoft.AspNetCore.Identity;
+using Microsoft.AspNetCore.Localization;
 using Microsoft.EntityFrameworkCore;
+using System.Globalization;
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -16,6 +18,9 @@ builder.Services.AddDbContext<ApplicationDbContext>(options =>
 
 // Registrar el motor de asignación
 builder.Services.AddScoped<CurlinggoSoft.Services.IDispatchEngineService, CurlinggoSoft.Services.DispatchEngineService>();
+
+// Registro de SignalR
+builder.Services.AddSignalR();
 
 // Configuración de ASP.NET Core Identity con roles
 builder.Services.AddIdentity<IdentityUser, IdentityRole>(options =>
@@ -56,6 +61,28 @@ builder.Services.AddAuthentication(CookieAuthenticationDefaults.AuthenticationSc
 
 builder.Services.AddAuthorization();
 
+// --- Cultura fija de la aplicación: es-CR ---
+// Sin esto, .NET usa la cultura del sistema operativo del servidor donde
+// corra el proyecto en producción. Fue justo lo que causó el bug de
+// "9838721,000000" — el servidor tenía configurado pt-BR (coma como
+// separador decimal), así que "9.838721" (formato JS con punto) se leyó mal
+// en el model binding automático de cualquier parámetro decimal.
+//
+// es-CR usa punto como separador decimal (igual que el formato que manda el
+// navegador), así que fijarla aquí resuelve el problema de raíz para TODOS
+// los decimales del proyecto (precios, montos, coordenadas), no solo los dos
+// que arreglamos a mano en SolicitudServicioController. De todas formas, deja
+// el parseo manual con InvariantCulture que ya está en el controlador —
+// es una segunda capa de seguridad barata si algún día el servidor cambia de
+// configuración regional otra vez.
+var cultura = new CultureInfo("es-CR");
+var opcionesLocalizacion = new RequestLocalizationOptions
+{
+    DefaultRequestCulture = new RequestCulture(cultura),
+    SupportedCultures = new List<CultureInfo> { cultura },
+    SupportedUICultures = new List<CultureInfo> { cultura }
+};
+
 // Session: se necesita el cache en memoria + el registro de AddSession.
 builder.Services.AddDistributedMemoryCache();
 builder.Services.AddSession(options =>
@@ -66,6 +93,11 @@ builder.Services.AddSession(options =>
 });
 
 var app = builder.Build();
+
+// UseRequestLocalization debe ir de los primeros middlewares del pipeline,
+// antes de UseRouting, para que la cultura ya esté fijada cuando MVC haga el
+// model binding de cualquier decimal/fecha en los controladores.
+app.UseRequestLocalization(opcionesLocalizacion);
 
 // Configure the HTTP request pipeline.
 if (!app.Environment.IsDevelopment())
@@ -87,6 +119,9 @@ app.MapControllerRoute(
     name: "default",
     pattern: "{controller=Home}/{action=Index}/{id?}")
     .WithStaticAssets();
+
+// Mapeo del Hub
+app.MapHub<CurlinggoSoft.Hubs.NotificacionesHub>("/hubs/notificaciones");
 
 // Seeding inicial de roles y usuario administrador al arrancar la aplicación
 using (var scope = app.Services.CreateScope())

@@ -6,41 +6,145 @@
 
 <div class="container my-4">
     <h2 class="fw-bold mb-3"><i class="fa fa-list"></i> Solicitudes y Ofertas Cercanas</h2>
-    <p class="text-muted mb-4">Estas son las solicitudes de servicio en tu zona de cobertura esperando respuesta.</p>
+    <p class="text-muted mb-2">Estas son las solicitudes de servicio en tu zona de cobertura esperando respuesta.</p>
+    <p class="text-muted small mb-4" id="estadoConexion">
+        <i class="bi bi-broadcast"></i> Conectando en tiempo real...
+    </p>
 
-    @if (!Model.Any())
+    @if (TempData["Success"] != null)
     {
-        <div class="alert alert-info">No hay ofertas pendientes en este momento. Vuelve a revisar más tarde.</div>
+        <div class="alert alert-success">@TempData["Success"]</div>
     }
-    else
+    @if (TempData["Error"] != null)
     {
-        <div class="table-responsive">
-            <table class="table table-hover align-middle">
-                <thead class="table-dark">
-                    <tr>
-                        <th>Servicio</th>
-                        <th>Descripción del Problema</th>
-                        <th>Distancia Aprox.</th>
-                        <th>Expira en</th>
-                        <th>Acción</th>
-                    </tr>
-                </thead>
-                <tbody>
-                    @foreach (var oferta in Model)
-                    {
+        <div class="alert alert-warning">@TempData["Error"]</div>
+    }
+
+    <div id="listaOfertas">
+        @if (!Model.Any())
+        {
+            <div class="alert alert-info">No hay ofertas pendientes en este momento. Te avisaremos en cuanto llegue una nueva.</div>
+        }
+        else
+        {
+            <div class="table-responsive">
+                <table class="table table-hover align-middle">
+                    <thead class="table-dark">
                         <tr>
-                            <td><strong>@(oferta.Reserva?.Servicio?.NombreServicio ?? "Servicio Técnico")</strong></td>
-                            <td>@oferta.Reserva?.DescripcionProblema</td>
-                            <td>@(oferta.DistanciaMetros.HasValue ? $"{oferta.DistanciaMetros.Value / 1000:N1} km" : "Zona asignada")</td>
-                            <td>@(oferta.FechaExpiracion?.ToString("HH:mm:ss") ?? "Sin límite")</td>
-                            <td>
-                                <!-- Aquí puedes conectar con tu SP usp_OfertaTecnico_Aceptar si creas un botón de acción -->
-                                <span class="badge bg-success">Disponible</span>
-                            </td>
+                            <th>Servicio</th>
+                            <th>Descripción del Problema</th>
+                            <th>Distancia Aprox.</th>
+                            <th>Expira en</th>
+                            <th>Acción</th>
                         </tr>
-                    }
-                </tbody>
-            </table>
-        </div>
-    }
+                    </thead>
+                    <tbody>
+                        @foreach (var oferta in Model)
+                        {
+                            <tr>
+                                <td><strong>@(oferta.Reserva?.Servicio?.NombreServicio ?? "Servicio Técnico")</strong></td>
+                                <td>@oferta.Reserva?.DescripcionProblema</td>
+                                <td>@(oferta.DistanciaMetros.HasValue ? $"{oferta.DistanciaMetros.Value / 1000:N1} km" : "Zona asignada")</td>
+                                <td>
+                                    @if (oferta.FechaExpiracion.HasValue)
+                                    {
+                                        <span class="countdown fw-bold text-danger"
+                                              data-expira="@oferta.FechaExpiracion.Value.ToString("O")">
+                                            --
+                                        </span>
+                                    }
+                                    else
+                                    {
+                                        <span class="text-muted">Sin límite</span>
+                                    }
+                                </td>
+                                <td>
+                                    <form asp-action="AceptarOferta" method="post" class="d-inline">
+                                        @Html.AntiForgeryToken()
+                                        <input type="hidden" name="ofertaId" value="@oferta.OfertaTecnicoID" />
+                                        <button type="submit" class="btn btn-success btn-sm">
+                                            <i class="bi bi-check-lg"></i> Aceptar
+                                        </button>
+                                    </form>
+                                </td>
+                            </tr>
+                        }
+                    </tbody>
+                </table>
+            </div>
+        }
+    </div>
 </div>
+
+@section Scripts {
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/microsoft-signalr/8.0.0/signalr.min.js"></script>
+    <script>
+        // --- Countdown visual (solo estético; la validación real de
+        //     expiración pasa en el servidor, en usp_OfertaTecnico_Aceptar). ---
+        function actualizarCountdowns() {
+            document.querySelectorAll('.countdown').forEach(function(el) {
+                const expira = new Date(el.dataset.expira);
+                const segundos = Math.floor((expira - new Date()) / 1000);
+                if (segundos <= 0) {
+                    el.textContent = 'Expirada';
+                    el.classList.add('text-muted');
+                } else {
+                    el.textContent = segundos + 's';
+                }
+            });
+        }
+        setInterval(actualizarCountdowns, 1000);
+        actualizarCountdowns();
+
+        // --- Refresco de la lista: se llama cuando el hub avisa que algo
+        //     cambió, o como respaldo periódico si la conexión se cae. ---
+        async function refrescarOfertas() {
+            try {
+                const resp = await fetch(window.location.href, { headers: { 'X-Requested-With': 'XMLHttpRequest' } });
+                if (!resp.ok) return;
+                const html = await resp.text();
+                const doc = new DOMParser().parseFromString(html, 'text/html');
+                const nuevaLista = doc.getElementById('listaOfertas');
+                if (nuevaLista) {
+                    document.getElementById('listaOfertas').innerHTML = nuevaLista.innerHTML;
+                    actualizarCountdowns();
+                }
+            } catch (e) {
+                console.warn('No se pudo refrescar ofertas:', e);
+            }
+        }
+
+        // --- Conexión SignalR: el servidor empuja "NuevaOferta" y
+        //     "OfertaYaTomada" al instante. withAutomaticReconnect() maneja
+        //     los cortes de red reintentando solo. ---
+        const estadoConexion = document.getElementById('estadoConexion');
+        const connection = new signalR.HubConnectionBuilder()
+            .withUrl('/hubs/notificaciones')
+            .withAutomaticReconnect()
+            .build();
+
+        connection.on('NuevaOferta', refrescarOfertas);
+        connection.on('OfertaYaTomada', refrescarOfertas);
+
+        connection.onreconnecting(function() {
+            estadoConexion.innerHTML = '<i class="bi bi-broadcast text-warning"></i> Reconectando...';
+        });
+        connection.onreconnected(function() {
+            estadoConexion.innerHTML = '<i class="bi bi-broadcast text-success"></i> Conectado en tiempo real.';
+            refrescarOfertas();
+        });
+
+        connection.start()
+            .then(function() {
+                estadoConexion.innerHTML = '<i class="bi bi-broadcast text-success"></i> Conectado en tiempo real.';
+            })
+            .catch(function(err) {
+                console.warn('No se pudo conectar al hub, usando respaldo por polling.', err);
+                estadoConexion.innerHTML = '<i class="bi bi-broadcast text-warning"></i> Sin conexión en tiempo real, actualizando cada minuto.';
+            });
+
+        // --- Respaldo: si el WebSocket nunca conecta o se cae por completo,
+        //     este poll lento (60s) sigue funcionando como red de seguridad. ---
+        setInterval(refrescarOfertas, 60000);
+    </script>
+}
