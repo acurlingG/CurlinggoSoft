@@ -11,6 +11,26 @@ public class CantonesController : Controller
         _context = context;
     }
 
+    // GET: CANTONES/PorProvincia/5
+    // Usado por los formularios de Perfiles de Cliente/Técnico para llenar
+    // el combo de Cantón en cascada según la Provincia seleccionada.
+    [HttpGet]
+    public async Task<IActionResult> PorProvincia(int? provinciaId)
+    {
+        if (provinciaId == null)
+        {
+            return Json(Array.Empty<object>());
+        }
+
+        var cantones = await _context.Cantones
+            .Where(c => c.ProvinciaID == provinciaId && c.Activo)
+            .OrderBy(c => c.Nombre)
+            .Select(c => new { c.CantonID, c.Nombre })
+            .ToListAsync();
+
+        return Json(cantones);
+    }
+
     // GET: CANTONES
     public async Task<IActionResult> Index()
     {

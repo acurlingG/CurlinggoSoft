@@ -19,9 +19,12 @@ namespace CurlinggoSoft.Services
 
         public async Task<bool> GenerarOfertasLoteInicialAsync(long reservaId, int tamanoLote = 3)
         {
+            var config = await _context.ConfiguracionDespacho.FindAsync(1)
+                ?? new ConfiguracionDespacho { RadioKm = 20.00m, MaxTecnicos = 10 };
+
             var reservaIdParam = new SqlParameter("@ReservaID", reservaId);
-            var radioParam = new SqlParameter("@RadioKm", 20.00m);
-            var maxTecnicosParam = new SqlParameter("@MaxTecnicos", tamanoLote);
+            var radioParam = new SqlParameter("@RadioKm", config.RadioKm);
+            var maxTecnicosParam = new SqlParameter("@MaxTecnicos", config.MaxTecnicos);
 
             var tecnicosCandidatos = await _context.Database
                 .SqlQueryRaw<TecnicoCandidatoDto>(

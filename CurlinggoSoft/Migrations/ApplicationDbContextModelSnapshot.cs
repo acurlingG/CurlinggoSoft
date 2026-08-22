@@ -164,6 +164,34 @@ namespace CurlinggoSoft.Migrations
                     b.ToTable("ClientesPerfil");
                 });
 
+            modelBuilder.Entity("CurlinggoSoft.Models.ConfiguracionDespacho", b =>
+                {
+                    b.Property<int>("ConfiguracionDespachoID")
+                        .HasColumnType("int");
+
+                    b.Property<DateTime>("FechaActualizacion")
+                        .HasColumnType("datetime2");
+
+                    b.Property<int>("MaxTecnicos")
+                        .HasColumnType("int");
+
+                    b.Property<decimal>("RadioKm")
+                        .HasColumnType("decimal(8,2)");
+
+                    b.HasKey("ConfiguracionDespachoID");
+
+                    b.ToTable("ConfiguracionDespacho");
+
+                    b.HasData(
+                        new
+                        {
+                            ConfiguracionDespachoID = 1,
+                            FechaActualizacion = new DateTime(2026, 1, 1, 0, 0, 0, 0, DateTimeKind.Unspecified),
+                            MaxTecnicos = 10,
+                            RadioKm = 20.00m
+                        });
+                });
+
             modelBuilder.Entity("CurlinggoSoft.Models.DetallePrecioReserva", b =>
                 {
                     b.Property<long>("DetallePrecioReservaID")
@@ -1036,6 +1064,13 @@ namespace CurlinggoSoft.Migrations
 
                     SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<long>("ReservaID"));
 
+                    b.Property<bool?>("CancelacionConPenalizacion")
+                        .HasColumnType("bit");
+
+                    b.Property<string>("CanceladoPor")
+                        .HasMaxLength(20)
+                        .HasColumnType("nvarchar(20)");
+
                     b.Property<int?>("CantonID")
                         .HasColumnType("int");
 
@@ -1100,6 +1135,10 @@ namespace CurlinggoSoft.Migrations
 
                     b.Property<decimal>("MontoTotalCotizado")
                         .HasColumnType("decimal(12,2)");
+
+                    b.Property<string>("MotivoCancelacionCodigo")
+                        .HasMaxLength(30)
+                        .HasColumnType("nvarchar(30)");
 
                     b.Property<string>("NotasCliente")
                         .HasMaxLength(1000)

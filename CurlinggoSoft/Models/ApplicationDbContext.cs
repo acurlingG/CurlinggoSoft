@@ -46,6 +46,8 @@ namespace CurlinggoSoft.Models
         public DbSet<RespuestaReservaOpcion> RespuestasReservaOpciones { get; set; }
         public DbSet<DetallePrecioReserva> DetallesPrecioReserva { get; set; }
         public DbSet<TecnicoUbicacionActual> TecnicosUbicacionActual { get; set; }
+        public DbSet<ConfiguracionDespacho> ConfiguracionDespacho { get; set; }
+        public DbSet<MensajeReserva> MensajesReserva { get; set; }
 
         protected override void OnModelCreating(ModelBuilder modelBuilder)
         {
@@ -61,6 +63,13 @@ namespace CurlinggoSoft.Models
                 .HasOne(r => r.Servicio).WithMany().HasForeignKey(r => r.ServicioID).OnDelete(DeleteBehavior.Restrict);
             modelBuilder.Entity<SolicitudReserva>()
                 .HasOne(r => r.EstadoReserva).WithMany().HasForeignKey(r => r.EstadoReservaID).OnDelete(DeleteBehavior.Restrict);
+
+            modelBuilder.Entity<MensajeReserva>()
+                .HasOne(m => m.Reserva).WithMany().HasForeignKey(m => m.ReservaID).OnDelete(DeleteBehavior.Restrict);
+            modelBuilder.Entity<MensajeReserva>()
+                .HasOne(m => m.Emisor).WithMany().HasForeignKey(m => m.EmisorUsuarioID).OnDelete(DeleteBehavior.Restrict);
+            modelBuilder.Entity<MensajeReserva>()
+                .HasOne(m => m.Receptor).WithMany().HasForeignKey(m => m.ReceptorUsuarioID).OnDelete(DeleteBehavior.Restrict);
 
             modelBuilder.Entity<HistorialEstadoReserva>()
                 .HasOne(h => h.Reserva).WithMany().HasForeignKey(h => h.ReservaID).OnDelete(DeleteBehavior.Restrict);
@@ -202,6 +211,15 @@ namespace CurlinggoSoft.Models
                 .HasForeignKey<Usuario>(u => u.UsuarioID)
                 .HasPrincipalKey<IdentityUser>(iu => iu.Id)
                 .OnDelete(DeleteBehavior.Cascade);
+
+            // Fila unica de configuracion del motor de despacho (RadioKm/MaxTecnicos)
+            modelBuilder.Entity<ConfiguracionDespacho>().HasData(new ConfiguracionDespacho
+            {
+                ConfiguracionDespachoID = 1,
+                RadioKm = 20.00m,
+                MaxTecnicos = 10,
+                FechaActualizacion = new DateTime(2026, 1, 1)
+            });
         }
     }
 }

@@ -54,19 +54,34 @@ namespace CurlinggoSoft.Hubs
             await base.OnDisconnectedAsync(exception);
         }
 
-        // Llamado por el cliente desde Paso6ConfirmacionExitosa.cshtml.
-        // Valida que la reserva le pertenezca antes de unirlo al grupo — así
-        // un cliente no puede suscribirse a la reserva de otra persona solo
-        // adivinando el ReservaID.
+        // Llamado por el cliente desde Paso6ConfirmacionExitosa.cshtml, y
+        // también por el técnico desde el chat de la reserva (_ChatReserva.cshtml).
+        // Valida que la reserva le pertenezca (como cliente o como técnico
+        // asignado) antes de unirlo al grupo — así nadie puede suscribirse a
+        // la reserva de otra persona solo adivinando el ReservaID.
         public async Task SuscribirseAReserva(long reservaId)
         {
-            var esDelCliente = await _context.SolicitudesReserva
-                .AnyAsync(r => r.ReservaID == reservaId && r.ClienteID == UsuarioId);
+            var perteneceALaReserva = await _context.SolicitudesReserva
+                .AnyAsync(r => r.ReservaID == reservaId &&
+                               (r.ClienteID == UsuarioId || r.TecnicoID == UsuarioId));
 
-            if (esDelCliente)
+            if (perteneceALaReserva)
             {
                 await Groups.AddToGroupAsync(Context.ConnectionId, GrupoReserva(reservaId));
             }
+        }
+
+        // Chat bilateral cliente-técnico de una reserva activa. La
+        // persistencia (INSERT en MensajesReserva) y la validación de que la
+        // reserva esté en un estado activo (ASIGNADA/EN_CAMINO/EN_PROCESO)
+        // ya se hicieron en MensajesController.Enviar ANTES de llamar a este
+        // método — aquí solo se retransmite en tiempo real a los miembros
+        // del grupo "reserva-{id}" (cliente + técnico ya están suscritos:
+        // el técnico vía OnConnectedAsync/grupo propio + este grupo, el
+        // cliente vía SuscribirseAReserva).
+        public async Task NotificarNuevoMensaje(long reservaId, object mensaje)
+        {
+            await Clients.Group(GrupoReserva(reservaId)).SendAsync("NuevoMensaje", mensaje);
         }
 
         public static string GrupoTecnico(string tecnicoId) => $"tecnico-{tecnicoId}";

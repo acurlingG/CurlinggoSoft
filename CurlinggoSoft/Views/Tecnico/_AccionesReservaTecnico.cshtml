@@ -1,0 +1,57 @@
+@* Acciones (Chat / Calificar Cliente) para una fila de reserva del técnico.
+   Uso dentro del foreach de Views/Tecnico/Index.cshtml:
+       @await Html.PartialAsync("_AccionesReservaTecnico", item)
+   donde "item" es un CurlinggoSoft.Models.SolicitudReserva. *@
+@model CurlinggoSoft.Models.SolicitudReserva
+@{
+    var codigo = Model.EstadoReserva?.Codigo;
+}
+
+@if (codigo is "ASIGNADA" or "EN_CAMINO" or "EN_PROCESO" or "COMPLETADA" or "CANCELADA")
+{
+    <button type="button" class="btn btn-sm btn-outline-secondary" data-bs-toggle="modal" data-bs-target="#modalChatTecnico-@Model.ReservaID">
+        <i class="fa fa-comments"></i> @(codigo is "COMPLETADA" or "CANCELADA" ? "Ver conversación" : "Chat")
+    </button>
+
+    <div class="modal fade" id="modalChatTecnico-@Model.ReservaID" tabindex="-1" aria-hidden="true">
+        <div class="modal-dialog modal-dialog-centered">
+            <div class="modal-content p-2">
+                <div class="modal-header">
+                    <h5 class="modal-title">Chat con el cliente</h5>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Cerrar"></button>
+                </div>
+                <div class="modal-body">
+                    @await Html.PartialAsync("_ChatReserva", Model.ReservaID)
+                </div>
+            </div>
+        </div>
+    </div>
+}
+
+@if (codigo == "COMPLETADA")
+{
+    <button type="button" class="btn btn-sm btn-warning" onclick="cargarCalificacionCliente(@Model.ReservaID)">
+        <i class="fa fa-star"></i> Calificar Cliente
+    </button>
+    <div id="contenedorCalificacionCliente-@Model.ReservaID"></div>
+}
+
+@* Se registra una sola vez el script de carga perezosa: si la vista
+   principal incluye este partial varias veces (una por fila), Razor no
+   duplicará la sección, pero por seguridad la función usa "var" con
+   verificación implícita del navegador (redefinir la misma función no
+   causa error). *@
+<script>
+    function cargarCalificacionCliente(reservaId) {
+        var contenedor = document.getElementById("contenedorCalificacionCliente-" + reservaId);
+        if (contenedor.dataset.cargado === "1") return;
+
+        fetch("/Tecnico/CalificarCliente?reservaId=" + reservaId)
+            .then(r => r.text())
+            .then(html => {
+                contenedor.innerHTML = html;
+                contenedor.dataset.cargado = "1";
+                new bootstrap.Modal(document.getElementById("modalCalificacion-" + reservaId)).show();
+            });
+    }
+</script>

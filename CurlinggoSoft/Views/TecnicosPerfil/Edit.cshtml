@@ -24,7 +24,6 @@
                 <input asp-for="CalificacionPromedio" type="number" step="0.01" class="form-control" />
             </div>
             <div class="form-check mb-3">
-                <input type="hidden" name="Disponible" value="false" />
                 <input asp-for="Disponible" type="checkbox" class="form-check-input" />
                 <label class="form-check-label" for="Disponible">Disponible</label>
             </div>
@@ -40,4 +39,31 @@
         </form>
     </div>
 </div>
-@section Scripts { @{await Html.RenderPartialAsync("_ValidationScriptsPartial");} }
+@section Scripts {
+    @{await Html.RenderPartialAsync("_ValidationScriptsPartial");}
+    <script>
+        var cantonCoberturaActual = @Html.Raw(Model.CantonCoberturaID?.ToString() ?? "null");
+
+        function cargarCantonesCobertura(provinciaId, cantonSeleccionado) {
+            var $canton = $('#CantonCoberturaID');
+            $canton.empty().append('<option value="">-- Ninguno --</option>');
+            if (!provinciaId) { return; }
+            $.getJSON('/Cantones/PorProvincia', { provinciaId: provinciaId }, function (data) {
+                $.each(data, function (i, item) {
+                    $canton.append($('<option></option>').val(item.cantonID).text(item.nombre));
+                });
+                if (cantonSeleccionado) { $canton.val(cantonSeleccionado); }
+            });
+        }
+
+        $(document).ready(function () {
+            if ($('#ProvinciaCoberturaID').val()) {
+                cargarCantonesCobertura($('#ProvinciaCoberturaID').val(), cantonCoberturaActual);
+            }
+
+            $('#ProvinciaCoberturaID').change(function () {
+                cargarCantonesCobertura($(this).val());
+            });
+        });
+    </script>
+}

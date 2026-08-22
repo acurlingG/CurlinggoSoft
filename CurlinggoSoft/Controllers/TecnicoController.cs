@@ -16,7 +16,7 @@ namespace CurlinggoSoft.Controllers
     // NOTA: ajusta "Tecnico" al nombre exacto de tu rol en AspNetRoles si es
     // distinto.
     [Authorize(Roles = "Tecnico")]
-    public class TecnicoController : Controller
+    public partial class TecnicoController : Controller
     {
         private readonly ApplicationDbContext _context;
         private readonly IHubContext<NotificacionesHub> _hub;

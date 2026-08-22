@@ -20,6 +20,10 @@ builder.Services.AddDbContext<ApplicationDbContext>(options =>
 // Registrar el motor de asignación
 builder.Services.AddScoped<CurlinggoSoft.Services.IDispatchEngineService, CurlinggoSoft.Services.DispatchEngineService>();
 
+// Registrar el servicio de creación de evaluaciones (llama a usp_Evaluacion_Crear),
+// compartido entre ClienteController y TecnicoController.
+builder.Services.AddScoped<CurlinggoSoft.Services.EvaluacionService>();
+
 // En Development, las Data Protection Keys se generan en memoria (efímeras) en
 // lugar de persistirse en %APPDATA%\ASP.NET\DataProtection-Keys. Esto evita que,
 // al detener y volver a correr el proyecto desde Visual Studio, las cookies de

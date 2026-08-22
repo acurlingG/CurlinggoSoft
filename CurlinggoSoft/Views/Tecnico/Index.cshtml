@@ -135,6 +135,7 @@
                                     </div>
                                     <div class="small mt-1 mensaje-cancelacion-tec"></div>
                                 }
+                                @await Html.PartialAsync("_AccionesReservaTecnico", trabajo)
                             </td>
                         </tr>
                     }
@@ -147,7 +148,6 @@
 @Html.AntiForgeryToken()
 
 @section Scripts {
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/microsoft-signalr/8.0.0/signalr.min.js"></script>
     <script>
         // --- Captura de ubicación al entrar al panel (igual que el wizard
         //     del cliente en Paso4direccion.cshtml). Sin esto,
@@ -257,14 +257,13 @@
         actualizarBadge();
         setInterval(actualizarBadge, 60000);
 
-        const connection = new signalR.HubConnectionBuilder()
-            .withUrl('/hubs/notificaciones')
-            .withAutomaticReconnect()
-            .build();
-
-        connection.on('NuevaOferta', actualizarBadge);
-        connection.on('OfertaYaTomada', actualizarBadge);
-        connection.start().catch(err => console.warn('Sin conexión en tiempo real, usando respaldo por polling.', err));
+        // Reutiliza la conexión SignalR única y compartida definida en
+        // _Layout.cshtml, en vez de abrir una conexión adicional aquí.
+        if (window.curlinggoConnection) {
+            window.curlinggoConnection.on('NuevaOferta', actualizarBadge);
+            window.curlinggoConnection.on('OfertaYaTomada', actualizarBadge);
+            window.curlinggoConnectionReady.catch(err => console.warn('Sin conexión en tiempo real, usando respaldo por polling.', err));
+        }
 
         // --- Cancelación de reserva por el técnico (ventana de gracia) ---
         document.querySelectorAll('.cancelar-tecnico').forEach(function(bloque) {

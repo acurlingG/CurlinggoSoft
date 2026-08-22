@@ -11,6 +11,26 @@ public class DistritosController : Controller
         _context = context;
     }
 
+    // GET: DISTRITOS/PorCanton/5
+    // Usado por los formularios de Perfiles de Cliente/Técnico para llenar
+    // el combo de Distrito en cascada según el Cantón seleccionado.
+    [HttpGet]
+    public async Task<IActionResult> PorCanton(int? cantonId)
+    {
+        if (cantonId == null)
+        {
+            return Json(Array.Empty<object>());
+        }
+
+        var distritos = await _context.Distritos
+            .Where(d => d.CantonID == cantonId && d.Activo)
+            .OrderBy(d => d.Nombre)
+            .Select(d => new { d.DistritoID, d.Nombre })
+            .ToListAsync();
+
+        return Json(distritos);
+    }
+
     public async Task<IActionResult> Index()
     {
         var distritos = await _context.Distritos

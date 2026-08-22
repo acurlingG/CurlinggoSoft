@@ -7,7 +7,43 @@ public class OfertasTecnicoController : Controller
     private readonly ApplicationDbContext _context;
     public OfertasTecnicoController(ApplicationDbContext context) => _context = context;
 
-    public async Task<IActionResult> Index() => View(await _context.OfertasTecnico.Include(o => o.Reserva).Include(o => o.Tecnico).Include(o => o.EstadoOferta).OrderByDescending(o => o.FechaEnvio).ToListAsync());
+    // GET: /OfertasTecnico/Index?tecnicoId=xxx
+    public async Task<IActionResult> Index(string? tecnicoId)
+    {
+        var query = _context.OfertasTecnico
+            .Include(o => o.Reserva)
+            .Include(o => o.Tecnico)
+            .Include(o => o.EstadoOferta)
+            .AsQueryable();
+
+        if (!string.IsNullOrEmpty(tecnicoId))
+        {
+            query = query.Where(o => o.TecnicoID == tecnicoId);
+        }
+
+        ViewBag.TecnicoIDSeleccionado = tecnicoId;
+        ViewBag.Tecnicos = await ObtenerListaTecnicosAsync(tecnicoId);
+
+        return View(await query.OrderByDescending(o => o.FechaEnvio).ToListAsync());
+    }
+
+    // Combo de t\u00e9cnicos mostrando "Nombre Apellidos (email)" en vez de solo
+    // el TecnicoID, uniendo TecnicosPerfil con Usuarios por el mismo Id.
+    private async Task<Microsoft.AspNetCore.Mvc.Rendering.SelectList> ObtenerListaTecnicosAsync(string? seleccionado)
+    {
+        var tecnicos = await (
+            from t in _context.TecnicosPerfil
+            join u in _context.Usuarios on t.TecnicoID equals u.UsuarioID into gu
+            from u in gu.DefaultIfEmpty()
+            orderby u != null ? u.Nombre : t.IdentificacionCedula
+            select new
+            {
+                t.TecnicoID,
+                Texto = u != null ? $"{u.Nombre} {u.Apellidos} ({u.Email})" : t.IdentificacionCedula
+            }).ToListAsync();
+
+        return new Microsoft.AspNetCore.Mvc.Rendering.SelectList(tecnicos, "TecnicoID", "Texto", seleccionado);
+    }
 
     public async Task<IActionResult> Details(long? id) => id == null ? NotFound() : View(await _context.OfertasTecnico.Include(o => o.Reserva).Include(o => o.Tecnico).Include(o => o.EstadoOferta).FirstOrDefaultAsync(m => m.OfertaTecnicoID == id) ?? new());
 

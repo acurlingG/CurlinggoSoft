@@ -37,6 +37,11 @@ namespace CurlinggoSoft.Models
         [Display(Name = "Fecha Actualización")]
         public DateTime FechaActualizacion { get; set; } = DateTime.Now;
 
+        [Column(TypeName = "decimal(3,2)")]
+        [Range(0.00, 5.00, ErrorMessage = "La calificación promedio debe estar entre 0.00 y 5.00")]
+        [Display(Name = "Calificación Promedio")]
+        public decimal CalificacionPromedio { get; set; } = 0.00m;
+
         [ForeignKey("ProvinciaID")]
         public virtual Provincia? Provincia { get; set; }
 

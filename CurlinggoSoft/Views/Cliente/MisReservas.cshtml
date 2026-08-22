@@ -36,11 +36,70 @@
                             <td>@item.Moneda @item.MontoTotalCotizado.ToString("N2")</td>
                             <td>
                                 <a asp-controller="SolicitudServicio" asp-action="Paso6ConfirmacionExitosa" asp-route-id="@item.ReservaID" class="btn btn-sm btn-primary">Ver Detalle</a>
+                                @if (item.EstadoReserva?.Codigo is "ASIGNADA" or "EN_CAMINO" or "EN_PROCESO")
+                                {
+                                    <button type="button" class="btn btn-sm btn-outline-secondary" data-bs-toggle="modal" data-bs-target="#modalChat-@item.ReservaID">
+                                        <i class="fa fa-comments"></i> Chat
+                                    </button>
+                                }
+                                else if (item.EstadoReserva?.Codigo is "COMPLETADA" or "CANCELADA")
+                                {
+                                    <button type="button" class="btn btn-sm btn-outline-secondary" data-bs-toggle="modal" data-bs-target="#modalChat-@item.ReservaID">
+                                        <i class="fa fa-comments"></i> Ver conversación
+                                    </button>
+                                }
+                                @if (item.EstadoReserva?.Codigo == "COMPLETADA")
+                                {
+                                    <button type="button" class="btn btn-sm btn-warning" onclick="cargarCalificacion(@item.ReservaID, 'Cliente')">
+                                        <i class="fa fa-star"></i> Calificar Técnico
+                                    </button>
+                                }
                             </td>
                         </tr>
                     }
                 </tbody>
             </table>
         </div>
+
+        @foreach (var item in Model)
+        {
+            @if (item.EstadoReserva?.Codigo is "ASIGNADA" or "EN_CAMINO" or "EN_PROCESO" or "COMPLETADA" or "CANCELADA")
+            {
+                <div class="modal fade" id="modalChat-@item.ReservaID" tabindex="-1" aria-hidden="true">
+                    <div class="modal-dialog modal-dialog-centered">
+                        <div class="modal-content p-2">
+                            <div class="modal-header">
+                                <h5 class="modal-title">Chat con el técnico</h5>
+                                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Cerrar"></button>
+                            </div>
+                            <div class="modal-body">
+                                @await Html.PartialAsync("_ChatReserva", item.ReservaID)
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            }
+            @if (item.EstadoReserva?.Codigo == "COMPLETADA")
+            {
+                <div id="contenedorCalificacion-@item.ReservaID"></div>
+            }
+        }
     }
 </div>
+
+<script>
+    // Carga perezosa del modal de calificación vía AJAX (para no consultar
+    // /Cliente/CalificarTecnico de todas las reservas de una sola vez).
+    function cargarCalificacion(reservaId, rol) {
+        const contenedor = document.getElementById("contenedorCalificacion-" + reservaId);
+        if (contenedor.dataset.cargado === "1") return;
+
+        fetch("/Cliente/CalificarTecnico?reservaId=" + reservaId)
+            .then(r => r.text())
+            .then(html => {
+                contenedor.innerHTML = html;
+                contenedor.dataset.cargado = "1";
+                new bootstrap.Modal(document.getElementById("modalCalificacion-" + reservaId)).show();
+            });
+    }
+</script>

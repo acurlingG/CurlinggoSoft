@@ -1,5 +1,8 @@
 @model IEnumerable<CurlinggoSoft.Models.ClientePerfil>
-@{ ViewData["Title"] = "Clientes Perfil"; }
+@{
+    ViewData["Title"] = "Clientes Perfil";
+    var usuarios = ViewData["Usuarios"] as Dictionary<string, CurlinggoSoft.Models.Usuario>;
+}
 <h1>Perfiles de Clientes</h1>
 <p><a asp-action="Create" class="btn btn-primary">+ Nuevo Perfil Cliente</a></p>
 <table class="table table-striped table-hover">
@@ -9,8 +12,20 @@
     <tbody>
         @foreach (var item in Model)
         {
+            CurlinggoSoft.Models.Usuario? usuario = null;
+            usuarios?.TryGetValue(item.ClienteID, out usuario);
             <tr>
-                <td>@item.ClienteID</td>
+                <td>
+                    @if (usuario != null)
+                    {
+                        <div>@usuario.Nombre @usuario.Apellidos</div>
+                        <small class="text-muted">@usuario.Email</small>
+                    }
+                    else
+                    {
+                        @item.ClienteID
+                    }
+                </td>
                 <td>@item.Provincia?.Nombre</td>
                 <td>@item.Canton?.Nombre</td>
                 <td>@item.Distrito?.Nombre</td>

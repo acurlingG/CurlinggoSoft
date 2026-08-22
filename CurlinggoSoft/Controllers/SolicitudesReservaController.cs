@@ -40,7 +40,70 @@ public class SolicitudesReservaController : Controller
         return RedirectToAction(nameof(Details), new { id = reservaId });
     }
 
-    public async Task<IActionResult> Index() => View(await _context.SolicitudesReserva.Include(r => r.Cliente).Include(r => r.Tecnico).Include(r => r.Servicio).Include(r => r.EstadoReserva).OrderByDescending(r => r.FechaHoraSolicitud).ToListAsync());
+    // GET: /SolicitudesReserva/Index?clienteId=xxx&servicioId=5&estadoId=3
+    // Se agregan filtros por cliente, servicio y estado; el combo de cliente
+    // muestra nombre/email (join con Usuarios) en vez del ClienteID crudo.
+    public async Task<IActionResult> Index(string? clienteId, int? servicioId, int? estadoId)
+    {
+        var query = _context.SolicitudesReserva
+            .Include(r => r.Cliente)
+            .Include(r => r.Tecnico)
+            .Include(r => r.Servicio)
+            .Include(r => r.EstadoReserva)
+            .AsQueryable();
+
+        if (!string.IsNullOrEmpty(clienteId))
+        {
+            query = query.Where(r => r.ClienteID == clienteId);
+        }
+        if (servicioId.HasValue)
+        {
+            query = query.Where(r => r.ServicioID == servicioId.Value);
+        }
+        if (estadoId.HasValue)
+        {
+            query = query.Where(r => r.EstadoReservaID == estadoId.Value);
+        }
+
+        ViewBag.ClienteIDSeleccionado = clienteId;
+        ViewBag.ServicioIDSeleccionado = servicioId;
+        ViewBag.EstadoIDSeleccionado = estadoId;
+
+        ViewBag.Clientes = await ObtenerListaClientesAsync(clienteId);
+        ViewBag.Servicios = new Microsoft.AspNetCore.Mvc.Rendering.SelectList(
+            await _context.Servicios.OrderBy(s => s.NombreServicio).ToListAsync(), "ServicioID", "NombreServicio", servicioId);
+        ViewBag.Estados = new Microsoft.AspNetCore.Mvc.Rendering.SelectList(
+            await _context.EstadosReserva.OrderBy(e => e.Nombre).ToListAsync(), "EstadoReservaID", "Nombre", estadoId);
+
+        var resultado = await query.OrderByDescending(r => r.FechaHoraSolicitud).ToListAsync();
+
+        // ClientePerfil no tiene navegación a Usuario, así que se arma un
+        // diccionario ClienteID -> "Nombre Apellidos (email)" para la vista.
+        var clienteIds = resultado.Select(r => r.ClienteID).Distinct().ToList();
+        ViewBag.ClienteNombres = await _context.Usuarios
+            .Where(u => clienteIds.Contains(u.UsuarioID))
+            .ToDictionaryAsync(u => u.UsuarioID, u => $"{u.Nombre} {u.Apellidos} ({u.Email})");
+
+        return View(resultado);
+    }
+
+    // Combo de clientes mostrando "Nombre Apellidos (email)" en vez de solo
+    // el ClienteID, uniendo ClientesPerfil con Usuarios por el mismo Id.
+    private async Task<Microsoft.AspNetCore.Mvc.Rendering.SelectList> ObtenerListaClientesAsync(string? seleccionado)
+    {
+        var clientes = await (
+            from c in _context.ClientesPerfil
+            join u in _context.Usuarios on c.ClienteID equals u.UsuarioID into gu
+            from u in gu.DefaultIfEmpty()
+            orderby u != null ? u.Nombre : c.ClienteID
+            select new
+            {
+                c.ClienteID,
+                Texto = u != null ? $"{u.Nombre} {u.Apellidos} ({u.Email})" : c.ClienteID
+            }).ToListAsync();
+
+        return new Microsoft.AspNetCore.Mvc.Rendering.SelectList(clientes, "ClienteID", "Texto", seleccionado);
+    }
 
     public async Task<IActionResult> Details(long? id) => id == null ? NotFound() : View(await _context.SolicitudesReserva.Include(r => r.Cliente).Include(r => r.Tecnico).Include(r => r.Servicio).Include(r => r.EstadoReserva).FirstOrDefaultAsync(m => m.ReservaID == id) ?? new());
 

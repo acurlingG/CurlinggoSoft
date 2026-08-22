@@ -2,6 +2,41 @@
 @{ ViewData["Title"] = "Solicitudes Reserva"; }
 <h1>Solicitudes de Reserva</h1>
 <p><a asp-action="Create" class="btn btn-primary">+ Nueva Reserva</a></p>
+
+<form method="get" asp-action="Index" class="row g-2 mb-3">
+    <div class="col-auto">
+        <select name="clienteId" class="form-select" onchange="this.form.submit()">
+            <option value="">-- Todos los clientes --</option>
+            @foreach (var item in (Microsoft.AspNetCore.Mvc.Rendering.SelectList)ViewBag.Clientes)
+            {
+                <option value="@item.Value" selected="@(item.Value == (string)ViewBag.ClienteIDSeleccionado)">@item.Text</option>
+            }
+        </select>
+    </div>
+    <div class="col-auto">
+        <select name="servicioId" class="form-select" onchange="this.form.submit()">
+            <option value="">-- Todos los servicios --</option>
+            @foreach (var item in (Microsoft.AspNetCore.Mvc.Rendering.SelectList)ViewBag.Servicios)
+            {
+                <option value="@item.Value" selected="@(item.Value == (ViewBag.ServicioIDSeleccionado?.ToString() ?? ""))">@item.Text</option>
+            }
+        </select>
+    </div>
+    <div class="col-auto">
+        <select name="estadoId" class="form-select" onchange="this.form.submit()">
+            <option value="">-- Todos los estados --</option>
+            @foreach (var item in (Microsoft.AspNetCore.Mvc.Rendering.SelectList)ViewBag.Estados)
+            {
+                <option value="@item.Value" selected="@(item.Value == (ViewBag.EstadoIDSeleccionado?.ToString() ?? ""))">@item.Text</option>
+            }
+        </select>
+    </div>
+    <div class="col-auto">
+        <button type="submit" class="btn btn-outline-secondary">Filtrar</button>
+        <a asp-action="Index" class="btn btn-outline-secondary">Limpiar</a>
+    </div>
+</form>
+
 <table class="table table-striped table-hover">
     <thead class="table-dark">
         <tr><th>Cliente</th><th>Técnico</th><th>Servicio</th><th>Estado</th><th>Monto</th><th>Fecha Programada</th><th>Acciones</th></tr>
@@ -9,8 +44,12 @@
     <tbody>
         @foreach (var item in Model)
         {
+            var nombresClientes = (Dictionary<string, string>)ViewBag.ClienteNombres;
+            var clienteTexto = nombresClientes != null && nombresClientes.ContainsKey(item.ClienteID)
+                ? nombresClientes[item.ClienteID]
+                : item.ClienteID;
             <tr>
-                <td>@item.Cliente?.ClienteID</td>
+                <td>@clienteTexto</td>
                 <td>@item.Tecnico?.IdentificacionCedula</td>
                 <td>@item.Servicio?.NombreServicio</td>
                 <td>@item.EstadoReserva?.Nombre</td>

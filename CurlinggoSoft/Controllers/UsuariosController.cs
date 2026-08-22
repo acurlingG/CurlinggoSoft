@@ -26,7 +26,7 @@ public class UsuariosController : Controller
         _roleManager = roleManager;
     }
 
-    public async Task<IActionResult> Index()
+    public async Task<IActionResult> Index(string? rolFiltro)
     {
         var usuarios = await _context.Usuarios.OrderBy(u => u.Nombre).ToListAsync();
         var roles = new Dictionary<string, string>();
@@ -43,7 +43,15 @@ public class UsuariosController : Controller
                 roles[usuario.UsuarioID] = "Sin cuenta de acceso";
             }
         }
+
+        if (!string.IsNullOrWhiteSpace(rolFiltro))
+        {
+            usuarios = usuarios.Where(u => roles.TryGetValue(u.UsuarioID, out var rol) && rol == rolFiltro).ToList();
+        }
+
         ViewData["Roles"] = roles;
+        ViewData["RolesDisponibles"] = await _roleManager.Roles.Select(r => r.Name).OrderBy(n => n).ToListAsync();
+        ViewData["RolFiltro"] = rolFiltro;
         return View(usuarios);
     }
 

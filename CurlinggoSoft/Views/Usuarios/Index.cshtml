@@ -2,9 +2,27 @@
 @{
     ViewData["Title"] = "Usuarios";
     var roles = ViewData["Roles"] as Dictionary<string, string> ?? new();
+    var rolesDisponibles = ViewData["RolesDisponibles"] as List<string?> ?? new();
+    var rolFiltro = ViewData["RolFiltro"] as string;
 }
 <h1>Usuarios Registrados</h1>
 <p><a asp-action="Create" class="btn btn-primary">+ Nuevo Usuario</a></p>
+<form asp-action="Index" method="get" class="row g-2 align-items-end mb-3">
+    <div class="col-auto">
+        <label class="form-label">Filtrar por rol</label>
+        <select name="rolFiltro" class="form-select" onchange="this.form.submit()">
+            <option value="">-- Todos --</option>
+            @foreach (var rol in rolesDisponibles)
+            {
+                <option value="@rol" selected="@(rol == rolFiltro)">@rol</option>
+            }
+        </select>
+    </div>
+    <div class="col-auto">
+        <button type="submit" class="btn btn-outline-secondary">Filtrar</button>
+        <a asp-action="Index" class="btn btn-outline-secondary">Ver todos</a>
+    </div>
+</form>
 <table class="table table-striped table-hover">
     <thead class="table-dark">
         <tr><th>Nombre</th><th>Apellidos</th><th>Email</th><th>Teléfono</th><th>Rol</th><th>Estado</th><th>Acciones</th></tr>
@@ -29,4 +47,5 @@
     </tbody>
 </table>
 <div><a asp-action="Index" asp-controller="Admin" class="btn btn-secondary mt-3">← Volver al Admin</a></div>
+
 

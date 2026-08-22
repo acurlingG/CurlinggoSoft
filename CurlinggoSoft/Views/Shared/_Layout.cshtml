@@ -102,6 +102,8 @@
                                         <li><a class="dropdown-item" asp-controller="Menus" asp-action="Index">Estructura de Menús</a></li>
                                         <li><a class="dropdown-item" asp-controller="Permisos" asp-action="Index">Permisos del Sistema</a></li>
                                         <li><a class="dropdown-item" asp-controller="MenuPermisos" asp-action="Index">Menú-Permisos</a></li>
+                                        <li><hr class="dropdown-divider" /></li>
+                                        <li><a class="dropdown-item" asp-controller="ConfiguracionDespacho" asp-action="Edit">Configuración de Despacho</a></li>
                                     </ul>
                                 </li>
                                 <li class="nav-item dropdown">
@@ -210,6 +212,31 @@
     <script src="~/lib/jquery/dist/jquery.min.js"></script>
     <script src="~/lib/bootstrap/dist/js/bootstrap.bundle.min.js"></script>
     <script src="~/js/site.js" asp-append-version="true"></script>
+    @if (User.Identity != null && User.Identity.IsAuthenticated)
+    {
+        <script src="https://cdnjs.cloudflare.com/ajax/libs/microsoft-signalr/8.0.0/signalr.min.js"></script>
+        <script>
+            // Conexión SignalR única y compartida por toda la página, para
+            // que las distintas partials (badge de ofertas, chats de
+            // reserva, etc.) no abran cada una su propia conexión al hub.
+            // Cualquier script puede:
+            //   - Esperar a que esté lista: await window.curlinggoConnectionReady
+            //   - Registrar handlers: window.curlinggoConnection.on('Evento', fn)
+            //   - Invocar métodos: window.curlinggoConnection.invoke('Metodo', ...)
+            (function () {
+                if (window.curlinggoConnection) return; // ya inicializada (layout aplicado una sola vez, pero por seguridad)
+
+                const connection = new signalR.HubConnectionBuilder()
+                    .withUrl('/hubs/notificaciones')
+                    .withAutomaticReconnect()
+                    .build();
+
+                window.curlinggoConnection = connection;
+                window.curlinggoConnectionReady = connection.start()
+                    .catch(err => console.error('Error conectando SignalR:', err));
+            })();
+        </script>
+    }
     @await RenderSectionAsync("Scripts", required: false)
 </body>
 </html>

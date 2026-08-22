@@ -7,7 +7,41 @@ public class DisponibilidadTecnicoController : Controller
     private readonly ApplicationDbContext _context;
     public DisponibilidadTecnicoController(ApplicationDbContext context) => _context = context;
 
-    public async Task<IActionResult> Index() => View(await _context.DisponibilidadTecnico.Include(d => d.Tecnico).ToListAsync());
+    // GET: /DisponibilidadTecnico/Index?tecnicoId=xxx
+    // Se agrega filtro por t\u00e9cnico (usando su Usuario asociado para mostrar
+    // nombre completo en el combo, en vez de solo la c\u00e9dula).
+    public async Task<IActionResult> Index(string? tecnicoId)
+    {
+        var query = _context.DisponibilidadTecnico.Include(d => d.Tecnico).AsQueryable();
+
+        if (!string.IsNullOrEmpty(tecnicoId))
+        {
+            query = query.Where(d => d.TecnicoID == tecnicoId);
+        }
+
+        ViewBag.TecnicoIDSeleccionado = tecnicoId;
+        ViewBag.Tecnicos = await ObtenerListaTecnicosAsync(tecnicoId);
+
+        return View(await query.OrderBy(d => d.TecnicoID).ThenBy(d => d.DiaSemana).ToListAsync());
+    }
+
+    // Combo de t\u00e9cnicos mostrando "Nombre Apellidos (email)" en vez de solo
+    // el TecnicoID, uniendo TecnicosPerfil con Usuarios por el mismo Id.
+    private async Task<Microsoft.AspNetCore.Mvc.Rendering.SelectList> ObtenerListaTecnicosAsync(string? seleccionado)
+    {
+        var tecnicos = await (
+            from t in _context.TecnicosPerfil
+            join u in _context.Usuarios on t.TecnicoID equals u.UsuarioID into gu
+            from u in gu.DefaultIfEmpty()
+            orderby u != null ? u.Nombre : t.IdentificacionCedula
+            select new
+            {
+                t.TecnicoID,
+                Texto = u != null ? $"{u.Nombre} {u.Apellidos} ({u.Email})" : t.IdentificacionCedula
+            }).ToListAsync();
+
+        return new Microsoft.AspNetCore.Mvc.Rendering.SelectList(tecnicos, "TecnicoID", "Texto", seleccionado);
+    }
 
     public async Task<IActionResult> Details(long? id) => id == null ? NotFound() : View(await _context.DisponibilidadTecnico.Include(d => d.Tecnico).FirstOrDefaultAsync(m => m.DisponibilidadID == id) ?? new());
 

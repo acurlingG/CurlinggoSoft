@@ -1,5 +1,6 @@
 using System.ComponentModel.DataAnnotations;
 using System.ComponentModel.DataAnnotations.Schema;
+using Microsoft.AspNetCore.Mvc.ModelBinding.Validation;
 
 namespace CurlinggoSoft.Models
 {
@@ -45,9 +46,11 @@ namespace CurlinggoSoft.Models
 
         // Relaciones
         [ForeignKey("CategoriaID")]
+        [ValidateNever]
         public virtual CategoriaServicio Categoria { get; set; } = null!;
 
         [ForeignKey("SubcategoriaID")]
+        [ValidateNever]
         public virtual SubcategoriaServicio Subcategoria { get; set; } = null!;
     }
 }

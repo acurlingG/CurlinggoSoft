@@ -1,0 +1,122 @@
+@* Chat bilateral de una reserva (activa o finalizada).
+   Uso: @await Html.PartialAsync("_ChatReserva", reservaId)
+   Si la reserva ya no está en un estado activo, el historial se sigue
+   mostrando (modo solo lectura) pero el input de envío se deshabilita;
+   el servidor (MensajesController.Enviar) también rechaza el envío en
+   ese caso, así que esto es una doble validación (UX + seguridad).
+   Reutiliza la conexión SignalR única y compartida definida en
+   _Layout.cshtml (window.curlinggoConnection / window.curlinggoConnectionReady)
+   en vez de crear una conexión propia por cada instancia del partial. *@
+@model long
+@{
+    var reservaId = Model;
+}
+
+<div class="card">
+    <div class="card-header">Chat de la reserva</div>
+    <div class="card-body" style="height:300px; overflow-y:auto;" id="chat-mensajes-@reservaId">
+        <!-- Se llena vía AJAX/SignalR -->
+    </div>
+    <div class="card-footer d-flex gap-2">
+        <input type="text" id="chat-texto-@reservaId" class="form-control" maxlength="1000" placeholder="Escribe un mensaje..." />
+        <button type="button" class="btn btn-primary" id="chat-enviar-@reservaId">Enviar</button>
+    </div>
+    <div class="card-footer text-muted small d-none" id="chat-solo-lectura-@reservaId">
+        Esta reserva ya finalizó; puedes ver la conversación, pero no enviar nuevos mensajes.
+    </div>
+</div>
+
+<script>
+    (function () {
+        const reservaId = @reservaId;
+        const contenedor = document.getElementById("chat-mensajes-" + reservaId);
+        const input = document.getElementById("chat-texto-" + reservaId);
+        const boton = document.getElementById("chat-enviar-" + reservaId);
+
+        function cargarHistorial() {
+            fetch("/Mensajes/Historial?reservaId=" + reservaId)
+                .then(r => r.text())
+                .then(html => {
+                    contenedor.innerHTML = html;
+                    contenedor.scrollTop = contenedor.scrollHeight;
+                });
+        }
+
+        function bloquearEnvio() {
+            input.disabled = true;
+            boton.disabled = true;
+            input.placeholder = "Esta reserva ya finalizó.";
+            const aviso = document.getElementById("chat-solo-lectura-" + reservaId);
+            if (aviso) aviso.classList.remove("d-none");
+        }
+
+        function obtenerAntiForgeryToken() {
+            const el = document.querySelector('input[name="__RequestVerificationToken"]');
+            return el ? el.value : "";
+        }
+
+        function enviar() {
+            const texto = input.value.trim();
+            if (!texto) return;
+
+            const formData = new FormData();
+            formData.append("reservaId", reservaId);
+            formData.append("texto", texto);
+            formData.append("__RequestVerificationToken", obtenerAntiForgeryToken());
+
+            fetch("/Mensajes/Enviar", { method: "POST", body: formData })
+                .then(r => {
+                    if (r.ok) {
+                        input.value = "";
+                    } else if (r.status === 403) {
+                        bloquearEnvio();
+                    } else {
+                        r.text().then(msg => alert(msg || "No se pudo enviar el mensaje."));
+                    }
+                });
+        }
+
+        boton.addEventListener("click", enviar);
+        input.addEventListener("keydown", e => { if (e.key === "Enter") enviar(); });
+
+        cargarHistorial();
+
+        // Consulta proactiva: si la reserva ya no está activa, deshabilita
+        // el input de inmediato (sin esperar a un intento fallido de envío)
+        // y evita suscribirse innecesariamente al grupo SignalR de la
+        // reserva, ya que no llegarán mensajes nuevos.
+        fetch("/Mensajes/EstadoActivo?reservaId=" + reservaId)
+            .then(r => r.ok ? r.json() : { activo: false })
+            .then(data => {
+                if (!data.activo) {
+                    bloquearEnvio();
+                    return;
+                }
+                suscribirseATiempoReal();
+            })
+            .catch(() => suscribirseATiempoReal()); // ante duda, intenta tiempo real igualmente
+
+        function suscribirseATiempoReal() {
+            // Reutiliza la conexión SignalR única de la página (definida en
+            // _Layout.cshtml). Se filtra por reservaId porque el evento
+            // "NuevoMensaje" se recibe globalmente y puede haber varios chats
+            // (varias reservas activas) escuchando en la misma página.
+            if (!window.curlinggoConnection) {
+                console.error("Conexión SignalR compartida no disponible; ¿el usuario está autenticado?");
+                return;
+            }
+
+            window.curlinggoConnection.on("NuevoMensaje", function (mensaje) {
+                if (mensaje.reservaId != reservaId) return;
+                // Recarga simple del historial; para volúmenes altos convendría
+                // anexar solo el mensaje nuevo en vez de recargar todo.
+                cargarHistorial();
+            });
+
+            window.curlinggoConnectionReady
+                .then(() => window.curlinggoConnection.invoke("SuscribirseAReserva", reservaId))
+                .catch(err => console.error("Error suscribiéndose al chat:", err));
+        }
+    })();
+</script>
+

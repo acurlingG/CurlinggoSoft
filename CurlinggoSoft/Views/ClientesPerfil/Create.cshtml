@@ -6,9 +6,12 @@
         <form asp-action="Create">
             <div asp-validation-summary="ModelOnly" class="alert alert-danger"></div>
             <div class="mb-3">
-                <label asp-for="ClienteID" class="form-label"></label>
-                <input asp-for="ClienteID" class="form-control" />
+                <label asp-for="ClienteID" class="form-label">Cliente (usuario)</label>
+                <select asp-for="ClienteID" class="form-select" asp-items="ViewBag.ClienteID">
+                    <option value="">-- Seleccione un cliente --</option>
+                </select>
                 <span asp-validation-for="ClienteID" class="text-danger"></span>
+                <small class="form-text text-muted">Solo se listan usuarios con rol "Cliente" que aún no tienen un perfil creado.</small>
             </div>
             <div class="mb-3">
                 <label asp-for="ProvinciaID" class="form-label"></label>
@@ -42,4 +45,41 @@
         </form>
     </div>
 </div>
-@section Scripts { @{await Html.RenderPartialAsync("_ValidationScriptsPartial");} }
+@section Scripts {
+    @{await Html.RenderPartialAsync("_ValidationScriptsPartial");}
+    <script>
+        function cargarCantones(provinciaId, cantonSeleccionado) {
+            var $canton = $('#CantonID');
+            $canton.empty().append('<option value="">-- Seleccione --</option>');
+            if (!provinciaId) { return; }
+            $.getJSON('/Cantones/PorProvincia', { provinciaId: provinciaId }, function (data) {
+                $.each(data, function (i, item) {
+                    $canton.append($('<option></option>').val(item.cantonID).text(item.nombre));
+                });
+                if (cantonSeleccionado) { $canton.val(cantonSeleccionado); }
+            });
+        }
+
+        function cargarDistritos(cantonId, distritoSeleccionado) {
+            var $distrito = $('#DistritoID');
+            $distrito.empty().append('<option value="">-- Seleccione --</option>');
+            if (!cantonId) { return; }
+            $.getJSON('/Distritos/PorCanton', { cantonId: cantonId }, function (data) {
+                $.each(data, function (i, item) {
+                    $distrito.append($('<option></option>').val(item.distritoID).text(item.nombre));
+                });
+                if (distritoSeleccionado) { $distrito.val(distritoSeleccionado); }
+            });
+        }
+
+        $(document).ready(function () {
+            $('#ProvinciaID').change(function () {
+                cargarCantones($(this).val());
+                $('#DistritoID').empty().append('<option value="">-- Seleccione --</option>');
+            });
+            $('#CantonID').change(function () {
+                cargarDistritos($(this).val());
+            });
+        });
+    </script>
+}

@@ -1,0 +1,56 @@
+@{
+    var reservaId = (long)ViewData["ReservaID"]!;
+    var yaCalifico = (bool)ViewData["YaCalifico"]!;
+    var titulo = (string)ViewData["TituloCalificacion"]!;
+    var accion = (string)ViewData["AccionEnviar"]!;
+}
+
+<div class="modal fade" id="modalCalificacion-@reservaId" tabindex="-1" aria-hidden="true">
+    <div class="modal-dialog modal-dialog-centered">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title">@titulo</h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Cerrar"></button>
+            </div>
+            @if (yaCalifico)
+            {
+                <div class="modal-body">
+                    <p class="text-muted mb-0">Ya enviaste tu calificación para esta reserva. ¡Gracias!</p>
+                </div>
+            }
+            else
+            {
+                <form asp-action="@accion" method="post">
+                    @Html.AntiForgeryToken()
+                    <input type="hidden" name="reservaId" value="@reservaId" />
+                    <div class="modal-body">
+                        <div class="estrellas mb-3" dir="rtl">
+                            @for (int i = 5; i >= 1; i--)
+                            {
+                                <input type="radio" id="estrella-@reservaId-@i" name="puntuacion" value="@i" required />
+                                <label for="estrella-@reservaId-@i" title="@i estrella(s)">&#9733;</label>
+                            }
+                        </div>
+                        <div class="form-group">
+                            <label>Comentario (opcional)</label>
+                            <textarea name="comentario" class="form-control" rows="3" maxlength="1000"></textarea>
+                        </div>
+                    </div>
+                    <div class="modal-footer">
+                        <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancelar</button>
+                        <button type="submit" class="btn btn-primary">Enviar Calificación</button>
+                    </div>
+                </form>
+            }
+        </div>
+    </div>
+</div>
+
+<style>
+    .estrellas { display: inline-flex; font-size: 2rem; }
+    .estrellas input { display: none; }
+    .estrellas label { color: #ccc; cursor: pointer; }
+    .estrellas input:checked ~ label,
+    .estrellas label:hover,
+    .estrellas label:hover ~ label { color: #f5b301; }
+</style>

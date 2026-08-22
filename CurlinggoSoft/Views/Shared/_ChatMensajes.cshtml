@@ -1,0 +1,11 @@
+@model IEnumerable<dynamic>
+
+@foreach (var m in Model)
+{
+    <div class="d-flex mb-2 @(m.esPropio ? "justify-content-end" : "justify-content-start")">
+        <div class="p-2 rounded @(m.esPropio ? "bg-primary text-white" : "bg-light")" style="max-width:75%;">
+            <div>@m.Texto</div>
+            <small class="@(m.esPropio ? "text-white-50" : "text-muted")">@(((DateTime)m.FechaEnvio).ToString("dd/MM HH:mm"))</small>
+        </div>
+    </div>
+}

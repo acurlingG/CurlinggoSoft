@@ -34,4 +34,47 @@
         </form>
     </div>
 </div>
-@section Scripts { @{await Html.RenderPartialAsync("_ValidationScriptsPartial");} }
+@section Scripts {
+    @{await Html.RenderPartialAsync("_ValidationScriptsPartial");}
+    <script>
+        var cantonActual = @Html.Raw(Model.CantonID);
+        var distritoActual = @Html.Raw(Model.DistritoID);
+
+        function cargarCantones(provinciaId, cantonSeleccionado) {
+            var $canton = $('#CantonID');
+            $canton.empty().append('<option value="">-- Seleccione --</option>');
+            if (!provinciaId) { return; }
+            $.getJSON('/Cantones/PorProvincia', { provinciaId: provinciaId }, function (data) {
+                $.each(data, function (i, item) {
+                    $canton.append($('<option></option>').val(item.cantonID).text(item.nombre));
+                });
+                if (cantonSeleccionado) { $canton.val(cantonSeleccionado); }
+            });
+        }
+
+        function cargarDistritos(cantonId, distritoSeleccionado) {
+            var $distrito = $('#DistritoID');
+            $distrito.empty().append('<option value="">-- Seleccione --</option>');
+            if (!cantonId) { return; }
+            $.getJSON('/Distritos/PorCanton', { cantonId: cantonId }, function (data) {
+                $.each(data, function (i, item) {
+                    $distrito.append($('<option></option>').val(item.distritoID).text(item.nombre));
+                });
+                if (distritoSeleccionado) { $distrito.val(distritoSeleccionado); }
+            });
+        }
+
+        $(document).ready(function () {
+            cargarCantones($('#ProvinciaID').val(), cantonActual);
+            cargarDistritos(cantonActual, distritoActual);
+
+            $('#ProvinciaID').change(function () {
+                cargarCantones($(this).val());
+                $('#DistritoID').empty().append('<option value="">-- Seleccione --</option>');
+            });
+            $('#CantonID').change(function () {
+                cargarDistritos($(this).val());
+            });
+        });
+    </script>
+}

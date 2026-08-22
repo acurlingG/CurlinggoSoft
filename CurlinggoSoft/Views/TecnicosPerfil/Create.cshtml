@@ -6,9 +6,12 @@
         <form asp-action="Create">
             <div asp-validation-summary="ModelOnly" class="alert alert-danger"></div>
             <div class="mb-3">
-                <label asp-for="TecnicoID" class="form-label"></label>
-                <input asp-for="TecnicoID" class="form-control" />
+                <label asp-for="TecnicoID" class="form-label">Técnico (usuario)</label>
+                <select asp-for="TecnicoID" class="form-select" asp-items="ViewBag.TecnicoID">
+                    <option value="">-- Seleccione un técnico --</option>
+                </select>
                 <span asp-validation-for="TecnicoID" class="text-danger"></span>
+                <small class="form-text text-muted">Solo se listan usuarios con rol "Tecnico" que aún no tienen un perfil creado.</small>
             </div>
             <div class="mb-3">
                 <label asp-for="IdentificacionCedula" class="form-label"></label>
@@ -26,10 +29,11 @@
             </div>
             <div class="mb-3">
                 <label asp-for="CalificacionPromedio" class="form-label"></label>
-                <input asp-for="CalificacionPromedio" type="number" step="0.01" class="form-control" />
+                <input asp-for="CalificacionPromedio" type="number" step="0.01" min="0" max="9.99" class="form-control" />
+                <small class="form-text text-muted">Valor permitido entre 0.00 y 9.99</small>
+                <span asp-validation-for="CalificacionPromedio" class="text-danger"></span>
             </div>
             <div class="form-check mb-3">
-                <input type="hidden" name="Disponible" value="false" />
                 <input asp-for="Disponible" type="checkbox" class="form-check-input" />
                 <label class="form-check-label" for="Disponible">Disponible</label>
             </div>
@@ -45,4 +49,25 @@
         </form>
     </div>
 </div>
-@section Scripts { @{await Html.RenderPartialAsync("_ValidationScriptsPartial");} }
+@section Scripts {
+    @{await Html.RenderPartialAsync("_ValidationScriptsPartial");}
+    <script>
+        function cargarCantonesCobertura(provinciaId, cantonSeleccionado) {
+            var $canton = $('#CantonCoberturaID');
+            $canton.empty().append('<option value="">-- Ninguno --</option>');
+            if (!provinciaId) { return; }
+            $.getJSON('/Cantones/PorProvincia', { provinciaId: provinciaId }, function (data) {
+                $.each(data, function (i, item) {
+                    $canton.append($('<option></option>').val(item.cantonID).text(item.nombre));
+                });
+                if (cantonSeleccionado) { $canton.val(cantonSeleccionado); }
+            });
+        }
+
+        $(document).ready(function () {
+            $('#ProvinciaCoberturaID').change(function () {
+                cargarCantonesCobertura($(this).val());
+            });
+        });
+    </script>
+}

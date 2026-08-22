@@ -1,5 +1,6 @@
 using System.ComponentModel.DataAnnotations;
 using System.ComponentModel.DataAnnotations.Schema;
+using Microsoft.AspNetCore.Mvc.ModelBinding.Validation;
 
 namespace CurlinggoSoft.Models
 {
@@ -29,6 +30,7 @@ namespace CurlinggoSoft.Models
 
         // Relación
         [ForeignKey("CantonID")]
+        [ValidateNever]
         public virtual Canton Canton { get; set; } = null!;
     }
 }
