@@ -99,6 +99,18 @@ namespace CurlinggoSoft.Models
         [Display(Name = "Fecha Modificación")]
         public DateTime? FechaModificacion { get; set; }
 
+        // --- Cancelación (regla de gracia 10 min / EN_CAMINO) ---
+        [StringLength(30)]
+        [Display(Name = "Motivo de Cancelación")]
+        public string? MotivoCancelacionCodigo { get; set; }
+
+        [StringLength(20)]
+        [Display(Name = "Cancelado Por")]
+        public string? CanceladoPor { get; set; } // 'CLIENTE' o 'TECNICO'
+
+        [Display(Name = "Cancelación con Penalización")]
+        public bool? CancelacionConPenalizacion { get; set; }
+
         [ForeignKey("ClienteID")]
         public virtual ClientePerfil? Cliente { get; set; }
 

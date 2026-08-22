@@ -2,6 +2,8 @@
 @{
     ViewData["Title"] = "¡Cita Confirmada!";
     var numeroOrden = Model.ReservaID.ToString("D4");
+    var estadoCodigo = Model.EstadoReserva?.Codigo ?? "SOLICITADA";
+    var tieneTecnico = ViewBag.TecnicoNombre != null;
 }
 
 <link rel="stylesheet" href="~/css/wizard-servicio.css" />
@@ -19,31 +21,237 @@
         <p class="orden-numero">Orden #CR-@numeroOrden</p>
 
         <div class="status-box">
-            <span class="status-label">Current Status</span>
-            <h4 class="status-texto">Buscando Técnico...</h4>
+            <span class="status-label">Estado actual</span>
+            <h4 class="status-texto" id="statusTexto">
+                @(estadoCodigo == "SOLICITADA" ? "Buscando técnico..." : estadoCodigo.Replace("_", " "))
+            </h4>
         </div>
 
-        <!-- Mascota / Mensaje de confirmación -->
-        <div class="mascota-confirmacion mt-4">
+        <!-- Buscando técnico: se oculta apenas llega TecnicoAsignado -->
+        <div class="mascota-confirmacion mt-4" id="bloqueBuscando" style="@(tieneTecnico ? "display:none;" : "")">
             <img src="~/images/nano-banana.png" alt="Nano" onerror="this.style.display='none'" />
             <div class="bubble-confirmacion">
-                ¡Técnico asignado!<br />
-                Revisa tu WhatsApp para la confirmación.
+                Buscando un técnico disponible en tu zona...<br />
+                Esto puede tardar unos segundos.
             </div>
         </div>
 
-        <!-- Barra de progreso / Tracking -->
+        <!-- Tarjeta de técnico asignado: oculta hasta que haya datos reales,
+             renderizada de entrada si Paso6ConfirmacionExitosa ya la trae
+             (recarga de página), o revelada por JS cuando llega el evento
+             TecnicoAsignado de SignalR. -->
+        <div class="mascota-confirmacion mt-4" id="bloqueTecnico" style="@(tieneTecnico ? "" : "display:none;")">
+            <div class="bubble-confirmacion text-start">
+                <strong><i class="bi bi-person-check"></i> ¡Técnico asignado!</strong><br />
+                <span id="tecnicoNombre">@ViewBag.TecnicoNombre @ViewBag.TecnicoApellidos</span><br />
+                <span id="tecnicoCalificacion">
+                    @if (ViewBag.TecnicoCalificacion != null)
+                    {
+                        <text><i class="bi bi-star-fill text-warning"></i> @(((decimal)ViewBag.TecnicoCalificacion).ToString("0.0"))</text>
+                    }
+                </span><br />
+                @if (!string.IsNullOrEmpty(ViewBag.TecnicoTelefono))
+                {
+                    <span id="tecnicoTelefono"><i class="bi bi-whatsapp"></i> @ViewBag.TecnicoTelefono</span>
+                }
+            </div>
+        </div>
+
+        <!-- Barra de progreso / Tracking: el ancho refleja el estado real,
+             no un 35% fijo como antes. -->
         <div class="tracking-box mt-4">
-            <span class="tracking-label">Live Tracking...</span>
+            <span class="tracking-label">Seguimiento</span>
             <div class="progress tracking-bar">
-                <div class="progress-bar progress-bar-striped progress-bar-animated bg-primary" 
-                     role="progressbar" style="width: 35%" aria-valuenow="35" aria-valuemin="0" aria-valuemax="100"></div>
+                <div class="progress-bar progress-bar-striped progress-bar-animated bg-primary"
+                     id="barraProgreso" role="progressbar"
+                     style="width: @ProgresoPorcentaje(estadoCodigo)%"
+                     aria-valuenow="@ProgresoPorcentaje(estadoCodigo)" aria-valuemin="0" aria-valuemax="100"></div>
             </div>
         </div>
 
         <a href="@Url.Action("Index", "Cliente")" class="btn-continuar w-100 mt-5 text-decoration-none text-center d-block">
             Volver al Inicio
         </a>
+
+        @{
+            var estadosCancelables = new[] { "SOLICITADA", "ASIGNADA", "EN_CAMINO" };
+            var puedeCancelar = estadosCancelables.Contains(estadoCodigo);
+        }
+        <div id="bloqueCancelar" style="@(puedeCancelar ? "" : "display:none;")" class="mt-3">
+            <p class="text-muted small text-start">
+                Puedes cancelar sin costo dentro de los primeros 10 minutos después de que se te asignó un técnico,
+                siempre que aún no haya salido hacia tu ubicación. Si cancelas después de eso, se aplicará una
+                penalización simulada por el tiempo del técnico.
+            </p>
+            <div class="mb-2 text-start">
+                <label for="motivoCancelacion" class="form-label">Motivo de cancelación</label>
+                <select id="motivoCancelacion" class="form-select">
+                    <option value="">-- Selecciona un motivo --</option>
+                    <option value="TECNICO_TARDO">El técnico tardó demasiado</option>
+                    <option value="YA_NO_NECESITO">Ya no necesito el servicio</option>
+                    <option value="OTRA_OPCION">Encontré otra opción</option>
+                    <option value="ERROR_RESERVA">Error al pedir la reserva</option>
+                </select>
+            </div>
+            <button type="button" class="btn btn-outline-danger w-100" id="btnCancelar" disabled>
+                <i class="bi bi-x-circle"></i> Cancelar servicio
+            </button>
+            <div id="mensajeCancelacion" class="mt-2 small"></div>
+        </div>
+        @Html.AntiForgeryToken()
     </div>
 
 </div>
+
+@functions {
+    // Mapea el estado de la reserva a un porcentaje visual de la barra.
+    // Centralizado aquí y también duplicado en JS (ver Scripts) porque el
+    // primer render es server-side (Razor) y las actualizaciones en vivo son
+    // client-side (SignalR) — no hay forma de compartir la función entre
+    // ambos sin una llamada a la API, así que se mantienen sincronizados a mano.
+    int ProgresoPorcentaje(string codigo) => codigo switch
+    {
+        "SOLICITADA" => 15,
+        "ASIGNADA" => 40,
+        "EN_CAMINO" => 60,
+        "EN_PROCESO" => 80,
+        "COMPLETADA" => 100,
+        "CANCELADA" => 0,
+        _ => 15
+    };
+}
+
+@section Scripts {
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/microsoft-signalr/8.0.0/signalr.min.js"></script>
+    <script>
+        const reservaId = @Model.ReservaID;
+
+        function progresoPorcentaje(codigo) {
+            const mapa = { SOLICITADA: 15, ASIGNADA: 40, EN_CAMINO: 60, EN_PROCESO: 80, COMPLETADA: 100, CANCELADA: 0 };
+            return mapa[codigo] ?? 15;
+        }
+
+        function actualizarEstadoUI(codigo) {
+            const textos = {
+                SOLICITADA: 'Buscando técnico...',
+                ASIGNADA: 'Técnico asignado',
+                EN_CAMINO: 'Técnico en camino',
+                EN_PROCESO: 'Servicio en proceso',
+                COMPLETADA: 'Servicio completado',
+                CANCELADA: 'Reserva cancelada'
+            };
+            document.getElementById('statusTexto').textContent = textos[codigo] ?? codigo.replace('_', ' ');
+
+            const barra = document.getElementById('barraProgreso');
+            const pct = progresoPorcentaje(codigo);
+            barra.style.width = pct + '%';
+            barra.setAttribute('aria-valuenow', pct);
+
+            if (codigo === 'COMPLETADA' || codigo === 'CANCELADA') {
+                barra.classList.remove('progress-bar-animated');
+            }
+
+            const estadosCancelables = ['SOLICITADA', 'ASIGNADA', 'EN_CAMINO'];
+            const bloqueCancelar = document.getElementById('bloqueCancelar');
+            if (bloqueCancelar) {
+                bloqueCancelar.style.display = estadosCancelables.includes(codigo) ? '' : 'none';
+            }
+        }
+
+        function mostrarTecnico(datos) {
+            document.getElementById('bloqueBuscando').style.display = 'none';
+            document.getElementById('bloqueTecnico').style.display = '';
+            document.getElementById('tecnicoNombre').textContent = `${datos.nombre} ${datos.apellidos}`.trim();
+
+            if (datos.calificacion) {
+                document.getElementById('tecnicoCalificacion').innerHTML =
+                    `<i class="bi bi-star-fill text-warning"></i> ${Number(datos.calificacion).toFixed(1)}`;
+            }
+            if (datos.telefono) {
+                document.getElementById('tecnicoTelefono').innerHTML =
+                    `<i class="bi bi-whatsapp"></i> ${datos.telefono}`;
+            }
+        }
+
+        const connection = new signalR.HubConnectionBuilder()
+            .withUrl('/hubs/notificaciones')
+            .withAutomaticReconnect()
+            .build();
+
+        connection.on('TecnicoAsignado', function(datos) {
+            mostrarTecnico(datos);
+            actualizarEstadoUI('ASIGNADA');
+        });
+
+        connection.on('EstadoActualizado', function(datos) {
+            actualizarEstadoUI(datos.estado);
+        });
+
+        connection.start()
+            .then(function() {
+                // Nos suscribimos SOLO a esta reserva — el hub valida en el
+                // servidor que de verdad sea del cliente conectado antes de
+                // unirlo al grupo, ver NotificacionesHub.SuscribirseAReserva.
+                connection.invoke('SuscribirseAReserva', reservaId);
+            })
+            .catch(function(err) {
+                console.warn('Sin conexión en tiempo real. La página no se actualizará sola; recarga manualmente para ver cambios de estado.', err);
+            });
+
+        // --- Cancelación con motivo obligatorio (AJAX) ---
+        const selectMotivo = document.getElementById('motivoCancelacion');
+        const btnCancelar = document.getElementById('btnCancelar');
+        const mensajeCancelacion = document.getElementById('mensajeCancelacion');
+
+        if (selectMotivo && btnCancelar) {
+            selectMotivo.addEventListener('change', function() {
+                btnCancelar.disabled = !selectMotivo.value;
+            });
+
+            btnCancelar.addEventListener('click', function() {
+                if (!selectMotivo.value) return;
+
+                if (!confirm('¿Seguro que deseas cancelar este servicio? Esta acción no se puede deshacer.')) {
+                    return;
+                }
+
+                btnCancelar.disabled = true;
+                mensajeCancelacion.textContent = '';
+
+                const token = document.querySelector('input[name="__RequestVerificationToken"]')?.value;
+                const formData = new FormData();
+                formData.append('id', reservaId);
+                formData.append('motivoCodigo', selectMotivo.value);
+                if (token) formData.append('__RequestVerificationToken', token);
+
+                fetch('@Url.Action("CancelarReserva", "SolicitudServicio")', {
+                    method: 'POST',
+                    body: formData
+                })
+                    .then(function(resp) { return resp.json(); })
+                    .then(function(data) {
+                        if (!data.ok) {
+                            mensajeCancelacion.className = 'mt-2 small text-danger';
+                            mensajeCancelacion.textContent = data.error || 'No se pudo cancelar la reserva.';
+                            btnCancelar.disabled = false;
+                            return;
+                        }
+
+                        actualizarEstadoUI('CANCELADA');
+                        document.getElementById('bloqueCancelar').style.display = 'none';
+
+                        mensajeCancelacion.className = data.conPenalizacion ? 'mt-2 small text-warning' : 'mt-2 small text-success';
+                        mensajeCancelacion.textContent = data.conPenalizacion
+                            ? 'Tu reserva fue cancelada. Como el técnico ya había salido o pasaron más de 10 minutos, se registró una penalización simulada por esta cancelación tardía.'
+                            : 'Tu reserva fue cancelada sin costo, dentro de la ventana de gracia.';
+                    })
+                    .catch(function(err) {
+                        console.error(err);
+                        mensajeCancelacion.className = 'mt-2 small text-danger';
+                        mensajeCancelacion.textContent = 'Ocurrió un error al cancelar la reserva.';
+                        btnCancelar.disabled = false;
+                    });
+            });
+        }
+    </script>
+}

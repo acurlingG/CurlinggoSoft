@@ -1,14 +1,31 @@
-@model CurlinggoSoft.Models.Usuario
+@model CurlinggoSoft.Models.UsuarioAdminVM
+@using Microsoft.AspNetCore.Mvc.Rendering
 @{ ViewData["Title"] = "Crear Usuario"; }
 <h1>Crear Usuario</h1>
+<p class="text-muted">
+    Este formulario crea la cuenta de acceso (ASP.NET Identity) y el perfil de negocio del usuario en un solo paso,
+    asignando de una vez el rol con el que podrá iniciar sesión.
+</p>
 <div class="row">
     <div class="col-md-6">
         <form asp-action="Create">
             <div asp-validation-summary="ModelOnly" class="alert alert-danger"></div>
             <div class="mb-3">
-                <label asp-for="UsuarioID" class="form-label"></label>
-                <input asp-for="UsuarioID" class="form-control" />
-                <span asp-validation-for="UsuarioID" class="text-danger"></span>
+                <label asp-for="Email" class="form-label"></label>
+                <input asp-for="Email" class="form-control" />
+                <span asp-validation-for="Email" class="text-danger"></span>
+            </div>
+            <div class="mb-3">
+                <label asp-for="Clave" class="form-label"></label>
+                <input asp-for="Clave" type="password" class="form-control" />
+                <span asp-validation-for="Clave" class="text-danger"></span>
+            </div>
+            <div class="mb-3">
+                <label asp-for="Rol" class="form-label"></label>
+                <select asp-for="Rol" class="form-select" asp-items="@(new SelectList(Model.RolesDisponibles))">
+                    <option value="">-- Selecciona un rol --</option>
+                </select>
+                <span asp-validation-for="Rol" class="text-danger"></span>
             </div>
             <div class="mb-3">
                 <label asp-for="Nombre" class="form-label"></label>
@@ -19,11 +36,6 @@
                 <label asp-for="Apellidos" class="form-label"></label>
                 <input asp-for="Apellidos" class="form-control" />
                 <span asp-validation-for="Apellidos" class="text-danger"></span>
-            </div>
-            <div class="mb-3">
-                <label asp-for="Email" class="form-label"></label>
-                <input asp-for="Email" class="form-control" />
-                <span asp-validation-for="Email" class="text-danger"></span>
             </div>
             <div class="mb-3">
                 <label asp-for="Telefono" class="form-label"></label>
@@ -43,3 +55,4 @@
     </div>
 </div>
 @section Scripts { @{await Html.RenderPartialAsync("_ValidationScriptsPartial");} }
+

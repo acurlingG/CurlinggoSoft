@@ -103,35 +103,80 @@
 
 @section Scripts {
     <script>
-        // --- Captura silenciosa de ubicación al cargar el Paso 4 ---
-        // No bloquea el formulario en ningún caso: si el navegador no soporta
-        // geolocalización, si el cliente niega el permiso, o si se agota el
-        // tiempo de espera, los campos "latitud"/"longitud" quedan vacíos y el
-        // formulario se puede enviar igual. El fallback de qué hacer sin
-        // coordenadas se maneja en el servidor (ConfirmarYPagar), no aquí.
+        // --- Captura de ubicación al cargar el Paso 4 ---
+        // Si el navegador no soporta geolocalización, si el cliente niega el
+        // permiso, o si se agota el tiempo de espera, los campos "latitud"/
+        // "longitud" quedan vacíos y el formulario se puede enviar igual. El
+        // fallback de qué hacer sin coordenadas se maneja en el servidor
+        // (ConfirmarYPagar), no aquí.
+        //
+        // IMPORTANTE: capturarUbicacion() es asíncrona y puede tardar varios
+        // segundos en resolver. Si el usuario le daba "Continuar" antes de que
+        // terminara, el submit se enviaba con latitud/longitud vacíos aunque
+        // el GPS sí estuviera disponible unos instantes después. Por eso el
+        // formulario ahora espera la promesa de ubicación (con un tope
+        // máximo) antes de enviarse.
         const estadoUbicacion = document.getElementById('estadoUbicacion');
         const inputLat = document.getElementById('latitud');
         const inputLon = document.getElementById('longitud');
+        const formDireccion = document.getElementById('formDireccion');
+
+        let ubicacionLista = false;
 
         function capturarUbicacion() {
-            if (!navigator.geolocation) {
-                estadoUbicacion.innerHTML = '<i class="bi bi-geo-alt text-warning"></i> Tu navegador no soporta geolocalización. Buscaremos un técnico por tu zona general.';
-                return;
-            }
+            return new Promise(function (resolve) {
+                if (!navigator.geolocation) {
+                    estadoUbicacion.innerHTML = '<i class="bi bi-geo-alt text-warning"></i> Tu navegador no soporta geolocalización. Buscaremos un técnico por tu zona general.';
+                    ubicacionLista = true;
+                    resolve();
+                    return;
+                }
 
-            navigator.geolocation.getCurrentPosition(
-                function (position) {
-                    inputLat.value = position.coords.latitude;
-                    inputLon.value = position.coords.longitude;
-                    estadoUbicacion.innerHTML = '<i class="bi bi-geo-alt-fill text-success"></i> Ubicación detectada. Te asignaremos un técnico cercano.';
-                },
-                function () {
-                    estadoUbicacion.innerHTML = '<i class="bi bi-geo-alt text-warning"></i> No se pudo obtener tu ubicación exacta. Buscaremos un técnico por tu zona general.';
-                },
-                { enableHighAccuracy: false, timeout: 8000, maximumAge: 60000 }
-            );
+                navigator.geolocation.getCurrentPosition(
+                    function (position) {
+                        inputLat.value = position.coords.latitude;
+                        inputLon.value = position.coords.longitude;
+                        estadoUbicacion.innerHTML = '<i class="bi bi-geo-alt-fill text-success"></i> Ubicación detectada. Te asignaremos un técnico cercano.';
+                        ubicacionLista = true;
+                        resolve();
+                    },
+                    function () {
+                        estadoUbicacion.innerHTML = '<i class="bi bi-geo-alt text-warning"></i> No se pudo obtener tu ubicación exacta. Buscaremos un técnico por tu zona general.';
+                        ubicacionLista = true;
+                        resolve();
+                    },
+                    { enableHighAccuracy: true, timeout: 8000, maximumAge: 0 }
+                );
+            });
         }
-        capturarUbicacion();
+
+        const promesaUbicacion = capturarUbicacion();
+
+        // Si el usuario envía el formulario antes de que la geolocalización
+        // termine, esperamos la promesa (con su propio tope de 8s) antes de
+        // continuar, en vez de dejarlo ir con latitud/longitud vacíos.
+        if (formDireccion) {
+            formDireccion.addEventListener('submit', function (evt) {
+                if (ubicacionLista) {
+                    return; // ya hay resultado (con o sin coordenadas), enviar normal
+                }
+
+                evt.preventDefault();
+                const submitBtn = formDireccion.querySelector('button[type="submit"]');
+                if (submitBtn) {
+                    submitBtn.disabled = true;
+                    submitBtn.textContent = 'Ubicando...';
+                }
+
+                promesaUbicacion.finally(function () {
+                    if (submitBtn) {
+                        submitBtn.disabled = false;
+                        submitBtn.textContent = 'Continuar';
+                    }
+                    formDireccion.submit();
+                });
+            });
+        }
 
         const cantonSelect = document.getElementById('cantonSelect');
         const distritoSelect = document.getElementById('distritoSelect');

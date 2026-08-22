@@ -44,7 +44,14 @@ namespace CurlinggoSoft.Services
             {
                 var pReserva = new SqlParameter("@ReservaID", reservaId);
                 var pTecnico = new SqlParameter("@TecnicoID", tecnico.TecnicoID);
-                var pDistancia = new SqlParameter("@DistanciaMetros", tecnico.DistanciaMetros);
+                // OJO: SqlParameter.Value no acepta null de C# directamente (a
+                // diferencia de DBNull.Value) para tipos nullable como
+                // decimal?. Si tecnico.DistanciaMetros es null (reserva sin
+                // GPS), pasarlo tal cual provoca el error de SQL Server
+                // "La consulta parametrizada... espera el parámetro
+                // '@DistanciaMetros', que no fue proporcionado", y toda la
+                // asignación falla silenciosamente para esa reserva.
+                var pDistancia = new SqlParameter("@DistanciaMetros", (object?)tecnico.DistanciaMetros ?? DBNull.Value);
                 var pExpiracion = new SqlParameter("@FechaExpiracion", fechaExpiracion);
                 var pMensaje = new SqlParameter("@Mensaje", "¡Nuevo servicio disponible cerca de ti!");
 
@@ -77,6 +84,6 @@ namespace CurlinggoSoft.Services
         public string Nombre { get; set; } = string.Empty;
         public string Apellidos { get; set; } = string.Empty;
         public decimal CalificacionPromedio { get; set; }
-        public decimal DistanciaMetros { get; set; }
+        public decimal? DistanciaMetros { get; set; }
     }
 }

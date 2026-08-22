@@ -2,7 +2,350 @@
     ViewData["Title"] = "Menú Administrador";
 }
 
+<!-- Estilos integrados para mantener el diseño limpio tipo Linear/Vercel -->
+<style>
+    :root {
+        --bg-color: #f8fafc;
+        --card-bg: #ffffff;
+        --border-color: #e2e8f0;
+        --text-main: #0f172a;
+        --text-muted: #64748b;
+        --accent-green: #16a34a;
+        --accent-red: #dc2626;
+        --accent-blue: #2563eb;
+        --accent-purple: #9333ea;
+        --badge-solicitada: #fef3c7;
+        --badge-solicitada-text: #92400e;
+        --badge-asignada: #dbeafe;
+        --badge-asignada-text: #1e40af;
+        --badge-camino: #e0e7ff;
+        --badge-camino-text: #3730a3;
+        --badge-proceso: #dcfce7;
+        --badge-proceso-text: #166534;
+    }
+
+    .dashboard-container {
+        width: 100%;
+        max-width: 1000px;
+        margin: 0 auto;
+        display: flex;
+        flex-direction: column;
+        gap: 20px;
+    }
+
+    .metrics-grid {
+        display: grid;
+        grid-template-columns: repeat(3, 1fr);
+        gap: 16px;
+    }
+
+    .metric-card {
+        background: var(--card-bg);
+        border: 1px solid var(--border-color);
+        border-radius: 12px;
+        padding: 18px;
+        box-shadow: 0 1px 3px 0 rgba(0, 0, 0, 0.05);
+    }
+
+    .metric-title {
+        font-size: 13px;
+        color: var(--text-muted);
+        margin-bottom: 8px;
+        font-weight: 500;
+    }
+
+    .metric-value {
+        font-size: 26px;
+        font-weight: 600;
+        color: var(--text-main);
+    }
+
+        .metric-value.green {
+            color: var(--accent-green);
+        }
+
+        .metric-value.blue {
+            color: var(--accent-blue);
+        }
+
+        .metric-value.purple {
+            color: var(--accent-purple);
+        }
+
+    .card {
+        background: var(--card-bg);
+        border: 1px solid var(--border-color);
+        border-radius: 12px;
+        padding: 20px;
+        box-shadow: 0 1px 3px 0 rgba(0, 0, 0, 0.05);
+    }
+
+    .card-title {
+        font-size: 15px;
+        font-weight: 600;
+        margin-bottom: 16px;
+        color: var(--text-main);
+    }
+
+    .status-badges {
+        display: flex;
+        gap: 10px;
+        flex-wrap: wrap;
+    }
+
+    .badge {
+        padding: 6px 14px;
+        border-radius: 20px;
+        font-size: 13px;
+        font-weight: 500;
+    }
+
+    .badge-solicitada {
+        background: var(--badge-solicitada);
+        color: var(--badge-solicitada-text);
+    }
+
+    .badge-asignada {
+        background: var(--badge-asignada);
+        color: var(--badge-asignada-text);
+    }
+
+    .badge-camino {
+        background: var(--badge-camino);
+        color: var(--badge-camino-text);
+    }
+
+    .badge-proceso {
+        background: var(--badge-proceso);
+        color: var(--badge-proceso-text);
+    }
+
+    .match-list, .feed-list {
+        display: flex;
+        flex-direction: column;
+        gap: 12px;
+    }
+
+    .match-item, .feed-item {
+        display: flex;
+        justify-content: space-between;
+        font-size: 14px;
+        padding-bottom: 8px;
+        border-bottom: 1px solid #f1f5f9;
+    }
+
+        .match-item:last-child, .feed-item:last-child {
+            border-bottom: none;
+            padding-bottom: 0;
+        }
+
+    .feed-time {
+        color: var(--text-muted);
+        font-size: 12px;
+    }
+
+        .feed-time.alert {
+            color: var(--accent-red);
+            font-weight: 500;
+        }
+
+    .bar-chart {
+        display: flex;
+        flex-direction: column;
+        gap: 14px;
+    }
+
+    .bar-row {
+        display: flex;
+        flex-direction: column;
+        gap: 4px;
+    }
+
+    .bar-info {
+        display: flex;
+        justify-content: space-between;
+        font-size: 13px;
+    }
+
+    .bar-track {
+        background: #f1f5f9;
+        border-radius: 4px;
+        height: 10px;
+        width: 100%;
+        overflow: hidden;
+    }
+
+    .bar-fill {
+        height: 100%;
+        border-radius: 4px;
+    }
+
+        .bar-fill.red {
+            background: var(--accent-red);
+        }
+
+        .bar-fill.blue {
+            background: var(--accent-blue);
+        }
+</style>
+
 <div class="container my-4">
-    <h2 class="fw-bold mb-3"><i class="fa fa-dashboard"></i> Panel de Mantenimiento - CURLINGgo</h2>
-    <p class="text-muted mb-4">Selecciona una categoría del menú principal para desplegar las opciones de administración.</p>
+    <div class="dashboard-container">
+
+        <div class="d-flex justify-content-between align-items-center mb-2">
+            <div>
+                <h2 class="fw-bold mb-1"><i class="fa fa-dashboard text-primary"></i> Panel de Control - CURLINGgo</h2>
+                <p class="text-muted mb-0">Monitoreo operativo en tiempo real del motor de despacho y métricas del sistema.</p>
+            </div>
+            <div>
+                <span class="badge bg-success text-white p-2">🟢 Sistema Activo</span>
+            </div>
+        </div>
+
+        <!-- KPIs Principales -->
+        <div class="metrics-grid">
+            <div class="metric-card">
+                <div class="metric-title">Reservas Activas</div>
+                <div class="metric-value" id="kpi-activas">-</div>
+            </div>
+            <div class="metric-card">
+                <div class="metric-title">Técnicos Conectados / Total</div>
+                <div class="metric-value blue" id="kpi-tecnicos">-</div>
+            </div>
+            <div class="metric-card">
+                <div class="metric-title">Clientes Registrados</div>
+                <div class="metric-value purple" id="kpi-clientes">-</div>
+            </div>
+            <div class="metric-card">
+                <div class="metric-title">Prom. Solicitudes / Día</div>
+                <div class="metric-value" id="kpi-promedio">-</div>
+            </div>
+            <div class="metric-card">
+                <div class="metric-title">Tiempo Prom. de Match</div>
+                <div class="metric-value" id="kpi-tiempo">-</div>
+            </div>
+            <div class="metric-card">
+                <div class="metric-title">Tasa de Éxito de Match</div>
+                <div class="metric-value green" id="kpi-tasa">-</div>
+            </div>
+        </div>
+
+        <!-- Reservas por Estado -->
+        <div class="card">
+            <div class="card-title">Reservas por Estado Actual</div>
+            <div class="status-badges" id="container-estados">
+                <span class="badge badge-solicitada">Cargando estados...</span>
+            </div>
+        </div>
+
+        <!-- Técnicos conectados por nivel de match -->
+        <div class="card">
+            <div class="card-title">Técnicos Conectados por Nivel de Match</div>
+            <div class="match-list" id="container-niveles">
+                <div class="match-item"><span>Calculando niveles de despacho...</span></div>
+            </div>
+        </div>
+
+        <!-- Motivos de cancelación -->
+        <div class="card">
+            <div class="card-title">Motivos de Cancelación (Histórico)</div>
+            <div class="bar-chart" id="container-motivos">
+                <div class="text-muted small">Cargando estadísticas de cancelación...</div>
+            </div>
+        </div>
+
+        <!-- Feed de Incidencias -->
+        <div class="card">
+            <div class="card-title">Feed de Incidencias Operativas (Logs)</div>
+            <div class="feed-list" id="container-logs">
+                <div class="feed-item"><span class="feed-text">Cargando registros recientes...</span></div>
+            </div>
+        </div>
+
+    </div>
 </div>
+
+@section Scripts {
+    <script>
+        // Función para consumir el Endpoint del Backend que devuelve los datos del Dashboard
+        async function cargarDatosDashboard() {
+            try {
+                // Aquí apuntarás a tu controlador en C# (ej. /Admin/ObtenerMetricasDashboard)
+                let response = await fetch('/Admin/ObtenerMetricasDashboard');
+                if (!response.ok) throw new Error('Error al obtener los datos del servidor.');
+
+                let data = await response.json();
+
+                // 1. Rellenar KPIs
+                document.getElementById('kpi-activas').innerText = data.reservasActivas;
+                document.getElementById('kpi-tecnicos').innerText = `${data.tecnicosConectados} / ${data.tecnicosTotales}`;
+                document.getElementById('kpi-clientes').innerText = data.clientesRegistrados;
+                document.getElementById('kpi-promedio').innerText = data.promedioSolicitudesDia;
+                document.getElementById('kpi-tiempo').innerText = data.tiempoPromedioMatch + ' min';
+                document.getElementById('kpi-tasa').innerText = data.tasaExitoMatch + '%';
+
+                // 2. Rellenar Badges de Estado
+                let contenedorEstados = document.getElementById('container-estados');
+                contenedorEstados.innerHTML = `
+                            <span class="badge badge-solicitada">Solicitada · ${data.estados.solicitada}</span>
+                            <span class="badge badge-asignada">Asignada · ${data.estados.asignada}</span>
+                            <span class="badge badge-camino">En camino · ${data.estados.enCamino}</span>
+                            <span class="badge badge-proceso">En proceso · ${data.estados.enProceso}</span>
+                        `;
+
+                // 3. Niveles de Match
+                let contenedorNiveles = document.getElementById('container-niveles');
+                contenedorNiveles.innerHTML = `
+                            <div class="match-item"><span>📍 GPS en vivo (Nivel 1)</span><span>${data.nivelesMatch.gpsEnVivo} técnicos</span></div>
+                            <div class="match-item"><span>🕒 Ubicación de referencia (Nivel 2)</span><span>${data.nivelesMatch.ubicacionReferencia} técnico</span></div>
+                            <div class="match-item"><span>🗺️ Solo zona de cobertura (Nivel 3)</span><span>${data.nivelesMatch.zonaCobertura} técnico</span></div>
+                        `;
+
+                // 4. Motivos de cancelacion (grafico de barras)
+                let contenedorMotivos = document.getElementById('container-motivos');
+                if (data.motivosCancelacion.length === 0) {
+                    contenedorMotivos.innerHTML = '<div class="text-muted small">Aún no hay cancelaciones registradas.</div>';
+                } else {
+                    contenedorMotivos.innerHTML = '';
+                    data.motivosCancelacion.forEach(motivo => {
+                        contenedorMotivos.innerHTML += `
+                            <div class="bar-row">
+                                <div class="bar-info">
+                                    <span>${motivo.etiqueta}</span>
+                                    <span>${motivo.cantidad} (${motivo.porcentaje}%)</span>
+                                </div>
+                                <div class="bar-track">
+                                    <div class="bar-fill red" style="width: ${motivo.porcentaje}%;"></div>
+                                </div>
+                            </div>
+                        `;
+                    });
+                }
+
+                // 5. Feed de Logs (Incidencias)
+                let contenedorLogs = document.getElementById('container-logs');
+                contenedorLogs.innerHTML = '';
+                if (data.logsRecientes.length === 0) {
+                    contenedorLogs.innerHTML = '<div class="feed-item"><span class="feed-text">Sin incidencias recientes.</span></div>';
+                }
+                data.logsRecientes.forEach(log => {
+                    contenedorLogs.innerHTML += `
+                                <div class="feed-item">
+                                    <span class="feed-text">${log.mensaje}</span>
+                                    <span class="feed-time ${log.esAlerta ? 'alert' : ''}">${log.tiempoAtras}</span>
+                                </div>
+                            `;
+                });
+
+            } catch (error) {
+                console.error('Error cargando el dashboard:', error);
+            }
+        }
+
+        // Ejecutar al cargar la página y refrescar cada 30 segundos en tiempo real
+        document.addEventListener('DOMContentLoaded', () => {
+            cargarDatosDashboard();
+            setInterval(cargarDatosDashboard, 30000);
+        });
+    </script>
+}

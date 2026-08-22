@@ -3,7 +3,7 @@ using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 
-[Authorize(Roles = "ADMIN, TECNICO")]
+[Authorize(Roles = "Admin,Tecnico")]
 public class ServiciosController : Controller
 {
     private readonly ApplicationDbContext _context;

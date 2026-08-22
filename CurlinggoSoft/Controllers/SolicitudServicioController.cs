@@ -1,8 +1,11 @@
-﻿using CurlinggoSoft.Models;
+﻿using CurlinggoSoft.Hubs;
+using CurlinggoSoft.Models;
 using CurlinggoSoft.Services;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
+using Microsoft.AspNetCore.SignalR;
+using Microsoft.Data.SqlClient;
 using Microsoft.EntityFrameworkCore;
 
 namespace CurlinggoSoft.Controllers
@@ -13,15 +16,20 @@ namespace CurlinggoSoft.Controllers
         private readonly ApplicationDbContext _context;
         private readonly IDispatchEngineService _dispatchEngine;
         private readonly UserManager<IdentityUser> _userManager;
+        private readonly ILogger<SolicitudServicioController> _logger;
+        private readonly IHubContext<NotificacionesHub> _hub;
 
         // Inyectamos el contexto, el motor de asignación y UserManager (para leer
         // Email/UserName del usuario logueado y poder crear su fila en dbo.Usuarios).
         public SolicitudServicioController(ApplicationDbContext context, IDispatchEngineService dispatchEngine,
-            UserManager<IdentityUser> userManager)
+            UserManager<IdentityUser> userManager, ILogger<SolicitudServicioController> logger,
+            IHubContext<NotificacionesHub> hub)
         {
             _context = context;
             _dispatchEngine = dispatchEngine;
             _userManager = userManager;
+            _logger = logger;
+            _hub = hub;
         }
 
         // GET: /SolicitudServicio/Paso1Servicio
@@ -494,14 +502,18 @@ namespace CurlinggoSoft.Controllers
                 // manejar con un job en background más adelante.
                 try
                 {
-                    await _dispatchEngine.GenerarOfertasLoteInicialAsync(reserva.ReservaID, tamanoLote: 3);
+                    var seEncontraronTecnicos = await _dispatchEngine.GenerarOfertasLoteInicialAsync(reserva.ReservaID, tamanoLote: 3);
+                    if (!seEncontraronTecnicos)
+                    {
+                        _logger.LogWarning(
+                            "[DispatchEngine] No se encontraron técnicos disponibles para ReservaID={ReservaID}. " +
+                            "La reserva queda en SOLICITADA sin oferta enviada.", reserva.ReservaID);
+                    }
                 }
                 catch (Exception dispatchEx)
                 {
-                    // TODO: reemplazar por ILogger<SolicitudServicioController> cuando
-                    // lo tengas inyectado. Por ahora al menos no perdemos el error.
-                    System.Diagnostics.Debug.WriteLine(
-                        $"[DispatchEngine] Falló la asignación inicial para ReservaID={reserva.ReservaID}: {dispatchEx}");
+                    _logger.LogError(dispatchEx,
+                        "[DispatchEngine] Falló la asignación inicial para ReservaID={ReservaID}", reserva.ReservaID);
                 }
 
                 return RedirectToAction("Paso6ConfirmacionExitosa", new { id = reserva.ReservaID });
@@ -555,6 +567,7 @@ namespace CurlinggoSoft.Controllers
 
             var reserva = await _context.SolicitudesReserva
                 .Include(r => r.Servicio)
+                .Include(r => r.EstadoReserva)
                 .FirstOrDefaultAsync(r => r.ReservaID == id && r.ClienteID == clienteId);
 
             if (reserva == null)
@@ -563,7 +576,184 @@ namespace CurlinggoSoft.Controllers
                 return RedirectToAction("Index", "Home");
             }
 
+            // Si la reserva ya tiene técnico (por ejemplo, el cliente recargó
+            // la página después de que se aceptó la oferta), traemos sus
+            // datos aquí para que la vista los muestre de entrada, sin
+            // depender de que llegue el evento de SignalR — ese evento solo
+            // dispara en el instante en que ocurre la aceptación, así que si
+            // el cliente entra o recarga DESPUÉS, nunca lo vería sin esto.
+            if (!string.IsNullOrEmpty(reserva.TecnicoID))
+            {
+                var datosTecnico = await _context.Usuarios
+                    .Where(u => u.UsuarioID == reserva.TecnicoID)
+                    .Select(u => new { u.Nombre, u.Apellidos, u.Telefono })
+                    .FirstOrDefaultAsync();
+
+                var calificacion = await _context.TecnicosPerfil
+                    .Where(t => t.TecnicoID == reserva.TecnicoID)
+                    .Select(t => (decimal?)t.CalificacionPromedio)
+                    .FirstOrDefaultAsync();
+
+                ViewBag.TecnicoNombre = datosTecnico?.Nombre;
+                ViewBag.TecnicoApellidos = datosTecnico?.Apellidos;
+                ViewBag.TecnicoTelefono = datosTecnico?.Telefono;
+                ViewBag.TecnicoCalificacion = calificacion;
+            }
+
             return View(reserva);
+        }
+
+        // POST: /SolicitudServicio/ReintentarAsignacion/5
+        // Permite reintentar el dispatch para una reserva que qued\u00f3 en SOLICITADA
+        // sin ofertas enviadas (por ejemplo, si el motor fall\u00f3 silenciosamente o
+        // la reserva fue creada fuera del flujo normal, como datos de prueba
+        // insertados directo en la base de datos).
+        [HttpPost]
+        [ValidateAntiForgeryToken]
+        [Authorize]
+        public async Task<IActionResult> ReintentarAsignacion(long id)
+        {
+            var reserva = await _context.SolicitudesReserva
+                .Include(r => r.EstadoReserva)
+                .FirstOrDefaultAsync(r => r.ReservaID == id);
+
+            if (reserva == null)
+            {
+                TempData["Error"] = "No se encontr\u00f3 la reserva.";
+                return RedirectToAction("Paso6ConfirmacionExitosa", new { id });
+            }
+
+            if (reserva.EstadoReserva?.Codigo != "SOLICITADA")
+            {
+                TempData["Error"] = "Esta reserva ya no est\u00e1 en estado SOLICITADA; no se puede reintentar la asignaci\u00f3n.";
+                return RedirectToAction("Paso6ConfirmacionExitosa", new { id });
+            }
+
+            try
+            {
+                var seEncontraronTecnicos = await _dispatchEngine.GenerarOfertasLoteInicialAsync(reserva.ReservaID, tamanoLote: 3);
+                TempData[seEncontraronTecnicos ? "Success" : "Error"] = seEncontraronTecnicos
+                    ? "Se reenviaron ofertas a los t\u00e9cnicos disponibles."
+                    : "No se encontraron t\u00e9cnicos disponibles para esta reserva (ni por distancia ni por zona de cobertura).";
+            }
+            catch (Exception dispatchEx)
+            {
+                _logger.LogError(dispatchEx,
+                    "[DispatchEngine] Fall\u00f3 el reintento de asignaci\u00f3n para ReservaID={ReservaID}", reserva.ReservaID);
+                TempData["Error"] = "Ocurri\u00f3 un error al reintentar la asignaci\u00f3n: " + (dispatchEx.InnerException?.Message ?? dispatchEx.Message);
+            }
+
+            return RedirectToAction("Paso6ConfirmacionExitosa", new { id });
+        }
+
+        // POST: /SolicitudServicio/CancelarReserva/5
+        // Permite al cliente cancelar su propia reserva mientras el tecnico
+        // aun no haya iniciado el servicio en el sitio (SOLICITADA, ASIGNADA
+        // o EN_CAMINO). La transicion real la valida usp_Reserva_CambiarEstado,
+        // aqui solo restringimos desde que estados se ofrece la opcion en la UI.
+        //
+        // Ventana de gracia (sin penalizacion) si se cumple AL MENOS UNA:
+        //  1) Pasaron 10 min o menos desde ASIGNADA.
+        //  2) El tecnico todavia no marco EN_CAMINO.
+        // Solo hay penalizacion simulada (bit, sin monto real) cuando AMBAS
+        // condiciones fallan a la vez. Ver ReservaCancelacionHelper.
+        [HttpPost]
+        [ValidateAntiForgeryToken]
+        [Authorize]
+        public async Task<IActionResult> CancelarReserva(long id, string motivoCodigo)
+        {
+            var clienteId = User.FindFirst(System.Security.Claims.ClaimTypes.NameIdentifier)?.Value;
+
+            if (!ReservaCancelacionHelper.EsMotivoValido(motivoCodigo))
+            {
+                return Json(new { ok = false, error = "Motivo de cancelacion invalido." });
+            }
+
+            var reserva = await _context.SolicitudesReserva
+                .Include(r => r.EstadoReserva)
+                .FirstOrDefaultAsync(r => r.ReservaID == id && r.ClienteID == clienteId);
+
+            if (reserva == null)
+            {
+                return Json(new { ok = false, error = "No se encontro la reserva." });
+            }
+
+            var estadosCancelables = new[] { "SOLICITADA", "ASIGNADA", "EN_CAMINO" };
+            if (!estadosCancelables.Contains(reserva.EstadoReserva?.Codigo))
+            {
+                return Json(new { ok = false, error = "Esta reserva ya no se puede cancelar desde su estado actual." });
+            }
+
+            try
+            {
+                var sinPenalizacion = await ReservaCancelacionHelper.EstaDentroDeVentanaDeGraciaAsync(_context, reserva.ReservaID);
+
+                var estadoCanceladaId = await _context.EstadosReserva
+                    .Where(e => e.Codigo == "CANCELADA")
+                    .Select(e => e.EstadoReservaID)
+                    .FirstOrDefaultAsync();
+
+                var pReserva = new SqlParameter("@ReservaID", reserva.ReservaID);
+                var pEstado = new SqlParameter("@EstadoNuevoID", estadoCanceladaId);
+                var pUsuario = new SqlParameter("@UsuarioModificadorID", clienteId ?? (object)DBNull.Value);
+                var pObs = new SqlParameter("@Observaciones", "Cancelado por el cliente.");
+
+                await _context.Database.ExecuteSqlRawAsync(
+                    "EXEC dbo.usp_Reserva_CambiarEstado @ReservaID, @EstadoNuevoID, @UsuarioModificadorID, @Observaciones",
+                    pReserva, pEstado, pUsuario, pObs);
+
+                // Guardamos el motivo, quien cancelo y si aplica penalizacion
+                // simulada directamente sobre la entidad (no via el SP).
+                reserva.MotivoCancelacionCodigo = motivoCodigo;
+                reserva.CanceladoPor = "CLIENTE";
+                reserva.CancelacionConPenalizacion = !sinPenalizacion;
+
+                // Ademas de la reserva, tambien hay que cerrar cualquier
+                // oferta que siguiera PENDIENTE o ACEPTADA en OfertasTecnico
+                // (tabla EstadosOfertaTecnico: PENDIENTE/ACEPTADA/RECHAZADA/
+                // EXPIRADA/CANCELADA), para que no queden ofertas "vivas"
+                // apuntando a una reserva ya cancelada.
+                var estadoOfertaCanceladaId = await _context.EstadosOfertaTecnico
+                    .Where(e => e.Codigo == "CANCELADA")
+                    .Select(e => e.EstadoOfertaID)
+                    .FirstOrDefaultAsync();
+
+                var ofertasAbiertas = await _context.OfertasTecnico
+                    .Include(o => o.EstadoOferta)
+                    .Where(o => o.ReservaID == reserva.ReservaID &&
+                                (o.EstadoOferta!.Codigo == "PENDIENTE" || o.EstadoOferta!.Codigo == "ACEPTADA"))
+                    .ToListAsync();
+
+                foreach (var oferta in ofertasAbiertas)
+                {
+                    oferta.EstadoOfertaID = estadoOfertaCanceladaId;
+                    oferta.FechaRespuesta ??= DateTime.Now;
+                }
+
+                await _context.SaveChangesAsync();
+
+                // Notificamos al cliente (por si tiene otra pestana abierta) y
+                // al tecnico asignado, si lo habia, para que su panel se
+                // actualice al instante.
+                await _hub.Clients.Group(NotificacionesHub.GrupoReserva(reserva.ReservaID))
+                    .SendAsync("EstadoActualizado", new { estado = "CANCELADA" });
+
+                if (!string.IsNullOrEmpty(reserva.TecnicoID))
+                {
+                    await _hub.Clients.Group(NotificacionesHub.GrupoTecnico(reserva.TecnicoID))
+                        .SendAsync("ReservaCancelada", new { reservaId = reserva.ReservaID });
+                }
+
+                return Json(new { ok = true, conPenalizacion = !sinPenalizacion });
+            }
+            catch (Exception ex)
+            {
+                var mensaje = ex.InnerException?.Message ?? ex.Message;
+                var errorMsg = mensaje.Contains("Transicion de estado no permitida")
+                    ? "Esta reserva ya no se puede cancelar desde su estado actual."
+                    : "No se pudo cancelar la reserva: " + mensaje;
+                return Json(new { ok = false, error = errorMsg });
+            }
         }
 
         private static readonly List<FranjaHoraria> FranjasHorarias = GenerarFranjasHorarias(7, 21);

@@ -78,6 +78,7 @@
             <table class="table table-striped align-middle">
                 <thead class="table-dark">
                     <tr>
+                        <th>Código</th>
                         <th>Fecha</th>
                         <th>Servicio</th>
                         <th>Dirección</th>
@@ -88,13 +89,52 @@
                 <tbody>
                     @foreach (var trabajo in Model)
                     {
-                        <tr>
+                        var codigoEstado = trabajo.EstadoReserva?.Codigo ?? "ASIGNADA";
+                        var (siguienteCodigo, etiquetaBoton, claseBadge) = codigoEstado switch
+                        {
+                            "ASIGNADA" => ("EN_CAMINO", "Iniciar viaje", "bg-warning text-dark"),
+                            "EN_CAMINO" => ("EN_PROCESO", "Iniciar servicio", "bg-info text-dark"),
+                            "EN_PROCESO" => ("COMPLETADA", "Finalizar servicio", "bg-primary"),
+                            "COMPLETADA" => ((string?)null, (string?)null, "bg-success"),
+                            "CANCELADA" => ((string?)null, (string?)null, "bg-secondary"),
+                            _ => ((string?)null, (string?)null, "bg-warning text-dark")
+                        };
+                        var estadosCancelablesTec = new[] { "SOLICITADA", "ASIGNADA", "EN_CAMINO" };
+                        var puedeCancelarTec = estadosCancelablesTec.Contains(codigoEstado);
+                        <tr id="fila-@trabajo.ReservaID">
+                            <td><span class="fw-bold">CR-@trabajo.ReservaID.ToString("D4")</span></td>
                             <td>@trabajo.FechaHoraProgramada.ToString("dd/MM/yyyy HH:mm")</td>
                             <td>@(trabajo.Servicio?.NombreServicio ?? "N/A")</td>
                             <td>@trabajo.DireccionServicio</td>
-                            <td><span class="badge bg-warning text-dark">@(trabajo.EstadoReserva?.Nombre ?? "Asignada")</span></td>
+                            <td><span class="badge @claseBadge" id="badgeEstado-@trabajo.ReservaID">@(trabajo.EstadoReserva?.Nombre ?? "Asignada")</span></td>
                             <td>
-                                <span class="text-muted small">En progreso</span>
+                                @if (siguienteCodigo != null)
+                                {
+                                    <form asp-action="AvanzarEstado" method="post" class="d-inline mb-1">
+                                        <input type="hidden" name="reservaId" value="@trabajo.ReservaID" />
+                                        <input type="hidden" name="nuevoEstadoCodigo" value="@siguienteCodigo" />
+                                        @Html.AntiForgeryToken()
+                                        <button type="submit" class="btn btn-sm btn-outline-primary">@etiquetaBoton</button>
+                                    </form>
+                                }
+                                else
+                                {
+                                    <span class="text-muted small d-block">Sin acciones</span>
+                                }
+                                @if (puedeCancelarTec)
+                                {
+                                    <div class="d-flex gap-1 mt-1 cancelar-tecnico" data-reserva-id="@trabajo.ReservaID">
+                                        <select class="form-select form-select-sm motivo-cancelacion-tec" style="max-width:160px;">
+                                            <option value="">-- Motivo --</option>
+                                            <option value="TECNICO_TARDO">El técnico tardó demasiado</option>
+                                            <option value="YA_NO_NECESITO">Ya no se necesita</option>
+                                            <option value="OTRA_OPCION">Otra opción</option>
+                                            <option value="ERROR_RESERVA">Error al pedir la reserva</option>
+                                        </select>
+                                        <button type="button" class="btn btn-sm btn-outline-danger btn-cancelar-tec" disabled>Cancelar</button>
+                                    </div>
+                                    <div class="small mt-1 mensaje-cancelacion-tec"></div>
+                                }
                             </td>
                         </tr>
                     }
@@ -225,5 +265,60 @@
         connection.on('NuevaOferta', actualizarBadge);
         connection.on('OfertaYaTomada', actualizarBadge);
         connection.start().catch(err => console.warn('Sin conexión en tiempo real, usando respaldo por polling.', err));
+
+        // --- Cancelación de reserva por el técnico (ventana de gracia) ---
+        document.querySelectorAll('.cancelar-tecnico').forEach(function(bloque) {
+            const reservaId = bloque.dataset.reservaId;
+            const select = bloque.querySelector('.motivo-cancelacion-tec');
+            const btn = bloque.querySelector('.btn-cancelar-tec');
+            const mensaje = bloque.parentElement.querySelector('.mensaje-cancelacion-tec');
+
+            select.addEventListener('change', function() {
+                btn.disabled = !select.value;
+            });
+
+            btn.addEventListener('click', function() {
+                if (!select.value) return;
+                if (!confirm('¿Seguro que deseas cancelar este trabajo?')) return;
+
+                btn.disabled = true;
+                mensaje.textContent = '';
+
+                const token = document.querySelector('input[name="__RequestVerificationToken"]')?.value;
+                const form = new FormData();
+                form.append('reservaId', reservaId);
+                form.append('motivoCodigo', select.value);
+                if (token) form.append('__RequestVerificationToken', token);
+
+                fetch('@Url.Action("CancelarReserva", "Tecnico")', { method: 'POST', body: form })
+                    .then(function(resp) { return resp.json(); })
+                    .then(function(data) {
+                        if (!data.ok) {
+                            mensaje.className = 'small mt-1 mensaje-cancelacion-tec text-danger';
+                            mensaje.textContent = data.error || 'No se pudo cancelar la reserva.';
+                            btn.disabled = false;
+                            return;
+                        }
+
+                        const badge = document.getElementById('badgeEstado-' + reservaId);
+                        if (badge) {
+                            badge.textContent = 'Cancelada';
+                            badge.className = 'badge bg-secondary';
+                        }
+                        bloque.style.display = 'none';
+
+                        mensaje.className = data.conPenalizacion ? 'small mt-1 mensaje-cancelacion-tec text-warning' : 'small mt-1 mensaje-cancelacion-tec text-success';
+                        mensaje.textContent = data.conPenalizacion
+                            ? 'Trabajo cancelado. Se registró una penalización simulada por cancelación tardía.'
+                            : 'Trabajo cancelado sin costo, dentro de la ventana de gracia.';
+                    })
+                    .catch(function(err) {
+                        console.error(err);
+                        mensaje.className = 'small mt-1 mensaje-cancelacion-tec text-danger';
+                        mensaje.textContent = 'Ocurrió un error al cancelar la reserva.';
+                        btn.disabled = false;
+                    });
+            });
+        });
     </script>
 }

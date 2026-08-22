@@ -1,5 +1,6 @@
 using CurlinggoSoft.Models;
 using Microsoft.AspNetCore.Authentication.Cookies;
+using Microsoft.AspNetCore.DataProtection;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Localization;
 using Microsoft.EntityFrameworkCore;
@@ -18,6 +19,18 @@ builder.Services.AddDbContext<ApplicationDbContext>(options =>
 
 // Registrar el motor de asignación
 builder.Services.AddScoped<CurlinggoSoft.Services.IDispatchEngineService, CurlinggoSoft.Services.DispatchEngineService>();
+
+// En Development, las Data Protection Keys se generan en memoria (efímeras) en
+// lugar de persistirse en %APPDATA%\ASP.NET\DataProtection-Keys. Esto evita que,
+// al detener y volver a correr el proyecto desde Visual Studio, las cookies de
+// autenticación que ya tenía el navegador (del último cliente o técnico que
+// inició sesión) sigan siendo válidas para el nuevo proceso del servidor y
+// parezca que "ya quedaste conectado" con el usuario anterior sin haber hecho
+// login. En Production se mantiene el comportamiento normal (persistente).
+if (builder.Environment.IsDevelopment())
+{
+    builder.Services.AddDataProtection().UseEphemeralDataProtectionProvider();
+}
 
 // Registro de SignalR
 builder.Services.AddSignalR();

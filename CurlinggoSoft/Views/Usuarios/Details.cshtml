@@ -5,6 +5,7 @@
     <dt class="col-sm-2">Nombre</dt><dd class="col-sm-10">@Model.Nombre @Model.Apellidos</dd>
     <dt class="col-sm-2">Email</dt><dd class="col-sm-10">@Model.Email</dd>
     <dt class="col-sm-2">Teléfono</dt><dd class="col-sm-10">@Model.Telefono</dd>
+    <dt class="col-sm-2">Rol</dt><dd class="col-sm-10">@ViewData["Rol"]</dd>
     <dt class="col-sm-2">Estado</dt><dd class="col-sm-10">@Model.EstadoUsuario</dd>
     <dt class="col-sm-2">Fecha Creación</dt><dd class="col-sm-10">@Model.FechaCreacion</dd>
     <dt class="col-sm-2">Último Acceso</dt><dd class="col-sm-10">@Model.UltimoAcceso</dd>
@@ -13,3 +14,4 @@
     <a asp-action="Edit" asp-route-id="@Model.UsuarioID" class="btn btn-warning">Editar</a>
     <a asp-action="Index" class="btn btn-secondary">Volver</a>
 </div>
+

@@ -1,5 +1,6 @@
 ﻿using CurlinggoSoft.Hubs;
 using CurlinggoSoft.Models;
+using CurlinggoSoft.Services;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.SignalR;
@@ -84,6 +85,39 @@ namespace CurlinggoSoft.Controllers
 
                 TempData["Success"] = "¡Servicio asignado! Ya aparece en tus trabajos.";
 
+                // Datos del técnico para mostrarle al cliente en Paso6. Se
+                // consultan aparte (no via reserva.Tecnico) para no depender
+                // de qué nombre de propiedad de navegación exista en el
+                // modelo — Usuarios + TecnicosPerfil es la fuente de verdad.
+                var datosTecnico = await _context.Usuarios
+                    .Where(u => u.UsuarioID == TecnicoId)
+                    .Select(u => new
+                    {
+                        nombre = u.Nombre,
+                        apellidos = u.Apellidos,
+                        telefono = u.Telefono
+                    })
+                    .FirstOrDefaultAsync();
+
+                var calificacion = await _context.TecnicosPerfil
+                    .Where(t => t.TecnicoID == TecnicoId)
+                    .Select(t => t.CalificacionPromedio)
+                    .FirstOrDefaultAsync();
+
+                // PUSH al cliente: reemplaza el "Buscando Técnico..." estático
+                // de Paso6ConfirmacionExitosa.cshtml por los datos reales.
+                if (reservaId > 0)
+                {
+                    await _hub.Clients.Group(NotificacionesHub.GrupoReserva(reservaId))
+                        .SendAsync("TecnicoAsignado", new
+                        {
+                            nombre = datosTecnico?.nombre ?? "Técnico",
+                            apellidos = datosTecnico?.apellidos ?? "",
+                            telefono = datosTecnico?.telefono ?? "",
+                            calificacion = calificacion
+                        });
+                }
+
                 // El SP ya marcó como RECHAZADA cualquier otra oferta pendiente
                 // de esta misma reserva. Avisamos por SignalR a esos técnicos
                 // para que su pantalla se refresque al instante y ya no vean
@@ -163,6 +197,156 @@ namespace CurlinggoSoft.Controllers
                 .CountAsync();
 
             return Json(new { count });
+        }
+
+        // POST: /Tecnico/AvanzarEstado
+        // Avanza la reserva por la máquina de estados ya validada en
+        // usp_Reserva_CambiarEstado (ASIGNADA→EN_CAMINO→EN_PROCESO→COMPLETADA,
+        // o CANCELADA desde cualquiera de esos). El SP rechaza cualquier
+        // transición fuera de esa secuencia con THROW 50008, así que aquí
+        // solo hace falta traducir el error, no revalidar la lógica de
+        // negocio dos veces.
+        [HttpPost]
+        [ValidateAntiForgeryToken]
+        public async Task<IActionResult> AvanzarEstado(long reservaId, string nuevoEstadoCodigo)
+        {
+            try
+            {
+                var esDelTecnico = await _context.SolicitudesReserva
+                    .AnyAsync(r => r.ReservaID == reservaId && r.TecnicoID == TecnicoId);
+
+                if (!esDelTecnico)
+                {
+                    TempData["Error"] = "Esa reserva no está asignada a tu cuenta.";
+                    return RedirectToAction(nameof(Index));
+                }
+
+                var estadoNuevoId = await _context.EstadosReserva
+                    .Where(e => e.Codigo == nuevoEstadoCodigo)
+                    .Select(e => e.EstadoReservaID)
+                    .FirstOrDefaultAsync();
+
+                if (estadoNuevoId == 0)
+                {
+                    TempData["Error"] = "Estado no reconocido.";
+                    return RedirectToAction(nameof(Index));
+                }
+
+                var pReserva = new SqlParameter("@ReservaID", reservaId);
+                var pEstado = new SqlParameter("@EstadoNuevoID", estadoNuevoId);
+                var pUsuario = new SqlParameter("@UsuarioModificadorID", TecnicoId);
+                var pObs = new SqlParameter("@Observaciones",
+                    (object?)$"Actualizado por el técnico a {nuevoEstadoCodigo}." ?? DBNull.Value);
+
+                await _context.Database.ExecuteSqlRawAsync(
+                    "EXEC dbo.usp_Reserva_CambiarEstado @ReservaID, @EstadoNuevoID, @UsuarioModificadorID, @Observaciones",
+                    pReserva, pEstado, pUsuario, pObs);
+
+                // PUSH al cliente: actualiza el tracking en Paso6 en tiempo
+                // real, sin que tenga que recargar la página.
+                await _hub.Clients.Group(NotificacionesHub.GrupoReserva(reservaId))
+                    .SendAsync("EstadoActualizado", new { estado = nuevoEstadoCodigo });
+
+                TempData["Success"] = "Estado actualizado.";
+                return RedirectToAction(nameof(Index));
+            }
+            catch (Exception ex)
+            {
+                var mensaje = ex.InnerException?.Message ?? ex.Message;
+                TempData["Error"] = mensaje.Contains("Transicion de estado no permitida")
+                    ? "Ese cambio de estado no es válido desde el estado actual de la reserva."
+                    : "No se pudo actualizar el estado: " + mensaje;
+                return RedirectToAction(nameof(Index));
+            }
+        }
+
+        // POST: /Tecnico/CancelarReserva
+        // Permite al tecnico cancelar una reserva que tiene asignada,
+        // mientras el estado siga siendo SOLICITADA, ASIGNADA o EN_CAMINO.
+        // Misma ventana de gracia que para el cliente (ver
+        // ReservaCancelacionHelper): sin penalizacion si pasaron 10 min o
+        // menos desde ASIGNADA, O el propio tecnico todavia no marco
+        // EN_CAMINO. Solo hay penalizacion simulada si ambas fallan.
+        [HttpPost]
+        [ValidateAntiForgeryToken]
+        public async Task<IActionResult> CancelarReserva(long reservaId, string motivoCodigo)
+        {
+            if (!ReservaCancelacionHelper.EsMotivoValido(motivoCodigo))
+            {
+                return Json(new { ok = false, error = "Motivo de cancelacion invalido." });
+            }
+
+            var reserva = await _context.SolicitudesReserva
+                .Include(r => r.EstadoReserva)
+                .FirstOrDefaultAsync(r => r.ReservaID == reservaId && r.TecnicoID == TecnicoId);
+
+            if (reserva == null)
+            {
+                return Json(new { ok = false, error = "Esa reserva no esta asignada a tu cuenta." });
+            }
+
+            var estadosCancelables = new[] { "SOLICITADA", "ASIGNADA", "EN_CAMINO" };
+            if (!estadosCancelables.Contains(reserva.EstadoReserva?.Codigo))
+            {
+                return Json(new { ok = false, error = "Esta reserva ya no se puede cancelar desde su estado actual." });
+            }
+
+            try
+            {
+                var sinPenalizacion = await ReservaCancelacionHelper.EstaDentroDeVentanaDeGraciaAsync(_context, reserva.ReservaID);
+
+                var estadoCanceladaId = await _context.EstadosReserva
+                    .Where(e => e.Codigo == "CANCELADA")
+                    .Select(e => e.EstadoReservaID)
+                    .FirstOrDefaultAsync();
+
+                var pReserva = new SqlParameter("@ReservaID", reserva.ReservaID);
+                var pEstado = new SqlParameter("@EstadoNuevoID", estadoCanceladaId);
+                var pUsuario = new SqlParameter("@UsuarioModificadorID", TecnicoId);
+                var pObs = new SqlParameter("@Observaciones", "Cancelado por el tecnico.");
+
+                await _context.Database.ExecuteSqlRawAsync(
+                    "EXEC dbo.usp_Reserva_CambiarEstado @ReservaID, @EstadoNuevoID, @UsuarioModificadorID, @Observaciones",
+                    pReserva, pEstado, pUsuario, pObs);
+
+                reserva.MotivoCancelacionCodigo = motivoCodigo;
+                reserva.CanceladoPor = "TECNICO";
+                reserva.CancelacionConPenalizacion = !sinPenalizacion;
+
+                var estadoOfertaCanceladaId = await _context.EstadosOfertaTecnico
+                    .Where(e => e.Codigo == "CANCELADA")
+                    .Select(e => e.EstadoOfertaID)
+                    .FirstOrDefaultAsync();
+
+                var ofertasAbiertas = await _context.OfertasTecnico
+                    .Include(o => o.EstadoOferta)
+                    .Where(o => o.ReservaID == reserva.ReservaID &&
+                                (o.EstadoOferta!.Codigo == "PENDIENTE" || o.EstadoOferta!.Codigo == "ACEPTADA"))
+                    .ToListAsync();
+
+                foreach (var oferta in ofertasAbiertas)
+                {
+                    oferta.EstadoOfertaID = estadoOfertaCanceladaId;
+                    oferta.FechaRespuesta ??= DateTime.Now;
+                }
+
+                await _context.SaveChangesAsync();
+
+                // Al cliente le llega el cambio de estado por el mismo
+                // evento que ya escucha en Paso6ConfirmacionExitosa.cshtml.
+                await _hub.Clients.Group(NotificacionesHub.GrupoReserva(reserva.ReservaID))
+                    .SendAsync("EstadoActualizado", new { estado = "CANCELADA" });
+
+                return Json(new { ok = true, conPenalizacion = !sinPenalizacion });
+            }
+            catch (Exception ex)
+            {
+                var mensaje = ex.InnerException?.Message ?? ex.Message;
+                var errorMsg = mensaje.Contains("Transicion de estado no permitida")
+                    ? "Esta reserva ya no se puede cancelar desde su estado actual."
+                    : "No se pudo cancelar la reserva: " + mensaje;
+                return Json(new { ok = false, error = errorMsg });
+            }
         }
 
         // GET: /Tecnico/GetProvincias
