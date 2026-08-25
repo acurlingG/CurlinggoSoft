@@ -1,0 +1,23 @@
+@{
+    ViewData["Title"] = "Registro de Técnico - Bienvenida";
+}
+<div class="container py-4" style="max-width:700px;">
+    <h2 class="mb-3"><i class="fa fa-user-plus"></i> Conviértase en Técnico CURLINGgo</h2>
+    <p class="text-muted">
+        Complete este formulario de 8 pasos para postularse como técnico. Podrá guardar
+        su progreso y continuar más tarde. Una vez enviada, un administrador revisará
+        su solicitud y le notificaremos el resultado.
+    </p>
+
+    @if (TempData["Success"] != null)
+    {
+        <div class="alert alert-success">@TempData["Success"]</div>
+    }
+
+    <form asp-action="Comenzar" method="post" class="mt-4">
+        @Html.AntiForgeryToken()
+        <button type="submit" class="btn btn-primary btn-lg">
+            <i class="fa fa-arrow-right"></i> Comenzar Solicitud
+        </button>
+    </form>
+</div>

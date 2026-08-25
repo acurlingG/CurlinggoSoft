@@ -1,0 +1,101 @@
+@model CurlinggoSoft.Models.ViewModels.SolicitudTecnicoWizardViewModel
+@{
+    ViewData["Title"] = "Paso 4 - Movilidad";
+}
+<div class="container py-4" style="max-width:700px;">
+    <partial name="_WizardProgress" model="4" />
+
+    <h4 class="mb-3">Movilidad y Equipo de Trabajo</h4>
+
+    <form asp-action="GuardarPaso4" method="post" id="formPaso4">
+        @Html.AntiForgeryToken()
+        <div asp-validation-summary="ModelOnly" class="alert alert-danger" role="alert"></div>
+
+        <div class="mb-3">
+            <label class="form-label">¿Tiene licencia de conducir?</label>
+            <select asp-for="Movilidad.TieneLicencia" class="form-select" id="tieneLicencia">
+                <option value="">-- Seleccione --</option>
+                <option value="true">Sí</option>
+                <option value="false">No</option>
+            </select>
+        </div>
+        <div class="mb-3" id="grupoTipoLicencia">
+            <label asp-for="Movilidad.TipoLicencia" class="form-label"></label>
+            <select asp-for="Movilidad.TipoLicencia" class="form-select">
+                <option value="">-- Seleccione --</option>
+                <option value="MOTO">Moto</option>
+                <option value="AUTOMOVIL">Automóvil</option>
+                <option value="AMBAS">Ambas</option>
+                <option value="OTRA">Otra</option>
+            </select>
+        </div>
+
+        <div class="mb-3">
+            <label class="form-label">¿Cuenta con vehículo para trabajar?</label>
+            <select asp-for="Movilidad.TieneVehiculo" class="form-select" id="tieneVehiculo">
+                <option value="">-- Seleccione --</option>
+                <option value="true">Sí</option>
+                <option value="false">No</option>
+            </select>
+        </div>
+        <div class="mb-3" id="grupoTipoVehiculo">
+            <label asp-for="Movilidad.TipoVehiculo" class="form-label"></label>
+            <select asp-for="Movilidad.TipoVehiculo" class="form-select">
+                <option value="">-- Seleccione --</option>
+                <option value="MOTOCICLETA">Motocicleta</option>
+                <option value="AUTOMOVIL">Automóvil</option>
+                <option value="CAMIONETA">Camioneta</option>
+                <option value="OTRO">Otro</option>
+            </select>
+        </div>
+
+        <div class="mb-3">
+            <label asp-for="Movilidad.ModalidadTrabajo" class="form-label"></label>
+            <select asp-for="Movilidad.ModalidadTrabajo" class="form-select" id="modalidadTrabajo">
+                <option value="SOLO">Trabajo solo</option>
+                <option value="UN_AYUDANTE">Con un ayudante</option>
+                <option value="DOS_O_MAS">Con dos o más ayudantes</option>
+            </select>
+            <span asp-validation-for="Movilidad.ModalidadTrabajo" class="text-danger"></span>
+        </div>
+
+        <div class="mb-3" id="grupoCantidadAyudantes">
+            <label asp-for="Movilidad.CantidadAyudantes" class="form-label"></label>
+            <input asp-for="Movilidad.CantidadAyudantes" type="number" min="1" max="50" class="form-control" />
+            <span asp-validation-for="Movilidad.CantidadAyudantes" class="text-danger"></span>
+        </div>
+
+        <div class="mb-3" id="grupoEquipoHabitual">
+            <label class="form-label">¿Forman parte de su equipo habitual?</label>
+            <select asp-for="Movilidad.EquipoHabitual" class="form-select">
+                <option value="">-- Seleccione --</option>
+                <option value="true">Sí</option>
+                <option value="false">No</option>
+            </select>
+        </div>
+
+        <div class="mt-4 d-flex justify-content-between">
+            <a asp-action="Paso" asp-route-paso="3" class="btn btn-outline-secondary">Atrás</a>
+            <button type="submit" class="btn btn-primary">Siguiente <i class="fa fa-arrow-right"></i></button>
+        </div>
+    </form>
+</div>
+
+@section Scripts {
+    <script>
+        function toggle(sel, group) {
+            document.getElementById(group).style.display = sel.value === 'true' ? '' : 'none';
+        }
+        function actualizarModalidad() {
+            var val = document.getElementById('modalidadTrabajo').value;
+            document.getElementById('grupoCantidadAyudantes').style.display = val === 'DOS_O_MAS' ? '' : 'none';
+            document.getElementById('grupoEquipoHabitual').style.display = val === 'SOLO' ? 'none' : '';
+        }
+        document.getElementById('tieneLicencia').addEventListener('change', function () { toggle(this, 'grupoTipoLicencia'); });
+        document.getElementById('tieneVehiculo').addEventListener('change', function () { toggle(this, 'grupoTipoVehiculo'); });
+        document.getElementById('modalidadTrabajo').addEventListener('change', actualizarModalidad);
+        toggle(document.getElementById('tieneLicencia'), 'grupoTipoLicencia');
+        toggle(document.getElementById('tieneVehiculo'), 'grupoTipoVehiculo');
+        actualizarModalidad();
+    </script>
+}

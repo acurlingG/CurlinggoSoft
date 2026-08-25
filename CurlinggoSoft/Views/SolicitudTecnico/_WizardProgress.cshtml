@@ -1,0 +1,23 @@
+@model int
+@{
+    var pasos = new[] { "Bienvenida", "Datos Personales", "Especialidades", "Movilidad", "Cobertura", "Seguro", "Documentos", "Revisión" };
+}
+<div class="mb-4">
+    <div class="d-flex justify-content-between flex-wrap">
+        @for (int i = 1; i <= pasos.Length; i++)
+        {
+            var activo = i == Model;
+            var completado = i < Model;
+            <div class="text-center flex-fill" style="min-width:90px;">
+                <div class="rounded-circle mx-auto d-flex align-items-center justify-content-center @(activo ? "bg-primary text-white" : completado ? "bg-success text-white" : "bg-light text-muted")"
+                     style="width:32px;height:32px;">
+                    @(completado ? "✓" : i.ToString())
+                </div>
+                <small class="@(activo ? "fw-bold" : "text-muted")">@pasos[i - 1]</small>
+            </div>
+        }
+    </div>
+    <div class="progress mt-2" style="height: 6px;">
+        <div class="progress-bar" role="progressbar" style="width: @((Model * 100) / pasos.Length)%;"></div>
+    </div>
+</div>

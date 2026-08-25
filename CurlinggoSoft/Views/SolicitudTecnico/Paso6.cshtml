@@ -1,0 +1,64 @@
+@model CurlinggoSoft.Models.ViewModels.SolicitudTecnicoWizardViewModel
+@{
+    ViewData["Title"] = "Paso 6 - Seguro y Accesibilidad";
+}
+<div class="container py-4" style="max-width:700px;">
+    <partial name="_WizardProgress" model="6" />
+
+    <h4 class="mb-3">Seguro y Condiciones Personales</h4>
+
+    <form asp-action="GuardarPaso6" method="post" id="formPaso6">
+        @Html.AntiForgeryToken()
+        <div asp-validation-summary="ModelOnly" class="alert alert-danger" role="alert"></div>
+
+        <div class="mb-3">
+            <label class="form-label">¿Cuenta actualmente con seguro?</label>
+            <select asp-for="SeguroAccesibilidad.TieneSeguro" class="form-select" id="tieneSeguro">
+                <option value="">-- Seleccione --</option>
+                <option value="true">Sí</option>
+                <option value="false">No</option>
+            </select>
+        </div>
+        <div class="mb-3" id="grupoTipoSeguro">
+            <label asp-for="SeguroAccesibilidad.TipoSeguro" class="form-label"></label>
+            <select asp-for="SeguroAccesibilidad.TipoSeguro" class="form-select">
+                <option value="">-- Seleccione --</option>
+                <option value="RIESGOS_TRABAJO">Riesgos del Trabajo</option>
+                <option value="SEGURO_VOLUNTARIO">Seguro Voluntario</option>
+                <option value="SEGURO_PRIVADO">Seguro Privado</option>
+                <option value="OTRO">Otro</option>
+            </select>
+        </div>
+
+        <div class="mb-3">
+            <label class="form-label">¿Necesita alguna consideración de accesibilidad?</label>
+            <select asp-for="SeguroAccesibilidad.NecesitaAccesibilidad" class="form-select" id="necesitaAccesibilidad">
+                <option value="">Prefiero no responder</option>
+                <option value="true">Sí</option>
+                <option value="false">No</option>
+            </select>
+        </div>
+        <div class="mb-3" id="grupoDetalleAccesibilidad">
+            <label asp-for="SeguroAccesibilidad.DetalleAccesibilidad" class="form-label"></label>
+            <textarea asp-for="SeguroAccesibilidad.DetalleAccesibilidad" class="form-control" rows="3"></textarea>
+            <span asp-validation-for="SeguroAccesibilidad.DetalleAccesibilidad" class="text-danger"></span>
+        </div>
+
+        <div class="mt-4 d-flex justify-content-between">
+            <a asp-action="Paso" asp-route-paso="5" class="btn btn-outline-secondary">Atrás</a>
+            <button type="submit" class="btn btn-primary">Siguiente <i class="fa fa-arrow-right"></i></button>
+        </div>
+    </form>
+</div>
+
+@section Scripts {
+    <script>
+        function toggle(sel, group) {
+            document.getElementById(group).style.display = sel.value === 'true' ? '' : 'none';
+        }
+        document.getElementById('tieneSeguro').addEventListener('change', function () { toggle(this, 'grupoTipoSeguro'); });
+        document.getElementById('necesitaAccesibilidad').addEventListener('change', function () { toggle(this, 'grupoDetalleAccesibilidad'); });
+        toggle(document.getElementById('tieneSeguro'), 'grupoTipoSeguro');
+        toggle(document.getElementById('necesitaAccesibilidad'), 'grupoDetalleAccesibilidad');
+    </script>
+}

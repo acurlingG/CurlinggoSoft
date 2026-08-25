@@ -1,0 +1,59 @@
+@model List<CurlinggoSoft.Models.SolicitudTecnico>
+@{
+    ViewData["Title"] = "Solicitudes de Técnico";
+    var estados = (List<CurlinggoSoft.Models.EstadoSolicitudTecnico>)ViewBag.Estados;
+    int? estadoSeleccionado = ViewBag.EstadoSeleccionado;
+}
+<div class="container py-4">
+    <h2 class="mb-3"><i class="fa fa-user-plus"></i> Solicitudes de Técnico</h2>
+
+    @if (TempData["Success"] != null)
+    {
+        <div class="alert alert-success">@TempData["Success"]</div>
+    }
+    @if (TempData["Error"] != null)
+    {
+        <div class="alert alert-danger">@TempData["Error"]</div>
+    }
+
+    <form method="get" class="row g-2 mb-3 align-items-end">
+        <div class="col-md-4">
+            <label class="form-label">Filtrar por Estado</label>
+            <select name="estadoId" class="form-select" onchange="this.form.submit()">
+                <option value="">-- Todas (excepto Borrador) --</option>
+                @foreach (var e in estados)
+                {
+                    <option value="@e.EstadoSolicitudTecnicoID" selected="@(estadoSeleccionado == e.EstadoSolicitudTecnicoID)">@e.Nombre</option>
+                }
+            </select>
+        </div>
+    </form>
+
+    <table class="table table-striped">
+        <thead>
+            <tr>
+                <th>Código</th>
+                <th>Aspirante</th>
+                <th>Estado</th>
+                <th>Fecha Envío</th>
+                <th></th>
+            </tr>
+        </thead>
+        <tbody>
+            @foreach (var s in Model)
+            {
+                <tr>
+                    <td>@s.CodigoSolicitud</td>
+                    <td>@(s.Usuario?.Nombre) @(s.Usuario?.Apellidos) <br /><small class="text-muted">@s.Usuario?.Email</small></td>
+                    <td><span class="badge bg-secondary">@s.EstadoSolicitud?.Nombre</span></td>
+                    <td>@(s.FechaEnvio?.ToString("dd/MM/yyyy HH:mm") ?? "-")</td>
+                    <td>
+                        <a asp-action="Details" asp-route-id="@s.SolicitudTecnicoID" class="btn btn-sm btn-outline-primary">
+                            <i class="fa fa-eye"></i> Ver
+                        </a>
+                    </td>
+                </tr>
+            }
+        </tbody>
+    </table>
+</div>

@@ -1,0 +1,51 @@
+@model CurlinggoSoft.Models.ViewModels.SolicitudTecnicoWizardViewModel
+@{
+    ViewData["Title"] = "Paso 7 - Documentos";
+    var tipos = (List<CurlinggoSoft.Models.TipoDocumentoTecnico>)ViewBag.TiposDocumento;
+}
+<div class="container py-4" style="max-width:800px;">
+    <partial name="_WizardProgress" model="7" />
+
+    <h4 class="mb-3">Documentos</h4>
+    <p class="text-muted">Adjunte los documentos solicitados. Los marcados como obligatorios son requeridos para continuar.</p>
+
+    <form asp-action="GuardarPaso7" method="post" enctype="multipart/form-data" id="formPaso7">
+        @Html.AntiForgeryToken()
+        <div asp-validation-summary="ModelOnly" class="alert alert-danger" role="alert"></div>
+
+        @for (int i = 0; i < tipos.Count; i++)
+        {
+            var tipo = tipos[i];
+            var doc = Model.Documentos.Documentos.FirstOrDefault(d => d.TipoDocumentoID == tipo.TipoDocumentoID);
+            <div class="mb-3">
+                <label class="form-label">
+                    @tipo.Nombre @(tipo.Obligatorio ? "*" : "")
+                    @if (doc?.NombreArchivo != null)
+                    {
+                        <span class="badge bg-success ms-2">✓ Subido: @doc.NombreArchivo</span>
+                    }
+                </label>
+                @if (!string.IsNullOrEmpty(tipo.Descripcion))
+                {
+                    <div class="form-text">@tipo.Descripcion</div>
+                }
+                <input type="hidden" name="tiposDocumentoID" value="@tipo.TipoDocumentoID" />
+                <input type="file" name="archivos" class="form-control" />
+            </div>
+        }
+
+        <div class="form-check mb-2">
+            <input asp-for="Documentos.AutorizaBackgroundCheck" class="form-check-input" />
+            <label asp-for="Documentos.AutorizaBackgroundCheck" class="form-check-label"></label>
+        </div>
+        <div class="form-check mb-3">
+            <input asp-for="Documentos.AceptaTerminos" class="form-check-input" />
+            <label asp-for="Documentos.AceptaTerminos" class="form-check-label"></label>
+        </div>
+
+        <div class="mt-4 d-flex justify-content-between">
+            <a asp-action="Paso" asp-route-paso="6" class="btn btn-outline-secondary">Atrás</a>
+            <button type="submit" class="btn btn-primary">Siguiente <i class="fa fa-arrow-right"></i></button>
+        </div>
+    </form>
+</div>

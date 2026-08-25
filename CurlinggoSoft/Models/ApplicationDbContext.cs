@@ -49,6 +49,15 @@ namespace CurlinggoSoft.Models
         public DbSet<ConfiguracionDespacho> ConfiguracionDespacho { get; set; }
         public DbSet<MensajeReserva> MensajesReserva { get; set; }
 
+        // --- Registro de Técnico (wizard de solicitud + aprobación) ---
+        public DbSet<EstadoSolicitudTecnico> EstadosSolicitudTecnico { get; set; }
+        public DbSet<SolicitudTecnico> SolicitudesTecnico { get; set; }
+        public DbSet<SolicitudTecnicoEspecialidad> SolicitudTecnicoEspecialidades { get; set; }
+        public DbSet<SolicitudTecnicoCobertura> SolicitudTecnicoCobertura { get; set; }
+        public DbSet<TipoDocumentoTecnico> TiposDocumentoTecnico { get; set; }
+        public DbSet<SolicitudTecnicoDocumento> SolicitudTecnicoDocumentos { get; set; }
+        public DbSet<SolicitudTecnicoBackgroundCheck> SolicitudTecnicoBackgroundCheck { get; set; }
+
         protected override void OnModelCreating(ModelBuilder modelBuilder)
         {
             base.OnModelCreating(modelBuilder);
@@ -70,6 +79,41 @@ namespace CurlinggoSoft.Models
                 .HasOne(m => m.Emisor).WithMany().HasForeignKey(m => m.EmisorUsuarioID).OnDelete(DeleteBehavior.Restrict);
             modelBuilder.Entity<MensajeReserva>()
                 .HasOne(m => m.Receptor).WithMany().HasForeignKey(m => m.ReceptorUsuarioID).OnDelete(DeleteBehavior.Restrict);
+
+            // --- Registro de Técnico (wizard de solicitud + aprobación) ---
+            modelBuilder.Entity<SolicitudTecnico>()
+                .HasOne(s => s.Usuario).WithMany().HasForeignKey(s => s.UsuarioID).OnDelete(DeleteBehavior.Restrict);
+            modelBuilder.Entity<SolicitudTecnico>()
+                .HasOne(s => s.EstadoSolicitud).WithMany().HasForeignKey(s => s.EstadoSolicitudTecnicoID).OnDelete(DeleteBehavior.Restrict);
+
+            modelBuilder.Entity<SolicitudTecnicoEspecialidad>()
+                .HasOne(e => e.Solicitud).WithMany(s => s.Especialidades).HasForeignKey(e => e.SolicitudTecnicoID).OnDelete(DeleteBehavior.Cascade);
+            modelBuilder.Entity<SolicitudTecnicoEspecialidad>()
+                .HasOne(e => e.Servicio).WithMany().HasForeignKey(e => e.ServicioID).OnDelete(DeleteBehavior.Restrict);
+
+            modelBuilder.Entity<SolicitudTecnicoCobertura>()
+                .HasOne(c => c.Solicitud).WithMany(s => s.Cobertura).HasForeignKey(c => c.SolicitudTecnicoID).OnDelete(DeleteBehavior.Cascade);
+            modelBuilder.Entity<SolicitudTecnicoCobertura>()
+                .HasOne(c => c.Provincia).WithMany().HasForeignKey(c => c.ProvinciaID).OnDelete(DeleteBehavior.Restrict);
+            modelBuilder.Entity<SolicitudTecnicoCobertura>()
+                .HasOne(c => c.Canton).WithMany().HasForeignKey(c => c.CantonID).OnDelete(DeleteBehavior.Restrict);
+            modelBuilder.Entity<SolicitudTecnicoCobertura>()
+                .HasOne(c => c.Distrito).WithMany().HasForeignKey(c => c.DistritoID).OnDelete(DeleteBehavior.Restrict);
+
+            modelBuilder.Entity<SolicitudTecnicoDocumento>()
+                .HasOne(d => d.Solicitud).WithMany(s => s.Documentos).HasForeignKey(d => d.SolicitudTecnicoID).OnDelete(DeleteBehavior.Cascade);
+            modelBuilder.Entity<SolicitudTecnicoDocumento>()
+                .HasOne(d => d.TipoDocumento).WithMany().HasForeignKey(d => d.TipoDocumentoID).OnDelete(DeleteBehavior.Restrict);
+
+            modelBuilder.Entity<SolicitudTecnicoBackgroundCheck>()
+                .HasOne(b => b.Solicitud).WithOne(s => s.BackgroundCheck).HasForeignKey<SolicitudTecnicoBackgroundCheck>(b => b.SolicitudTecnicoID).OnDelete(DeleteBehavior.Cascade);
+
+            modelBuilder.Entity<SolicitudTecnico>()
+                .HasIndex(s => s.CodigoSolicitud).IsUnique();
+            modelBuilder.Entity<EstadoSolicitudTecnico>()
+                .HasIndex(e => e.Codigo).IsUnique();
+            modelBuilder.Entity<TipoDocumentoTecnico>()
+                .HasIndex(t => t.Codigo).IsUnique();
 
             modelBuilder.Entity<HistorialEstadoReserva>()
                 .HasOne(h => h.Reserva).WithMany().HasForeignKey(h => h.ReservaID).OnDelete(DeleteBehavior.Restrict);

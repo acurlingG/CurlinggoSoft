@@ -1,0 +1,131 @@
+@model CurlinggoSoft.Models.SolicitudTecnico
+@{
+    ViewData["Title"] = $"Solicitud {Model.CodigoSolicitud}";
+}
+<div class="container py-4">
+    <h2 class="mb-1">Solicitud <small class="text-muted">@Model.CodigoSolicitud</small></h2>
+    <span class="badge bg-secondary mb-3">@Model.EstadoSolicitud?.Nombre</span>
+
+    @if (TempData["Success"] != null)
+    {
+        <div class="alert alert-success alert-dismissible fade show" role="alert">
+            @TempData["Success"]
+            <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+        </div>
+    }
+
+    @if (TempData["Error"] != null)
+    {
+        <div class="alert alert-danger alert-dismissible fade show" role="alert">
+            @TempData["Error"]
+            <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+        </div>
+    }
+
+    <div class="card mb-3">
+        <div class="card-header fw-bold">Datos del Aspirante</div>
+        <div class="card-body">
+            <p><strong>Nombre:</strong> @Model.Usuario?.Nombre @Model.Usuario?.Apellidos</p>
+            <p><strong>Email:</strong> @Model.Usuario?.Email</p>
+            <p><strong>Teléfono:</strong> @Model.Usuario?.Telefono</p>
+            <p><strong>Identificación:</strong> @Model.Identificacion</p>
+        </div>
+    </div>
+
+    <div class="card mb-3">
+        <div class="card-header fw-bold">Movilidad y Equipo</div>
+        <div class="card-body">
+            <p><strong>¿Tiene licencia?</strong> @(Model.TieneLicencia == true ? $"Sí ({Model.TipoLicencia})" : "No")</p>
+            <p><strong>¿Tiene vehículo?</strong> @(Model.TieneVehiculo == true ? $"Sí ({Model.TipoVehiculo})" : "No")</p>
+            <p><strong>Modalidad de trabajo:</strong> @Model.ModalidadTrabajo @(Model.CantidadAyudantes.HasValue ? $"({Model.CantidadAyudantes} ayudantes)" : "")</p>
+        </div>
+    </div>
+
+    <div class="card mb-3">
+        <div class="card-header fw-bold">Especialidades</div>
+        <div class="card-body">
+            <ul>
+                @foreach (var esp in Model.Especialidades)
+                {
+                    <li>@esp.Servicio?.NombreServicio - @esp.AniosExperiencia años de experiencia</li>
+                }
+            </ul>
+        </div>
+    </div>
+
+    <div class="card mb-3">
+        <div class="card-header fw-bold">Cobertura</div>
+        <div class="card-body">
+            <ul>
+                @foreach (var cob in Model.Cobertura)
+                {
+                    <li>@cob.Provincia?.Nombre / @cob.Canton?.Nombre @(cob.Distrito != null ? "/ " + cob.Distrito.Nombre : "") (radio: @cob.RadioCoberturaKm km)</li>
+                }
+            </ul>
+        </div>
+    </div>
+
+    <div class="card mb-3">
+        <div class="card-header fw-bold">Seguro y Accesibilidad</div>
+        <div class="card-body">
+            <p><strong>¿Tiene seguro?</strong> @(Model.TieneSeguro == true ? $"Sí ({Model.TipoSeguro})" : "No")</p>
+            <p><strong>Accesibilidad:</strong> @(Model.NecesitaAccesibilidad == true ? Model.DetalleAccesibilidad : "No indicó necesidad")</p>
+        </div>
+    </div>
+
+    <div class="card mb-3">
+        <div class="card-header fw-bold">Documentos</div>
+        <div class="card-body">
+            <ul>
+                @foreach (var doc in Model.Documentos)
+                {
+                    <li>
+                        @doc.TipoDocumento?.Nombre —
+                        <a href="@doc.RutaArchivo" target="_blank">@doc.NombreArchivo</a>
+                        <span class="badge bg-info">@doc.EstadoDocumento</span>
+                    </li>
+                }
+            </ul>
+            <p><strong>Background Check:</strong> @(Model.BackgroundCheck?.Estado ?? "No iniciado")</p>
+        </div>
+    </div>
+
+    @if (Model.MotivoRechazo != null)
+    {
+        <div class="alert alert-danger"><strong>Motivo de rechazo:</strong> @Model.MotivoRechazo</div>
+    }
+
+    <div class="d-flex gap-2 mt-4 align-items-center">
+        <a asp-action="Index" class="btn btn-outline-secondary">Volver</a>
+
+        @if (Model.EstadoSolicitud?.Codigo == "APROBADA")
+        {
+            <div class="alert alert-info mb-0 py-2">Esta solicitud ya fue aprobada y procesada.</div>
+        }
+        else
+        {
+            @if (Model.EstadoSolicitud?.Codigo == "ENVIADA")
+            {
+                <form asp-action="PasarARevision" asp-route-id="@Model.SolicitudTecnicoID" method="post" class="d-inline">
+                    @Html.AntiForgeryToken()
+                    <button type="submit" class="btn btn-info">Pasar a Revisión</button>
+                </form>
+            }
+
+            <form asp-action="Aprobar" asp-route-id="@Model.SolicitudTecnicoID" method="post" class="d-inline"
+                  onsubmit="return confirm('¿Está seguro de aprobar esta solicitud? Esto le otorgará el perfil y rol de Técnico al usuario.');">
+                @Html.AntiForgeryToken()
+                <button type="submit" class="btn btn-success">
+                    <i class="fa fa-check-circle"></i> Aprobar Solicitud
+                </button>
+            </form>
+
+            @if (Model.EstadoSolicitud?.Codigo != "RECHAZADA")
+            {
+                <a asp-action="Rechazar" asp-route-id="@Model.SolicitudTecnicoID" class="btn btn-danger">
+                    <i class="fa fa-times"></i> Rechazar
+                </a>
+            }
+        }
+    </div>
+</div>

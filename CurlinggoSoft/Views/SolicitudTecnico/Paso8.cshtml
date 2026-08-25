@@ -1,0 +1,34 @@
+@model CurlinggoSoft.Models.ViewModels.SolicitudTecnicoWizardViewModel
+@{
+    ViewData["Title"] = "Paso 8 - Revisión y Envío";
+}
+<div class="container py-4" style="max-width:700px;">
+    <partial name="_WizardProgress" model="8" />
+
+    <h4 class="mb-3">Revisión Final</h4>
+    <p class="text-muted">Verifique que su información sea correcta antes de enviar su solicitud (código: <strong>@Model.CodigoSolicitud</strong>).</p>
+
+    <div asp-validation-summary="ModelOnly" class="alert alert-danger" role="alert"></div>
+
+    <div class="card mb-3">
+        <div class="card-body">
+            <p>Al enviar su solicitud, un administrador revisará su información y documentos.
+            Le notificaremos por correo el resultado de la evaluación.</p>
+        </div>
+    </div>
+
+    <form asp-action="GuardarPaso8" asp-controller="SolicitudTecnico" method="post">
+        @Html.AntiForgeryToken()
+        <div asp-validation-summary="ModelOnly" class="alert alert-danger" role="alert"></div>
+
+        <div class="form-check mb-3">
+            <input asp-for="ConfirmaInformacionVeridica" class="form-check-input" id="confirma" />
+            <label class="form-check-label" for="confirma">Confirmo que toda la información suministrada es verdadera.</label>
+        </div>
+            
+        <div class="mt-4 d-flex justify-content-between">
+            <a asp-action="Paso" asp-route-paso="7" class="btn btn-outline-secondary">Atrás</a>
+            <button type="submit" class="btn btn-success">Enviar Solicitud <i class="fa fa-paper-plane"></i></button>
+        </div>
+    </form>
+</div>

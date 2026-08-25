@@ -1,0 +1,163 @@
+@model CurlinggoSoft.Models.ViewModels.SolicitudTecnicoWizardViewModel
+@using Microsoft.AspNetCore.Mvc.Rendering
+@{
+    ViewData["Title"] = "Paso 5 - Cobertura";
+    var provincias = (List<CurlinggoSoft.Models.Provincia>)ViewBag.Provincias;
+}
+<div class="container py-4" style="max-width:800px;">
+    <partial name="_WizardProgress" model="5" />
+
+    <h4 class="mb-3">Zona de Cobertura</h4>
+    <p class="text-muted">Indique las provincias/cantones/distritos donde puede ofrecer sus servicios y el radio máximo de desplazamiento.</p>
+
+    <form asp-action="GuardarPaso5" method="post" id="formPaso5">
+        @Html.AntiForgeryToken()
+        <div asp-validation-summary="ModelOnly" class="alert alert-danger" role="alert"></div>
+
+        <div class="mb-3">
+            <label asp-for="Cobertura.RadioCoberturaKm" class="form-label"></label>
+            <input asp-for="Cobertura.RadioCoberturaKm" type="number" min="1" max="200" class="form-control" style="max-width:200px;" />
+            <span asp-validation-for="Cobertura.RadioCoberturaKm" class="text-danger"></span>
+        </div>
+
+        <div class="row g-2 align-items-end mb-3">
+            <div class="col-md-4">
+                <label class="form-label">Provincia</label>
+                <select id="selProvincia" class="form-select">
+                    <option value="">-- Seleccione --</option>
+                    @foreach (var p in provincias)
+                    {
+                        <option value="@p.ProvinciaID">@p.Nombre</option>
+                    }
+                </select>
+            </div>
+            <div class="col-md-4">
+                <label class="form-label">Cantón</label>
+                <select id="selCanton" class="form-select" disabled>
+                    <option value="">-- Seleccione provincia --</option>
+                </select>
+            </div>
+            <div class="col-md-3">
+                <label class="form-label">Distrito (opcional)</label>
+                <select id="selDistrito" class="form-select" disabled>
+                    <option value="">-- Todos --</option>
+                </select>
+            </div>
+            <div class="col-md-1">
+                <button type="button" id="btnAgregarZona" class="btn btn-success w-100"><i class="fa fa-plus"></i></button>
+            </div>
+        </div>
+
+        <table class="table table-sm" id="tablaZonas">
+            <thead><tr><th>Provincia</th><th>Cantón</th><th>Distrito</th><th></th></tr></thead>
+            <tbody>
+                @for (int i = 0; i < Model.Cobertura.ZonasSeleccionadas.Count; i++)
+                {
+                    var z = Model.Cobertura.ZonasSeleccionadas[i];
+                    <tr data-provincia="@z.ProvinciaID" data-canton="@z.CantonID" data-distrito="@z.DistritoID">
+                        <td>@z.NombreProvincia</td>
+                        <td>@z.NombreCanton</td>
+                        <td>@z.NombreDistrito</td>
+                        <td><button type="button" class="btn btn-sm btn-outline-danger btnEliminarZona"><i class="fa fa-trash"></i></button></td>
+                    </tr>
+                }
+            </tbody>
+        </table>
+
+        <div id="contenedor-zonas-ocultas"></div>
+
+        <div class="mt-4 d-flex justify-content-between">
+            <a asp-action="Paso" asp-route-paso="4" class="btn btn-outline-secondary">Atrás</a>
+            <button type="submit" class="btn btn-primary">Siguiente <i class="fa fa-arrow-right"></i></button>
+        </div>
+    </form>
+</div>
+
+@section Scripts {
+    <script>
+        var selProvincia = document.getElementById('selProvincia');
+        var selCanton = document.getElementById('selCanton');
+        var selDistrito = document.getElementById('selDistrito');
+
+        selProvincia.addEventListener('change', function () {
+            selCanton.innerHTML = '<option value="">-- Cargando... --</option>';
+            selCanton.disabled = true;
+            selDistrito.innerHTML = '<option value="">-- Todos --</option>';
+            selDistrito.disabled = true;
+            if (!this.value) { selCanton.innerHTML = '<option value="">-- Seleccione provincia --</option>'; return; }
+
+            fetch('/Cantones/PorProvincia?provinciaId=' + this.value)
+                .then(r => r.json())
+                .then(data => {
+                    selCanton.innerHTML = '<option value="">-- Seleccione --</option>';
+                    data.forEach(c => {
+                        var opt = document.createElement('option');
+                        opt.value = c.cantonID;
+                        opt.text = c.nombre;
+                        selCanton.appendChild(opt);
+                    });
+                    selCanton.disabled = false;
+                });
+        });
+
+        selCanton.addEventListener('change', function () {
+            selDistrito.innerHTML = '<option value="">-- Cargando... --</option>';
+            selDistrito.disabled = true;
+            if (!this.value) { selDistrito.innerHTML = '<option value="">-- Todos --</option>'; return; }
+
+            fetch('/Distritos/PorCanton?cantonId=' + this.value)
+                .then(r => r.json())
+                .then(data => {
+                    selDistrito.innerHTML = '<option value="">-- Todos --</option>';
+                    data.forEach(d => {
+                        var opt = document.createElement('option');
+                        opt.value = d.distritoID;
+                        opt.text = d.nombre;
+                        selDistrito.appendChild(opt);
+                    });
+                    selDistrito.disabled = false;
+                });
+        });
+
+        document.getElementById('btnAgregarZona').addEventListener('click', function () {
+            if (!selProvincia.value || !selCanton.value) {
+                alert('Debe seleccionar al menos provincia y cantón.');
+                return;
+            }
+            var tbody = document.querySelector('#tablaZonas tbody');
+            var tr = document.createElement('tr');
+            tr.setAttribute('data-provincia', selProvincia.value);
+            tr.setAttribute('data-canton', selCanton.value);
+            tr.setAttribute('data-distrito', selDistrito.value || '');
+            tr.innerHTML = '<td>' + selProvincia.options[selProvincia.selectedIndex].text + '</td>' +
+                '<td>' + selCanton.options[selCanton.selectedIndex].text + '</td>' +
+                '<td>' + (selDistrito.value ? selDistrito.options[selDistrito.selectedIndex].text : '') + '</td>' +
+                '<td><button type="button" class="btn btn-sm btn-outline-danger btnEliminarZona"><i class="fa fa-trash"></i></button></td>';
+            tbody.appendChild(tr);
+            adjuntarEliminar(tr);
+        });
+
+        function adjuntarEliminar(tr) {
+            tr.querySelector('.btnEliminarZona').addEventListener('click', function () { tr.remove(); });
+        }
+        document.querySelectorAll('.btnEliminarZona').forEach(function (btn) {
+            btn.addEventListener('click', function () { btn.closest('tr').remove(); });
+        });
+
+        document.getElementById('formPaso5').addEventListener('submit', function () {
+            var contenedor = document.getElementById('contenedor-zonas-ocultas');
+            contenedor.innerHTML = '';
+            var filas = document.querySelectorAll('#tablaZonas tbody tr');
+            filas.forEach(function (fila, idx) {
+                ['provincia', 'canton', 'distrito'].forEach(function (campo) {
+                    var input = document.createElement('input');
+                    input.type = 'hidden';
+                    var prop = campo === 'provincia' ? 'ProvinciaID' : campo === 'canton' ? 'CantonID' : 'DistritoID';
+                    input.name = 'Cobertura.ZonasSeleccionadas[' + idx + '].' + prop;
+                    input.value = fila.getAttribute('data-' + campo) || '';
+                    contenedor.appendChild(input);
+                });
+            });
+        });
+    </script>
+}

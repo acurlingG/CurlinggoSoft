@@ -1,0 +1,105 @@
+@model CurlinggoSoft.Models.ViewModels.SolicitudTecnicoWizardViewModel
+@{
+    ViewData["Title"] = "Paso 2 - Datos Personales";
+    var esAnonimo = !(User.Identity?.IsAuthenticated ?? false);
+}
+<div class="container py-4" style="max-width:700px;">
+    <partial name="_WizardProgress" model="2" />
+
+    <h4 class="mb-3">Datos Personales</h4>
+
+    <form asp-action="GuardarPaso2" asp-controller="SolicitudTecnico" method="post" id="formPaso2">
+        @Html.AntiForgeryToken()
+        <div asp-validation-summary="All" class="alert alert-danger" role="alert"></div>
+
+        <div class="row g-3">
+            <div class="col-md-6">
+                <label for="Nombre" class="form-label">Nombre *</label>
+                <input type="text" name="DatosPersonales.Nombre" class="form-control" id="Nombre" value="@Model.DatosPersonales.Nombre" required />
+            </div>
+            <div class="col-md-6">
+                <label for="Apellidos" class="form-label">Apellidos *</label>
+                <input type="text" name="DatosPersonales.Apellidos" class="form-control" id="Apellidos" value="@Model.DatosPersonales.Apellidos" required />
+            </div>
+            <div class="col-md-6">
+                <label for="Identificacion" class="form-label">Identificación *</label>
+                <input type="text" name="DatosPersonales.Identificacion" class="form-control" id="Identificacion" value="@Model.DatosPersonales.Identificacion" required />
+            </div>
+            <div class="col-md-6">
+                <label for="Email" class="form-label">Correo Electrónico *</label>
+                <input type="email" name="DatosPersonales.Email" class="form-control" id="Email" value="@Model.DatosPersonales.Email" @if(!esAnonimo) { <text>readonly</text> } required />
+            </div>
+            <div class="col-md-6">
+                <label for="Telefono" class="form-label">Teléfono *</label>
+                <input type="tel" name="DatosPersonales.Telefono" class="form-control" id="Telefono" value="@Model.DatosPersonales.Telefono" required />
+            </div>
+            <div class="col-md-6">
+                <label for="TelefonoSecundario" class="form-label">Teléfono Secundario</label>
+                <input type="tel" name="DatosPersonales.TelefonoSecundario" class="form-control" id="TelefonoSecundario" value="@Model.DatosPersonales.TelefonoSecundario" />
+            </div>
+
+            @if (esAnonimo)
+            {
+                <div class="col-md-12">
+                    <label for="clave" class="form-label">Contraseña *</label>
+                    <input type="password" name="clave" class="form-control" id="clave" required />
+                    <small class="text-muted d-block mt-2">Se usará para crear su cuenta de acceso.</small>
+                    <div class="mt-3">
+                        <small class="d-block text-muted mb-2"><strong>La contraseña debe cumplir con:</strong></small>
+                        <div id="passwordRequirements" class="small">
+                            <div class="requirement" id="req-length">
+                                <i class="fa fa-circle" style="color: #ccc; font-size: 0.5em;"></i>
+                                <span class="ms-2">Al menos 6 caracteres</span>
+                            </div>
+                            <div class="requirement" id="req-number">
+                                <i class="fa fa-circle" style="color: #ccc; font-size: 0.5em;"></i>
+                                <span class="ms-2">Al menos 1 número (0-9)</span>
+                            </div>
+                            <div class="requirement" id="req-uppercase">
+                                <i class="fa fa-circle" style="color: #ccc; font-size: 0.5em;"></i>
+                                <span class="ms-2">Al menos 1 mayúscula (A-Z)</span>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            }
+        </div>
+
+        <div class="mt-4 d-flex justify-content-between">
+            <a asp-action="Index" class="btn btn-outline-secondary">
+                <i class="fa fa-arrow-left"></i> Cancelar
+            </a>
+            <button type="submit" class="btn btn-primary" id="btnSiguiente">
+                Siguiente <i class="fa fa-arrow-right"></i>
+            </button>
+        </div>
+    </form>
+</div>
+
+@section Scripts {
+    <script>
+        const claveInput = document.getElementById('clave');
+        if (claveInput) {
+            claveInput.addEventListener('input', function() {
+                const value = this.value;
+                const hasLength = value.length >= 6;
+                const hasNumber = /\d/.test(value);
+                const hasUppercase = /[A-Z]/.test(value);
+
+                updateRequirement('req-length', hasLength);
+                updateRequirement('req-number', hasNumber);
+                updateRequirement('req-uppercase', hasUppercase);
+            });
+        }
+
+        function updateRequirement(id, met) {
+            const elem = document.getElementById(id);
+            const icon = elem.querySelector('i');
+            if (met) {
+                icon.style.color = '#28a745';
+            } else {
+                icon.style.color = '#ccc';
+            }
+        }
+    </script>
+}

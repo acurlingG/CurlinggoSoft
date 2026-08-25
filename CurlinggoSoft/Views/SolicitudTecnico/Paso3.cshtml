@@ -1,0 +1,237 @@
+@model CurlinggoSoft.Models.ViewModels.SolicitudTecnicoWizardViewModel
+@{
+    ViewData["Title"] = "Paso 3 - Especialidades";
+}
+<div class="container py-4" style="max-width:900px;">
+    <partial name="_WizardProgress" model="3" />
+
+    <h4 class="mb-3">Especialidades y Experiencia</h4>
+    <p class="text-muted">Seleccione los servicios que puede ofrecer, indique sus años de experiencia y agregue a la lista.</p>
+
+    <form asp-action="GuardarPaso3" method="post" id="formPaso3">
+        @Html.AntiForgeryToken()
+        <div asp-validation-summary="ModelOnly" class="alert alert-danger" role="alert"></div>
+
+        <div class="card mb-4">
+            <div class="card-header bg-light fw-bold">Seleccionar Especialidades</div>
+            <div class="card-body">
+                <div class="row mb-3">
+                    <div class="col-md-5">
+                        <label for="categoriaSelect" class="form-label">Categoría</label>
+                        <select id="categoriaSelect" class="form-select">
+                            <option value="">-- Seleccione una categoría --</option>
+                            @foreach (var cat in Model.Especialidades.Categorias)
+                            {
+                                <option value="@cat.CategoriaID">@cat.NombreCategoria</option>
+                            }
+                        </select>
+                    </div>
+                    <div class="col-md-5">
+                        <label for="servicioSelect" class="form-label">Servicio</label>
+                        <select id="servicioSelect" class="form-select" disabled>
+                            <option value="">-- Seleccione un servicio --</option>
+                        </select>
+                    </div>
+                    <div class="col-md-2">
+                        <label for="aniosExp" class="form-label">Años Exp.</label>
+                        <input type="number" id="aniosExp" class="form-control" min="0" max="60" value="0" />
+                    </div>
+                </div>
+
+                <div class="row">
+                    <div class="col-md-12 mb-3">
+                        <label for="descripcionExp" class="form-label">Descripción de Experiencia (opcional)</label>
+                        <textarea id="descripcionExp" class="form-control" rows="2" placeholder="Descripción de tu experiencia..."></textarea>
+                    </div>
+                </div>
+
+                <button type="button" id="btnAgregar" class="btn btn-success">
+                    <i class="fa fa-plus"></i> Agregar
+                </button>
+            </div>
+        </div>
+
+        <!-- Grid de especialidades seleccionadas -->
+        <div class="card">
+            <div class="card-header bg-light fw-bold">
+                Especialidades Seleccionadas
+                <span class="badge bg-primary float-end" id="countBadge">0</span>
+            </div>
+            <div class="card-body">
+                <div class="table-responsive">
+                    <table class="table table-striped" id="tblEspecialidades">
+                        <thead>
+                            <tr>
+                                <th>Categoría</th>
+                                <th>Servicio</th>
+                                <th>Años Experiencia</th>
+                                <th>Descripción</th>
+                                <th>Acción</th>
+                            </tr>
+                        </thead>
+                        <tbody id="tbodyEspecialidades">
+                        </tbody>
+                    </table>
+                    <p id="emptyMsg" class="text-muted text-center py-3">No hay especialidades seleccionadas aún.</p>
+                </div>
+            </div>
+        </div>
+
+        <!-- Contenedor para inputs ocultos -->
+        <div id="contenedor-inputs-ocultos"></div>
+
+        <div class="mt-4 d-flex justify-content-between">
+            <a asp-action="Paso" asp-route-paso="2" class="btn btn-outline-secondary">
+                <i class="fa fa-arrow-left"></i> Atrás
+            </a>
+            <button type="submit" class="btn btn-primary" id="btnSiguiente">
+                Siguiente <i class="fa fa-arrow-right"></i>
+            </button>
+        </div>
+    </form>
+</div>
+
+@section Scripts {
+    <script>
+        // Estado global: diccionario de especialidades seleccionadas
+        let especialidadesSeleccionadas = {};
+        let serviciosDisponibles = {};
+
+        // Cargar especialidades existentes desde el servidor
+        const especialidadesExistentes = @Html.Raw(Json.Serialize(Model.Especialidades.EspecialidadesSeleccionadas));
+
+        $(document).ready(function() {
+            // Inicializar dropdowns
+            $('#categoriaSelect').on('change', cargarServicios);
+            $('#btnAgregar').on('click', agregarEspecialidad);
+
+            // Cargar especialidades ya seleccionadas
+            if (especialidadesExistentes && especialidadesExistentes.length > 0) {
+                especialidadesExistentes.forEach(function(esp) {
+                    const key = 'servicio_' + esp.servicioID;
+                    especialidadesSeleccionadas[key] = {
+                        servicioID: esp.servicioID,
+                        nombre: esp.nombreServicio,
+                        anios: esp.aniosExperiencia,
+                        descripcion: esp.descripcionExperiencia
+                    };
+                });
+                renderizarTabla();
+            }
+        });
+
+        function cargarServicios() {
+            const categoriaId = $('#categoriaSelect').val();
+            const servicioSelect = $('#servicioSelect');
+
+            if (!categoriaId) {
+                servicioSelect.prop('disabled', true).html('<option value="">-- Seleccione un servicio --</option>');
+                return;
+            }
+
+            $.getJSON('/SolicitudTecnico/ObtenerServiciosPorCategoria?categoriaId=' + categoriaId, function(data) {
+                servicioSelect.prop('disabled', false).html('');
+                $('<option value="">-- Seleccione un servicio --</option>').appendTo(servicioSelect);
+
+                data.forEach(function(servicio) {
+                    serviciosDisponibles[servicio.id] = servicio.nombre;
+                    $(`<option value="${servicio.id}">${servicio.nombre}</option>`).appendTo(servicioSelect);
+                });
+            });
+        }
+
+        function agregarEspecialidad() {
+            const servicioId = parseInt($('#servicioSelect').val());
+            const anios = parseInt($('#aniosExp').val()) || 0;
+            const descripcion = $('#descripcionExp').val().trim();
+
+            if (!servicioId) {
+                alert('Debe seleccionar un servicio.');
+                return;
+            }
+
+            if (anios < 0 || anios > 60) {
+                alert('Los años de experiencia deben estar entre 0 y 60.');
+                return;
+            }
+
+            const key = 'servicio_' + servicioId;
+            const nombreServicio = $('#servicioSelect option:selected').text();
+            const nombreCategoria = $('#categoriaSelect option:selected').text();
+
+            especialidadesSeleccionadas[key] = {
+                servicioID: servicioId,
+                nombre: nombreServicio,
+                categoria: nombreCategoria,
+                anios: anios,
+                descripcion: descripcion
+            };
+
+            // Limpiar formulario
+            $('#servicioSelect').val('');
+            $('#aniosExp').val('0');
+            $('#descripcionExp').val('');
+
+            renderizarTabla();
+        }
+
+        function eliminarEspecialidad(servicioId) {
+            const key = 'servicio_' + servicioId;
+            delete especialidadesSeleccionadas[key];
+            renderizarTabla();
+        }
+
+        function renderizarTabla() {
+            const tbody = $('#tbodyEspecialidades');
+            const emptyMsg = $('#emptyMsg');
+            tbody.html('');
+
+            const count = Object.keys(especialidadesSeleccionadas).length;
+            $('#countBadge').text(count);
+
+            if (count === 0) {
+                emptyMsg.show();
+                return;
+            }
+
+            emptyMsg.hide();
+
+            Object.values(especialidadesSeleccionadas).forEach(function(esp) {
+                const row = `
+                    <tr>
+                        <td>${esp.categoria}</td>
+                        <td>${esp.nombre}</td>
+                        <td>${esp.anios}</td>
+                        <td>${esp.descripcion || '-'}</td>
+                        <td>
+                            <button type="button" class="btn btn-sm btn-danger" onclick="eliminarEspecialidad(${esp.servicioID})">
+                                <i class="fa fa-trash"></i>
+                            </button>
+                        </td>
+                    </tr>
+                `;
+                tbody.append(row);
+            });
+        }
+
+        // Al enviar el formulario, preparar inputs ocultos
+        $('#formPaso3').on('submit', function(e) {
+            const contenedor = $('#contenedor-inputs-ocultos');
+            contenedor.html('');
+
+            let idx = 0;
+            Object.values(especialidadesSeleccionadas).forEach(function(esp) {
+                contenedor.append(`<input type='hidden' name='especialidadesSeleccionadas[${idx}].ServicioID' value='${esp.servicioID}' />`);
+                contenedor.append(`<input type='hidden' name='especialidadesSeleccionadas[${idx}].AniosExperiencia' value='${esp.anios}' />`);
+                contenedor.append(`<input type='hidden' name='especialidadesSeleccionadas[${idx}].DescripcionExperiencia' value='${esp.descripcion || ''}' />`);
+                idx++;
+            });
+
+            if (idx === 0) {
+                e.preventDefault();
+                alert('Debe agregar al menos una especialidad.');
+                return false;
+            }
+        });
+    </script>
+}

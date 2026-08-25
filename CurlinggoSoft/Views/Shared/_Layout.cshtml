@@ -45,6 +45,14 @@
                             <li class="nav-item">
                                 <a class="nav-link" asp-area="" asp-controller="Home" asp-action="Index">About</a>
                             </li>
+                            @if (!User.IsInRole("Tecnico"))
+                            {
+                                <li class="nav-item">
+                                    <a class="nav-link" asp-controller="SolicitudTecnico" asp-action="Index">
+                                        <i class="fa fa-user-plus"></i> Regístrese como Técnico
+                                    </a>
+                                </li>
+                            }
                         }
 
                         @if (User.Identity != null && User.Identity.IsAuthenticated)
@@ -53,6 +61,9 @@
                             {
                                 <li class="nav-item">
                                     <a class="nav-link" asp-controller="Admin" asp-action="Index"><i class="fa fa-tachometer"></i> Panel Admin</a>
+                                </li>
+                                <li class="nav-item">
+                                    <a class="nav-link" asp-controller="SolicitudTecnicoAdmin" asp-action="Index"><i class="fa fa-user-plus"></i> Solicitudes de Técnico</a>
                                 </li>
                                 <li class="nav-item dropdown">
                                     <a class="nav-link dropdown-toggle" href="#" role="button" data-bs-toggle="dropdown" aria-expanded="false">
