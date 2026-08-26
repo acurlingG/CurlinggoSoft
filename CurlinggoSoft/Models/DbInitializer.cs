@@ -51,7 +51,8 @@ namespace CurlinggoSoft.Models
                 {
                     UserName = AdminUserName,
                     Email = AdminEmail,
-                    EmailConfirmed = true
+                    EmailConfirmed = true,
+                    TwoFactorEnabled = true
                 };
 
                 var createResult = await userManager.CreateAsync(adminUser, AdminPassword);

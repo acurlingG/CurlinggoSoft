@@ -24,6 +24,10 @@ builder.Services.AddScoped<CurlinggoSoft.Services.IDispatchEngineService, Curlin
 // compartido entre ClienteController y TecnicoController.
 builder.Services.AddScoped<CurlinggoSoft.Services.EvaluacionService>();
 
+// Registrar el servicio de correo (2FA por email + alertas de inicio de sesión).
+// Antes existía la clase pero nunca se registraba aquí, así que nunca se inyectaba.
+builder.Services.AddScoped<CurlinggoSoft.Services.IEmailService, CurlinggoSoft.Services.EmailService>();
+
 // En Development, las Data Protection Keys se generan en memoria (efímeras) en
 // lugar de persistirse en %APPDATA%\ASP.NET\DataProtection-Keys. Esto evita que,
 // al detener y volver a correr el proyecto desde Visual Studio, las cookies de
@@ -79,19 +83,6 @@ builder.Services.AddAuthentication(CookieAuthenticationDefaults.AuthenticationSc
 builder.Services.AddAuthorization();
 
 // --- Cultura fija de la aplicación: es-CR ---
-// Sin esto, .NET usa la cultura del sistema operativo del servidor donde
-// corra el proyecto en producción. Fue justo lo que causó el bug de
-// "9838721,000000" — el servidor tenía configurado pt-BR (coma como
-// separador decimal), así que "9.838721" (formato JS con punto) se leyó mal
-// en el model binding automático de cualquier parámetro decimal.
-//
-// es-CR usa punto como separador decimal (igual que el formato que manda el
-// navegador), así que fijarla aquí resuelve el problema de raíz para TODOS
-// los decimales del proyecto (precios, montos, coordenadas), no solo los dos
-// que arreglamos a mano en SolicitudServicioController. De todas formas, deja
-// el parseo manual con InvariantCulture que ya está en el controlador —
-// es una segunda capa de seguridad barata si algún día el servidor cambia de
-// configuración regional otra vez.
 var cultura = new CultureInfo("es-CR");
 var opcionesLocalizacion = new RequestLocalizationOptions
 {
@@ -111,9 +102,6 @@ builder.Services.AddSession(options =>
 
 var app = builder.Build();
 
-// UseRequestLocalization debe ir de los primeros middlewares del pipeline,
-// antes de UseRouting, para que la cultura ya esté fijada cuando MVC haga el
-// model binding de cualquier decimal/fecha en los controladores.
 app.UseRequestLocalization(opcionesLocalizacion);
 
 // Configure the HTTP request pipeline.
@@ -123,8 +111,6 @@ if (!app.Environment.IsDevelopment())
 }
 app.UseRouting();
 
-// El middleware de Session debe ir después de UseRouting y antes de
-// Authentication/Authorization (y antes de cualquier controlador que use HttpContext.Session).
 app.UseSession();
 
 app.UseAuthentication();

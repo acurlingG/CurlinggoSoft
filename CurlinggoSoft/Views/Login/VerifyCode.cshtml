@@ -1,0 +1,128 @@
+﻿@{
+    ViewData["Title"] = "Verificación";
+    ViewData["HideAdminMenu"] = true;
+    Layout = "_Layout";
+}
+
+<style>
+    .verify-wrapper {
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        padding: 40px 20px 60px;
+    }
+
+    .verify-card {
+        width: min(440px, 92vw);
+        background: rgba(255,255,255,.96);
+        border: 1px solid rgba(206, 220, 235, .72);
+        border-radius: 18px;
+        padding: 32px;
+        box-shadow: 0 18px 45px rgba(25, 75, 125, .12), 0 4px 14px rgba(25, 75, 125, .06);
+        text-align: center;
+    }
+
+    .verify-card .icon-circle {
+        width: 64px;
+        height: 64px;
+        margin: 0 auto 18px;
+        border-radius: 50%;
+        background: var(--brand-orange-light, #FDECE7);
+        color: var(--brand-orange, #E33B19);
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        font-size: 28px;
+    }
+
+    .verify-card h1 {
+        font-size: 24px;
+        font-weight: 700;
+        color: var(--brand-navy, #02225F);
+        margin-bottom: 8px;
+    }
+
+    .verify-card p.subtitle {
+        color: #6c757d;
+        font-size: 15px;
+        margin-bottom: 24px;
+    }
+
+    .codigo-input {
+        width: 100%;
+        height: 56px;
+        border: 2px solid #d9e2ec;
+        border-radius: 10px;
+        outline: none;
+        text-align: center;
+        font-size: 26px;
+        letter-spacing: 10px;
+        color: var(--brand-navy, #163d6b);
+        margin-bottom: 20px;
+    }
+
+        .codigo-input:focus {
+            border-color: var(--brand-orange, #1772d6);
+            box-shadow: 0 0 0 4px rgba(227,59,25,.10);
+        }
+
+    .verify-submit {
+        width: 100%;
+        height: 52px;
+        border: 0;
+        border-radius: 10px;
+        background: var(--brand-orange, #E33B19);
+        color: #fff;
+        font-size: 17px;
+        font-weight: 600;
+        cursor: pointer;
+    }
+
+        .verify-submit:hover {
+            filter: brightness(1.05);
+        }
+
+    .verify-back {
+        display: block;
+        text-align: center;
+        margin-top: 18px;
+        font-size: 14px;
+        color: #6c757d;
+        text-decoration: none;
+    }
+
+        .verify-back:hover {
+            text-decoration: underline;
+        }
+</style>
+
+<div class="verify-wrapper">
+    <div class="verify-card">
+        <div class="icon-circle">
+            <i class="fa fa-envelope-o"></i>
+        </div>
+        <h1>Verifica tu identidad</h1>
+        <p class="subtitle">
+            Te enviamos un código de 6 dígitos a <strong>@ViewData["CorreoDestino"]</strong>.
+            Ingrésalo para completar el inicio de sesión.
+        </p>
+
+        <form method="post" asp-controller="Account" asp-action="VerifyCode" asp-route-returnUrl="@ViewData["ReturnUrl"]">
+            <div asp-validation-summary="ModelOnly" class="text-danger mb-3"></div>
+
+            <input type="text"
+                   name="codigo"
+                   class="codigo-input"
+                   maxlength="6"
+                   inputmode="numeric"
+                   autocomplete="one-time-code"
+                   placeholder="------"
+                   autofocus
+                   required />
+
+            <button type="submit" class="verify-submit">Verificar</button>
+        </form>
+
+        <a asp-controller="Account" asp-action="Login" class="verify-back">Volver al inicio de sesión</a>
+    </div>
+</div>
