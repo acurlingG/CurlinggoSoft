@@ -1,115 +1,1122 @@
-﻿/* ============================================
-   HOME - HERO
-   ============================================ */
-.hero-section {
-    position: relative;
-    min-height: 560px;
-    display: flex;
-    align-items: flex-end;
-    background-image: url('/images/hero-tecnico.jpeg');
-    background-size: cover;
-    /* Punto de enfoque: el primer valor mueve horizontal (50% = centro),
-       el segundo mueve vertical (0% = arriba de la foto, 100% = abajo).
-       Ajusta el segundo número hasta que el técnico se vea completo. */
-    background-position: center 25%;
-    overflow: hidden;
-    margin-bottom: 3rem;
+﻿/* =========================================================
+CURLINGgo - HOME
+Página principal
+========================================================= */
+
+/* =========================================================
+CONFIGURACIÓN GENERAL
+========================================================= */
+
+.home-section {
+padding: 5rem 0;
 }
 
-/* En pantallas angostas el hero es más bajo, así que recorta distinto.
-   Si en mobile también se ve mal, ajusta este 25% por separado. */
-@media (max-width: 767.98px) {
-    .hero-section {
-        min-height: 420px;
-        background-position: center 15%;
-    }
+.section-heading {
+max-width: 760px;
+margin: 0 auto 3rem;
+}
+
+.section-kicker {
+display: inline-block;
+color: var(--brand-orange);
+font-size: .78rem;
+font-weight: 800;
+letter-spacing: .12em;
+text-transform: uppercase;
+margin-bottom: .65rem;
+}
+
+.section-heading h2 {
+color: var(--brand-navy);
+font-size: clamp(2rem, 4vw, 2.65rem);
+font-weight: 800;
+margin-bottom: .85rem;
+}
+
+.section-heading p {
+color: #6c757d;
+font-size: 1.05rem;
+margin-bottom: 0;
+line-height: 1.7;
+}
+
+.section-action {
+text-align: center;
+margin-top: 2.5rem;
+}
+
+/* =========================================================
+
+1. HERO
+   ========================================================= */
+
+.hero-section {
+position: relative;
+min-height: 610px;
+display: flex;
+align-items: center;
+
+
+background-image: url('/images/hero-tecnico1.jpeg');
+background-size: cover;
+background-position: center 25%;
+
+overflow: hidden;
+margin-bottom: 0;
+
+
+}
+
+.hero-overlay {
+position: absolute;
+inset: 0;
+
+
+background:
+    linear-gradient(
+        90deg,
+        rgba(2, 34, 95, .92) 0%,
+        rgba(2, 34, 95, .78) 42%,
+        rgba(2, 34, 95, .25) 78%,
+        rgba(2, 34, 95, .08) 100%
+    );
+
+
 }
 
 .hero-content {
-    position: relative;
-    z-index: 1;
-    padding: 3rem 0 3.5rem;
-    max-width: 620px;
-    color: #fff;
+position: relative;
+z-index: 1;
+
+
+max-width: 720px;
+padding: 4rem 0;
+color: #fff;
+
+
 }
 
-    .hero-content h1 {
-        font-weight: 800;
-        font-size: clamp(2rem, 4vw, 3rem);
-        line-height: 1.15;
-        margin-bottom: 1rem;
-        text-shadow: 0 2px 10px rgba(0, 0, 0, 0.55);
-    }
+.hero-badge {
+display: inline-flex;
+align-items: center;
+gap: .5rem;
 
-    .hero-content p {
-        font-size: 1.1rem;
-        color: rgba(255, 255, 255, 0.92);
-        margin-bottom: 1.75rem;
-        text-shadow: 0 1px 6px rgba(0, 0, 0, 0.55);
-    }
 
-/* ============================================
-   HOME - SERVICIOS DESTACADOS
-   ============================================ */
+padding: .5rem .85rem;
+margin-bottom: 1.2rem;
+
+border: 1px solid rgba(255, 255, 255, .25);
+border-radius: 999px;
+
+background: rgba(255, 255, 255, .10);
+
+color: rgba(255, 255, 255, .95);
+font-size: .85rem;
+font-weight: 600;
+
+backdrop-filter: blur(5px);
+
+
+}
+
+.hero-content h1 {
+font-weight: 800;
+font-size: clamp(2.25rem, 5vw, 3.75rem);
+line-height: 1.08;
+
+
+margin-bottom: 1.25rem;
+
+text-shadow: 0 2px 10px rgba(0, 0, 0, .4);
+
+
+}
+
+.hero-content h1 span {
+color: var(--brand-orange);
+}
+
+.hero-content p {
+max-width: 650px;
+
+
+font-size: 1.15rem;
+line-height: 1.7;
+
+color: rgba(255, 255, 255, .93);
+
+margin-bottom: 1.8rem;
+
+text-shadow: 0 1px 6px rgba(0, 0, 0, .35);
+
+
+}
+
+.hero-actions {
+display: flex;
+flex-wrap: wrap;
+gap: .85rem;
+margin-bottom: 2rem;
+}
+
+.hero-primary-btn {
+padding-left: 1.5rem;
+padding-right: 1.5rem;
+}
+
+.hero-secondary-btn {
+border: 1px solid rgba(255, 255, 255, .65);
+color: #fff;
+background: rgba(255, 255, 255, .08);
+padding: .75rem 1.3rem;
+}
+
+.hero-secondary-btn:hover {
+background: rgba(255, 255, 255, .18);
+color: #fff;
+}
+
+.hero-trust {
+display: flex;
+flex-wrap: wrap;
+gap: 1.5rem;
+}
+
+.hero-trust-item {
+display: flex;
+align-items: center;
+gap: .45rem;
+
+
+color: rgba(255, 255, 255, .88);
+font-size: .88rem;
+
+
+}
+
+.hero-trust-item i {
+color: var(--brand-orange);
+}
+
+/* =========================================================
+2. SERVICIOS DESTACADOS
+========================================================= */
+
 .services-section {
-    margin-bottom: 3rem;
+background: #fff;
 }
 
-    .services-section h2 {
-        font-weight: 800;
-        color: var(--brand-navy);
-        margin-bottom: 1.75rem;
-    }
+.services-section h2 {
+color: var(--brand-navy);
+}
 
 .service-card {
-    height: 100%;
-    display: flex;
-    flex-direction: column;
-    border: 1px solid #e9ecef;
-    border-radius: 12px;
-    padding: 1.75rem 1.5rem;
-    background: #fff;
-    transition: transform .15s ease, box-shadow .15s ease;
+height: 100%;
+
+
+display: flex;
+flex-direction: column;
+
+border: 1px solid #e9ecef;
+border-radius: 14px;
+
+padding: 1.6rem 1.45rem;
+
+background: #fff;
+
+transition:
+    transform .2s ease,
+    box-shadow .2s ease,
+    border-color .2s ease;
+
+
 }
 
-    .service-card:hover {
-        transform: translateY(-4px);
-        box-shadow: 0 12px 24px rgba(2, 34, 95, 0.1);
-    }
+.service-card:hover {
+transform: translateY(-5px);
 
-    .service-card .service-icon {
-        width: 56px;
-        height: 56px;
-        display: flex;
-        align-items: center;
-        justify-content: center;
-        border-radius: 10px;
-        background: var(--brand-orange-light);
-        color: var(--brand-orange);
-        font-size: 1.5rem;
-        margin-bottom: 1rem;
-        flex-shrink: 0;
-    }
 
-    .service-card h3 {
-        font-size: 1.15rem;
-        font-weight: 700;
-        color: var(--brand-navy);
-        margin-bottom: .5rem;
-    }
+border-color: rgba(2, 34, 95, .12);
 
-    .service-card p {
-        color: #6c757d;
-        font-size: .92rem;
-    }
+box-shadow:
+    0 14px 30px rgba(2, 34, 95, .10);
 
-    /* Empuja precio + botón al fondo de la tarjeta, sin importar
-       cuántas líneas ocupen el título o la descripción arriba.
-       Esto es lo que alinea los botones entre tarjetas. */
-    .service-card .service-price {
-        font-weight: 700;
-        color: var(--brand-navy);
-        margin-top: auto;
-        padding-top: .75rem;
-        margin-bottom: 1rem;
-    }
+
+}
+
+.service-card .service-icon {
+width: 58px;
+height: 58px;
+
+
+display: flex;
+align-items: center;
+justify-content: center;
+
+border-radius: 12px;
+
+background: var(--brand-orange-light);
+color: var(--brand-orange);
+
+font-size: 1.5rem;
+
+margin-bottom: 1.1rem;
+
+flex-shrink: 0;
+
+
+}
+
+.service-card h3 {
+font-size: 1.12rem;
+font-weight: 700;
+
+
+color: var(--brand-navy);
+
+margin-bottom: .55rem;
+
+
+}
+
+.service-card p {
+color: #6c757d;
+font-size: .92rem;
+line-height: 1.55;
+
+
+margin-bottom: 0;
+
+
+}
+
+.service-card .service-price {
+font-weight: 700;
+color: var(--brand-navy);
+
+
+margin-top: auto;
+
+padding-top: 1rem;
+margin-bottom: 1rem;
+
+
+}
+
+.service-card .btn {
+font-weight: 600;
+}
+
+.empty-services {
+text-align: center;
+padding: 3rem 1rem;
+
+
+border: 1px dashed #dee2e6;
+border-radius: 14px;
+
+color: #6c757d;
+
+
+}
+
+.empty-services i {
+font-size: 2rem;
+color: var(--brand-orange);
+margin-bottom: 1rem;
+}
+
+.empty-services h3 {
+color: var(--brand-navy);
+font-weight: 700;
+}
+
+/* =========================================================
+3. ¿CÓMO FUNCIONA?
+========================================================= */
+
+.how-section {
+background: #f7f9fc;
+}
+
+.steps-container {
+display: grid;
+
+
+grid-template-columns: repeat(3, 1fr);
+
+gap: 1.5rem;
+
+
+}
+
+.step-card {
+position: relative;
+
+
+background: #fff;
+
+border: 1px solid #e9ecef;
+border-radius: 14px;
+
+padding: 2rem 1.5rem;
+
+text-align: center;
+
+transition:
+    transform .2s ease,
+    box-shadow .2s ease;
+
+
+}
+
+.step-card:hover {
+transform: translateY(-4px);
+
+
+box-shadow:
+    0 12px 28px rgba(2, 34, 95, .08);
+
+
+}
+
+.step-number {
+position: absolute;
+
+
+top: 1rem;
+right: 1rem;
+
+font-size: .75rem;
+font-weight: 800;
+
+color: #adb5bd;
+
+
+}
+
+.step-icon {
+width: 68px;
+height: 68px;
+
+
+display: flex;
+align-items: center;
+justify-content: center;
+
+margin: 0 auto 1.2rem;
+
+border-radius: 50%;
+
+background: var(--brand-orange-light);
+color: var(--brand-orange);
+
+font-size: 1.5rem;
+
+
+}
+
+.step-card h3 {
+color: var(--brand-navy);
+
+
+font-size: 1.1rem;
+font-weight: 700;
+
+margin-bottom: .6rem;
+
+
+}
+
+.step-card p {
+color: #6c757d;
+
+
+font-size: .92rem;
+line-height: 1.6;
+
+margin-bottom: 0;
+
+
+}
+
+/* =========================================================
+4. ¿POR QUÉ CURLINGgo?
+========================================================= */
+
+.why-section {
+background: #fff;
+}
+
+.benefit-card {
+height: 100%;
+
+
+text-align: center;
+
+padding: 2rem 1.5rem;
+
+border: 1px solid #e9ecef;
+border-radius: 14px;
+
+background: #fff;
+
+transition:
+    transform .2s ease,
+    box-shadow .2s ease;
+
+
+}
+
+.benefit-card:hover {
+transform: translateY(-4px);
+
+
+box-shadow:
+    0 12px 28px rgba(2, 34, 95, .08);
+
+
+}
+
+.benefit-icon {
+width: 64px;
+height: 64px;
+
+
+display: flex;
+align-items: center;
+justify-content: center;
+
+margin: 0 auto 1.15rem;
+
+border-radius: 14px;
+
+background: var(--brand-orange-light);
+color: var(--brand-orange);
+
+font-size: 1.45rem;
+
+
+}
+
+.benefit-card h3 {
+color: var(--brand-navy);
+
+
+font-size: 1.15rem;
+font-weight: 700;
+
+margin-bottom: .65rem;
+
+
+}
+
+.benefit-card p {
+color: #6c757d;
+
+
+font-size: .92rem;
+line-height: 1.6;
+
+margin-bottom: 0;
+
+
+}
+
+/* =========================================================
+5. TÉCNICOS DESTACADOS
+========================================================= */
+
+.technicians-section {
+background: #f7f9fc;
+}
+
+.technician-feature-card {
+height: 100%;
+
+
+display: flex;
+align-items: flex-start;
+
+gap: 1.25rem;
+
+padding: 1.6rem;
+
+background: #fff;
+
+border: 1px solid #e9ecef;
+border-radius: 14px;
+
+transition:
+    transform .2s ease,
+    box-shadow .2s ease;
+
+
+}
+
+.technician-feature-card:hover {
+transform: translateY(-4px);
+
+
+box-shadow:
+    0 12px 28px rgba(2, 34, 95, .08);
+
+
+}
+
+.technician-avatar {
+width: 64px;
+height: 64px;
+
+
+display: flex;
+align-items: center;
+justify-content: center;
+
+flex-shrink: 0;
+
+border-radius: 50%;
+
+background: var(--brand-orange-light);
+color: var(--brand-orange);
+
+font-size: 1.5rem;
+
+
+}
+
+.technician-content {
+flex: 1;
+}
+
+.technician-label {
+display: inline-block;
+
+
+font-size: .7rem;
+font-weight: 800;
+
+letter-spacing: .1em;
+
+color: var(--brand-orange);
+
+margin-bottom: .35rem;
+
+
+}
+
+.technician-content h3 {
+color: var(--brand-navy);
+
+
+font-size: 1.1rem;
+font-weight: 700;
+
+margin-bottom: .5rem;
+
+
+}
+
+.technician-content p {
+color: #6c757d;
+
+
+font-size: .9rem;
+line-height: 1.55;
+
+margin-bottom: .8rem;
+
+
+}
+
+.technician-info {
+display: flex;
+align-items: center;
+
+
+gap: .4rem;
+
+color: var(--brand-navy);
+
+font-size: .82rem;
+font-weight: 600;
+
+
+}
+
+.technician-info i {
+color: var(--brand-orange);
+}
+
+/* =========================================================
+6. SEGURIDAD Y CONFIANZA
+========================================================= */
+
+.trust-section {
+background: #fff;
+}
+
+.trust-wrapper {
+display: grid;
+
+
+grid-template-columns: 1.4fr .8fr;
+
+gap: 4rem;
+
+align-items: center;
+
+
+}
+
+.trust-content h2 {
+color: var(--brand-navy);
+
+
+font-size: clamp(2rem, 4vw, 2.65rem);
+
+font-weight: 800;
+
+margin-bottom: 1rem;
+
+
+}
+
+.trust-content > p {
+color: #6c757d;
+
+
+max-width: 650px;
+
+line-height: 1.7;
+
+margin-bottom: 2rem;
+
+
+}
+
+.trust-list {
+display: flex;
+flex-direction: column;
+
+
+gap: 1.2rem;
+
+
+}
+
+.trust-item {
+display: flex;
+align-items: flex-start;
+
+
+gap: 1rem;
+
+
+}
+
+.trust-item-icon {
+width: 42px;
+height: 42px;
+
+
+display: flex;
+align-items: center;
+justify-content: center;
+
+flex-shrink: 0;
+
+border-radius: 50%;
+
+background: var(--brand-orange-light);
+color: var(--brand-orange);
+
+
+}
+
+.trust-item h3 {
+color: var(--brand-navy);
+
+
+font-size: 1rem;
+font-weight: 700;
+
+margin-bottom: .2rem;
+
+
+}
+
+.trust-item p {
+color: #6c757d;
+
+
+font-size: .88rem;
+
+margin-bottom: 0;
+
+
+}
+
+.trust-visual {
+min-height: 330px;
+
+
+display: flex;
+flex-direction: column;
+
+align-items: center;
+justify-content: center;
+
+text-align: center;
+
+padding: 2rem;
+
+border-radius: 20px;
+
+background:
+    linear-gradient(
+        145deg,
+        var(--brand-navy),
+        #0a438f
+    );
+
+box-shadow:
+    0 18px 40px rgba(2, 34, 95, .16);
+
+
+}
+
+.trust-circle {
+width: 105px;
+height: 105px;
+
+
+display: flex;
+align-items: center;
+justify-content: center;
+
+margin-bottom: 1.25rem;
+
+border-radius: 50%;
+
+background: rgba(255, 255, 255, .12);
+
+color: var(--brand-orange);
+
+font-size: 3rem;
+
+
+}
+
+.trust-visual h3 {
+color: #fff;
+
+
+font-size: 1.35rem;
+font-weight: 700;
+
+margin-bottom: .5rem;
+
+
+}
+
+.trust-visual p {
+max-width: 300px;
+
+
+color: rgba(255, 255, 255, .78);
+
+font-size: .9rem;
+
+margin-bottom: 0;
+
+
+}
+
+/* =========================================================
+7. CTA - SOLICITAR SERVICIO
+========================================================= */
+
+.cta-section {
+padding: 4rem 0;
+
+
+background:
+    linear-gradient(
+        135deg,
+        var(--brand-navy),
+        #0b4c9a
+    );
+
+
+}
+
+.cta-content {
+display: grid;
+
+
+grid-template-columns: auto 1fr auto;
+
+align-items: center;
+
+gap: 1.75rem;
+
+
+}
+
+.cta-icon {
+width: 72px;
+height: 72px;
+
+
+display: flex;
+align-items: center;
+justify-content: center;
+
+border-radius: 16px;
+
+background: rgba(255, 255, 255, .12);
+
+color: var(--brand-orange);
+
+font-size: 1.8rem;
+
+
+}
+
+.cta-text span {
+display: block;
+
+
+color: var(--brand-orange);
+
+font-size: .75rem;
+font-weight: 800;
+
+letter-spacing: .12em;
+
+margin-bottom: .35rem;
+
+
+}
+
+.cta-text h2 {
+color: #fff;
+
+
+font-size: clamp(1.5rem, 3vw, 2.15rem);
+
+font-weight: 800;
+
+margin-bottom: .45rem;
+
+
+}
+
+.cta-text p {
+color: rgba(255, 255, 255, .78);
+
+
+margin-bottom: 0;
+
+font-size: .95rem;
+
+
+}
+
+.cta-action .btn {
+white-space: nowrap;
+
+
+padding-left: 1.5rem;
+padding-right: 1.5rem;
+
+
+}
+
+/* =========================================================
+RESPONSIVE - TABLET
+========================================================= */
+
+@media (max-width: 991.98px) {
+
+
+.hero-section {
+    min-height: 570px;
+
+    background-position: center 25%;
+}
+
+.hero-content {
+    max-width: 650px;
+}
+
+.steps-container {
+    grid-template-columns: repeat(2, 1fr);
+}
+
+.trust-wrapper {
+    grid-template-columns: 1fr;
+
+    gap: 2.5rem;
+}
+
+.trust-visual {
+    min-height: 280px;
+}
+
+.cta-content {
+    grid-template-columns: auto 1fr;
+
+    gap: 1.25rem;
+}
+
+.cta-action {
+    grid-column: 1 / -1;
+    margin-left: 88px;
+}
+
+
+}
+
+/* =========================================================
+RESPONSIVE - MOBILE
+========================================================= */
+
+@media (max-width: 767.98px) {
+
+
+.home-section {
+    padding: 3.5rem 0;
+}
+
+.section-heading {
+    margin-bottom: 2rem;
+}
+
+.hero-section {
+    min-height: 620px;
+
+    align-items: flex-end;
+
+    background-position: center 15%;
+}
+
+.hero-overlay {
+    background:
+        linear-gradient(
+            180deg,
+            rgba(2, 34, 95, .30) 0%,
+            rgba(2, 34, 95, .88) 52%,
+            rgba(2, 34, 95, .96) 100%
+        );
+}
+
+.hero-content {
+    padding: 2.5rem 0 3rem;
+}
+
+.hero-content h1 {
+    font-size: clamp(2rem, 9vw, 2.65rem);
+}
+
+.hero-content p {
+    font-size: 1rem;
+}
+
+.hero-actions {
+    flex-direction: column;
+}
+
+.hero-actions .btn {
+    width: 100%;
+}
+
+.hero-trust {
+    flex-direction: column;
+
+    gap: .7rem;
+}
+
+.steps-container {
+    grid-template-columns: 1fr;
+}
+
+.technician-feature-card {
+    flex-direction: column;
+
+    text-align: center;
+
+    align-items: center;
+}
+
+.technician-info {
+    justify-content: center;
+}
+
+.cta-content {
+    display: flex;
+
+    flex-direction: column;
+
+    text-align: center;
+}
+
+.cta-action {
+    margin-left: 0;
+    width: 100%;
+}
+
+.cta-action .btn {
+    width: 100%;
+}
+
+
+}
+
+/* =========================================================
+RESPONSIVE - MOBILE PEQUEÑO
+========================================================= */
+
+@media (max-width: 575.98px) {
+
+
+.hero-section {
+    min-height: 650px;
+}
+
+.hero-badge {
+    font-size: .76rem;
+}
+
+.hero-content h1 {
+    font-size: 2rem;
+}
+
+.section-heading h2 {
+    font-size: 2rem;
+}
+
+.service-card {
+    padding: 1.4rem;
+}
+
+.trust-visual {
+    min-height: 250px;
+
+    padding: 1.5rem;
+}
+
+.trust-circle {
+    width: 85px;
+    height: 85px;
+
+    font-size: 2.3rem;
+}
+
+.cta-section {
+    padding: 3rem 0;
+}
+
+
+}

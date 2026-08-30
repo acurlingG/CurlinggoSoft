@@ -1,0 +1,1103 @@
+﻿@{
+    ViewData["Title"] = "¿Cómo funciona CURLINGgo?";
+}
+
+@section Styles {
+    <link rel="stylesheet"
+          href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/4.7.0/css/font-awesome.min.css">
+
+    
+    <link rel="stylesheet"
+          href="~/css/como-funciona.css"
+          asp-append-version="true" />
+    
+
+}
+
+<!-- =========================================================
+     HERO
+     ========================================================= -->
+
+<section class="how-hero">
+
+    
+    <div class="site-container">
+
+        <div class="how-hero-content">
+
+            <span class="how-kicker">
+                ¿CÓMO FUNCIONA CURLINGgo?
+            </span>
+
+            <h1>
+                De una necesidad
+                <strong>a una solución.</strong>
+            </h1>
+
+            <p>
+                CURLINGgo simplifica el proceso de encontrar y ofrecer
+                servicios profesionales. El cliente indica qué necesita,
+                la plataforma facilita la conexión y un técnico puede
+                atender la solicitud.
+            </p>
+
+            <div class="how-hero-actions">
+
+                <a asp-controller="SolicitudServicio"
+                   asp-action="Paso1Servicio"
+                   class="btn btn-brand btn-lg">
+                    <i class="fa fa-search"></i>
+                    Solicitar un servicio
+                </a>
+
+                <a asp-controller="SolicitudTecnico"
+                   asp-action="Index"
+                   class="btn btn-outline-light btn-lg">
+                    <i class="fa fa-user"></i>
+                    Quiero ser técnico
+                </a>
+
+            </div>
+
+        </div>
+
+    </div>
+    
+
+</section>
+
+<!-- =========================================================
+     FLUJO GENERAL
+     ========================================================= -->
+
+<section class="process-overview">
+
+    
+    <div class="site-container">
+
+        <div class="section-heading centered">
+
+            <span class="how-kicker">
+                UNA VISIÓN GENERAL
+            </span>
+
+            <h2>
+                Así funciona CURLINGgo
+            </h2>
+
+            <p>
+                El proceso está diseñado para reducir pasos innecesarios
+                y facilitar la conexión entre una necesidad y un profesional.
+            </p>
+
+        </div>
+
+
+        <div class="main-flow">
+
+            <!-- CLIENTE -->
+
+            <div class="flow-party">
+
+                <div class="flow-party-icon">
+                    <i class="fa fa-user"></i>
+                </div>
+
+                <h3>
+                    Cliente
+                </h3>
+
+                <span>
+                    Tiene una necesidad
+                </span>
+
+            </div>
+
+
+            <div class="flow-arrow">
+                <i class="fa fa-long-arrow-right"></i>
+            </div>
+
+
+            <!-- CURLINGgo -->
+
+            <div class="flow-platform">
+
+                <div class="flow-platform-icon">
+                    <i class="fa fa-cogs"></i>
+                </div>
+
+                <h3>
+                    CURLINGgo
+                </h3>
+
+                <span>
+                    Organiza y facilita la conexión
+                </span>
+
+            </div>
+
+
+            <div class="flow-arrow">
+                <i class="fa fa-long-arrow-right"></i>
+            </div>
+
+
+            <!-- TÉCNICO -->
+
+            <div class="flow-party">
+
+                <div class="flow-party-icon">
+                    <i class="fa fa-wrench"></i>
+                </div>
+
+                <h3>
+                    Técnico
+                </h3>
+
+                <span>
+                    Puede resolverla
+                </span>
+
+            </div>
+
+        </div>
+
+    </div>
+    
+
+</section>
+
+<!-- =========================================================
+     PARA CLIENTES
+     ========================================================= -->
+
+<section class="client-section">
+
+    
+    <div class="site-container">
+
+        <div class="section-heading">
+
+            <span class="how-kicker">
+                PARA CLIENTES
+            </span>
+
+            <h2>
+                Solicitar un servicio es sencillo.
+            </h2>
+
+            <p>
+                No necesitas comenzar buscando a una persona específica.
+                Comienza indicando qué necesitas resolver.
+            </p>
+
+        </div>
+
+
+        <div class="client-process">
+
+            <div class="client-step">
+
+                <div class="step-number">
+                    01
+                </div>
+
+                <div class="step-icon">
+                    <i class="fa fa-search"></i>
+                </div>
+
+                <h3>
+                    Elige el servicio
+                </h3>
+
+                <p>
+                    Selecciona la categoría y el tipo de servicio
+                    que necesitas.
+                </p>
+
+            </div>
+
+
+            <div class="client-step">
+
+                <div class="step-number">
+                    02
+                </div>
+
+                <div class="step-icon">
+                    <i class="fa fa-pencil"></i>
+                </div>
+
+                <h3>
+                    Describe tu necesidad
+                </h3>
+
+                <p>
+                    Proporciona la información necesaria para comprender
+                    qué necesitas y qué tipo de trabajo debe realizarse.
+                </p>
+
+            </div>
+
+
+            <div class="client-step">
+
+                <div class="step-number">
+                    03
+                </div>
+
+                <div class="step-icon">
+                    <i class="fa fa-map-marker"></i>
+                </div>
+
+                <h3>
+                    Indica dónde
+                </h3>
+
+                <p>
+                    La ubicación ayuda a identificar profesionales
+                    que puedan atender la solicitud en tu zona.
+                </p>
+
+            </div>
+
+
+            <div class="client-step">
+
+                <div class="step-number">
+                    04
+                </div>
+
+                <div class="step-icon">
+                    <i class="fa fa-calendar"></i>
+                </div>
+
+                <h3>
+                    Indica cuándo
+                </h3>
+
+                <p>
+                    Selecciona la fecha y el momento en que necesitas
+                    recibir el servicio.
+                </p>
+
+            </div>
+
+
+            <div class="client-step">
+
+                <div class="step-number">
+                    05
+                </div>
+
+                <div class="step-icon">
+                    <i class="fa fa-send"></i>
+                </div>
+
+                <h3>
+                    Envía la solicitud
+                </h3>
+
+                <p>
+                    CURLINGgo recibe la información y comienza
+                    el proceso de búsqueda.
+                </p>
+
+            </div>
+
+        </div>
+
+    </div>
+    
+
+</section>
+
+<!-- =========================================================
+     FLUJO DE SOLICITUD
+     ========================================================= -->
+
+<section class="visual-process-section">
+
+    
+    <div class="site-container">
+
+        <div class="section-heading centered">
+
+            <span class="how-kicker">
+                EL RECORRIDO DE TU SOLICITUD
+            </span>
+
+            <h2>
+                ¿Qué ocurre después de solicitar?
+            </h2>
+
+        </div>
+
+
+        <div class="vertical-flow">
+
+            <div class="vertical-flow-item">
+
+                <div class="vertical-flow-icon">
+                    <i class="fa fa-file-text-o"></i>
+                </div>
+
+                <div class="vertical-flow-content">
+
+                    <span>
+                        PASO 01
+                    </span>
+
+                    <h3>
+                        Solicitud creada
+                    </h3>
+
+                    <p>
+                        La información proporcionada por el cliente
+                        queda registrada como una solicitud de servicio.
+                    </p>
+
+                </div>
+
+            </div>
+
+
+            <div class="vertical-flow-line"></div>
+
+
+            <div class="vertical-flow-item">
+
+                <div class="vertical-flow-icon">
+                    <i class="fa fa-search"></i>
+                </div>
+
+                <div class="vertical-flow-content">
+
+                    <span>
+                        PASO 02
+                    </span>
+
+                    <h3>
+                        Búsqueda de profesionales
+                    </h3>
+
+                    <p>
+                        CURLINGgo identifica profesionales que puedan
+                        atender la solicitud considerando elementos como
+                        especialidad y ubicación.
+                    </p>
+
+                </div>
+
+            </div>
+
+
+            <div class="vertical-flow-line"></div>
+
+
+            <div class="vertical-flow-item">
+
+                <div class="vertical-flow-icon">
+                    <i class="fa fa-bell-o"></i>
+                </div>
+
+                <div class="vertical-flow-content">
+
+                    <span>
+                        PASO 03
+                    </span>
+
+                    <h3>
+                        El técnico recibe la oportunidad
+                    </h3>
+
+                    <p>
+                        Los profesionales que cumplen con los criterios
+                        de la solicitud pueden recibir una oportunidad
+                        para atenderla.
+                    </p>
+
+                </div>
+
+            </div>
+
+
+            <div class="vertical-flow-line"></div>
+
+
+            <div class="vertical-flow-item">
+
+                <div class="vertical-flow-icon">
+                    <i class="fa fa-check"></i>
+                </div>
+
+                <div class="vertical-flow-content">
+
+                    <span>
+                        PASO 04
+                    </span>
+
+                    <h3>
+                        Un técnico acepta
+                    </h3>
+
+                    <p>
+                        Cuando un profesional acepta la solicitud,
+                        el proceso avanza hacia la coordinación
+                        y realización del servicio.
+                    </p>
+
+                </div>
+
+            </div>
+
+        </div>
+
+    </div>
+    
+
+</section>
+
+<!-- =========================================================
+     PARA TÉCNICOS
+     ========================================================= -->
+
+<section class="technician-section">
+
+    
+    <div class="site-container">
+
+        <div class="technician-heading">
+
+            <span class="how-kicker">
+                PARA TÉCNICOS
+            </span>
+
+            <h2>
+                Convierte tus habilidades
+                en nuevas oportunidades.
+            </h2>
+
+            <p>
+                CURLINGgo busca facilitar que profesionales con diferentes
+                especialidades puedan encontrar oportunidades de trabajo
+                relacionadas con sus capacidades y zonas de servicio.
+            </p>
+
+        </div>
+
+
+        <div class="technician-process">
+
+            <div class="technician-step">
+
+                <div class="technician-step-number">
+                    01
+                </div>
+
+                <i class="fa fa-user-plus"></i>
+
+                <h3>
+                    Regístrate
+                </h3>
+
+                <p>
+                    Completa tu información profesional
+                    y tus datos de contacto.
+                </p>
+
+            </div>
+
+
+            <div class="technician-step">
+
+                <div class="technician-step-number">
+                    02
+                </div>
+
+                <i class="fa fa-wrench"></i>
+
+                <h3>
+                    Define tus especialidades
+                </h3>
+
+                <p>
+                    Indica qué servicios puedes realizar
+                    y cuáles son tus áreas de especialización.
+                </p>
+
+            </div>
+
+
+            <div class="technician-step">
+
+                <div class="technician-step-number">
+                    03
+                </div>
+
+                <i class="fa fa-map-marker"></i>
+
+                <h3>
+                    Define tu zona
+                </h3>
+
+                <p>
+                    Indica las zonas donde estás disponible
+                    para brindar tus servicios.
+                </p>
+
+            </div>
+
+
+            <div class="technician-step">
+
+                <div class="technician-step-number">
+                    04
+                </div>
+
+                <i class="fa fa-bell-o"></i>
+
+                <h3>
+                    Recibe oportunidades
+                </h3>
+
+                <p>
+                    Puedes recibir solicitudes relacionadas
+                    con tus servicios y ubicación.
+                </p>
+
+            </div>
+
+
+            <div class="technician-step">
+
+                <div class="technician-step-number">
+                    05
+                </div>
+
+                <i class="fa fa-check-circle"></i>
+
+                <h3>
+                    Acepta y realiza
+                </h3>
+
+                <p>
+                    Acepta las solicitudes que puedas atender
+                    y realiza el servicio acordado.
+                </p>
+
+            </div>
+
+
+            <div class="technician-step">
+
+                <div class="technician-step-number">
+                    06
+                </div>
+
+                <i class="fa fa-star"></i>
+
+                <h3>
+                    Construye reputación
+                </h3>
+
+                <p>
+                    Las experiencias de los clientes pueden contribuir
+                    a construir tu reputación dentro de la plataforma.
+                </p>
+
+            </div>
+
+        </div>
+
+    </div>
+    
+
+</section>
+
+<!-- =========================================================
+     ASIGNACIÓN DEL TÉCNICO
+     ========================================================= -->
+
+<section class="assignment-section">
+
+    
+    <div class="site-container">
+
+        <div class="assignment-grid">
+
+            <div class="assignment-explanation">
+
+                <span class="how-kicker">
+                    ASIGNACIÓN DEL TÉCNICO
+                </span>
+
+                <h2>
+                    No se trata solamente de encontrar
+                    a cualquier técnico.
+                </h2>
+
+                <p>
+                    El objetivo de CURLINGgo es facilitar una conexión
+                    relevante entre la solicitud y profesionales que
+                    puedan atenderla.
+                </p>
+
+                <p>
+                    Para ello, el proceso puede considerar diferentes
+                    elementos de la solicitud y del perfil profesional.
+                </p>
+
+            </div>
+
+
+            <div class="matching-diagram">
+
+                <div class="matching-input">
+
+                    <i class="fa fa-file-text-o"></i>
+
+                    <strong>
+                        Solicitud
+                    </strong>
+
+                    <span>
+                        Servicio + ubicación + disponibilidad
+                    </span>
+
+                </div>
+
+
+                <div class="matching-arrow">
+                    <i class="fa fa-arrow-down"></i>
+                </div>
+
+
+                <div class="matching-engine">
+
+                    <i class="fa fa-cogs"></i>
+
+                    <strong>
+                        CURLINGgo
+                    </strong>
+
+                    <span>
+                        Analiza criterios de conexión
+                    </span>
+
+                </div>
+
+
+                <div class="matching-arrow">
+                    <i class="fa fa-arrow-down"></i>
+                </div>
+
+
+                <div class="matching-results">
+
+                    <div>
+                        <i class="fa fa-wrench"></i>
+                        <span>Técnico A</span>
+                    </div>
+
+                    <div>
+                        <i class="fa fa-wrench"></i>
+                        <span>Técnico B</span>
+                    </div>
+
+                    <div>
+                        <i class="fa fa-wrench"></i>
+                        <span>Técnico C</span>
+                    </div>
+
+                </div>
+
+            </div>
+
+        </div>
+
+    </div>
+    
+
+</section>
+
+<!-- =========================================================
+     REALIZACIÓN DEL SERVICIO
+     ========================================================= -->
+
+<section class="service-execution-section">
+
+    
+    <div class="site-container">
+
+        <div class="section-heading centered">
+
+            <span class="how-kicker">
+                REALIZACIÓN DEL SERVICIO
+            </span>
+
+            <h2>
+                La conexión es solo el comienzo.
+            </h2>
+
+            <p>
+                El objetivo final es que la necesidad del cliente
+                termine convertida en un servicio realizado.
+            </p>
+
+        </div>
+
+
+        <div class="execution-timeline">
+
+            <div class="execution-item">
+
+                <div class="execution-icon">
+                    <i class="fa fa-handshake-o"></i>
+                </div>
+
+                <h3>
+                    Conexión
+                </h3>
+
+                <p>
+                    Cliente y técnico quedan vinculados
+                    a una solicitud.
+                </p>
+
+            </div>
+
+
+            <div class="execution-connector"></div>
+
+
+            <div class="execution-item">
+
+                <div class="execution-icon">
+                    <i class="fa fa-comments-o"></i>
+                </div>
+
+                <h3>
+                    Coordinación
+                </h3>
+
+                <p>
+                    Se coordinan los detalles necesarios
+                    para realizar el servicio.
+                </p>
+
+            </div>
+
+
+            <div class="execution-connector"></div>
+
+
+            <div class="execution-item">
+
+                <div class="execution-icon">
+                    <i class="fa fa-wrench"></i>
+                </div>
+
+                <h3>
+                    Trabajo
+                </h3>
+
+                <p>
+                    El profesional realiza el servicio
+                    solicitado.
+                </p>
+
+            </div>
+
+
+            <div class="execution-connector"></div>
+
+
+            <div class="execution-item">
+
+                <div class="execution-icon">
+                    <i class="fa fa-check-circle"></i>
+                </div>
+
+                <h3>
+                    Finalización
+                </h3>
+
+                <p>
+                    El servicio se marca como completado
+                    y queda registrado.
+                </p>
+
+            </div>
+
+        </div>
+
+    </div>
+    
+
+</section>
+
+<!-- =========================================================
+     CALIFICACIÓN
+     ========================================================= -->
+
+<section class="rating-section">
+
+    
+    <div class="site-container">
+
+        <div class="rating-grid">
+
+            <div class="rating-visual">
+
+                <div class="rating-card">
+
+                    <span>
+                        ¿Cómo fue tu experiencia?
+                    </span>
+
+                    <div class="stars">
+
+                        <i class="fa fa-star"></i>
+                        <i class="fa fa-star"></i>
+                        <i class="fa fa-star"></i>
+                        <i class="fa fa-star"></i>
+                        <i class="fa fa-star"></i>
+
+                    </div>
+
+                    <strong>
+                        Tu opinión ayuda.
+                    </strong>
+
+                </div>
+
+            </div>
+
+
+            <div class="rating-content">
+
+                <span class="how-kicker">
+                    CALIFICACIÓN
+                </span>
+
+                <h2>
+                    Cada servicio también construye confianza.
+                </h2>
+
+                <p>
+                    Después de completar un servicio, el cliente puede
+                    compartir su experiencia mediante una calificación.
+                </p>
+
+                <p>
+                    Estas experiencias permiten construir progresivamente
+                    una reputación digital para los profesionales y ayudan
+                    a otros usuarios a tomar decisiones informadas.
+                </p>
+
+                <div class="rating-benefits">
+
+                    <div>
+                        <i class="fa fa-star"></i>
+                        <span>
+                            Reconoce un buen servicio
+                        </span>
+                    </div>
+
+                    <div>
+                        <i class="fa fa-users"></i>
+                        <span>
+                            Ayuda a otros usuarios
+                        </span>
+                    </div>
+
+                    <div>
+                        <i class="fa fa-line-chart"></i>
+                        <span>
+                            Construye reputación profesional
+                        </span>
+                    </div>
+
+                </div>
+
+            </div>
+
+        </div>
+
+    </div>
+    
+
+</section>
+
+<!-- =========================================================
+     VALOR PARA USUARIOS
+     ========================================================= -->
+
+<section class="value-section">
+
+    
+    <div class="site-container">
+
+        <div class="section-heading centered">
+
+            <span class="how-kicker">
+                MÁS QUE UNA CONEXIÓN
+            </span>
+
+            <h2>
+                ¿Qué valor aporta CURLINGgo?
+            </h2>
+
+        </div>
+
+
+        <div class="value-grid">
+
+            <div class="value-column">
+
+                <div class="value-column-header">
+
+                    <i class="fa fa-user"></i>
+
+                    <h3>
+                        Para clientes
+                    </h3>
+
+                </div>
+
+                <ul>
+
+                    <li>
+                        <i class="fa fa-check"></i>
+                        Menos tiempo buscando profesionales.
+                    </li>
+
+                    <li>
+                        <i class="fa fa-check"></i>
+                        Solicitud organizada.
+                    </li>
+
+                    <li>
+                        <i class="fa fa-check"></i>
+                        Conexión basada en la necesidad.
+                    </li>
+
+                    <li>
+                        <i class="fa fa-check"></i>
+                        Consideración de ubicación.
+                    </li>
+
+                    <li>
+                        <i class="fa fa-check"></i>
+                        Historial de servicios.
+                    </li>
+
+                    <li>
+                        <i class="fa fa-check"></i>
+                        Sistema de calificaciones.
+                    </li>
+
+                </ul>
+
+            </div>
+
+
+            <div class="value-column">
+
+                <div class="value-column-header">
+
+                    <i class="fa fa-wrench"></i>
+
+                    <h3>
+                        Para técnicos
+                    </h3>
+
+                </div>
+
+                <ul>
+
+                    <li>
+                        <i class="fa fa-check"></i>
+                        Nuevas oportunidades.
+                    </li>
+
+                    <li>
+                        <i class="fa fa-check"></i>
+                        Mayor visibilidad profesional.
+                    </li>
+
+                    <li>
+                        <i class="fa fa-check"></i>
+                        Perfil de especialidades.
+                    </li>
+
+                    <li>
+                        <i class="fa fa-check"></i>
+                        Definición de zonas de servicio.
+                    </li>
+
+                    <li>
+                        <i class="fa fa-check"></i>
+                        Reputación digital.
+                    </li>
+
+                    <li>
+                        <i class="fa fa-check"></i>
+                        Gestión organizada de solicitudes.
+                    </li>
+
+                </ul>
+
+            </div>
+
+        </div>
+
+    </div>
+    
+
+</section>
+
+<!-- =========================================================
+     CIERRE
+     ========================================================= -->
+
+<section class="how-closing">
+
+    
+    <div class="site-container">
+
+        <div class="how-closing-content">
+
+            <span>
+                CURLINGgo
+            </span>
+
+            <h2>
+                Una necesidad.
+                Un profesional.
+                Una conexión.
+            </h2>
+
+            <p>
+                Empieza indicando qué necesitas.
+                Nosotros facilitamos el camino.
+            </p>
+
+            <a asp-controller="SolicitudServicio"
+               asp-action="Paso1Servicio"
+               class="btn btn-brand btn-lg">
+
+                <i class="fa fa-search"></i>
+
+                Solicitar un servicio
+
+            </a>
+
+        </div>
+
+    </div>
+    
+
+</section>

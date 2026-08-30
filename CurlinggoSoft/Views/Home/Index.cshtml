@@ -1,76 +1,752 @@
 ﻿@model List<CurlinggoSoft.Models.Servicio>
+
 @{
     ViewData["Title"] = "Inicio";
 
-    // Ícono según la categoría del servicio (solo estético; si el nombre no
-    // matchea con nada, cae en el ícono genérico de llave).
-    string IconoPara(string? categoria)
+
+// Ícono según la categoría del servicio.
+string IconoPara(string? categoria)
     {
         var c = (categoria ?? "").ToLowerInvariant();
-        if (c.Contains("fontan") || c.Contains("plomer") || c.Contains("fuga")) return "fa-wrench";
-        if (c.Contains("electric")) return "fa-bolt";
-        if (c.Contains("soporte") || c.Contains("red") || c.Contains("cómputo") || c.Contains("computo") || c.Contains("tecnología") || c.Contains("tecnologia")) return "fa-desktop";
-        if (c.Contains("handyman") || c.Contains("reparac")) return "fa-hammer";
-        if (c.Contains("limpieza")) return "fa-tint";
-        if (c.Contains("pintura")) return "fa-paint-brush";
-        if (c.Contains("cerraj")) return "fa-key";
+
+        if (c.Contains("fontan") || c.Contains("plomer") || c.Contains("fuga"))
+            return "fa-wrench";
+
+        if (c.Contains("electric"))
+            return "fa-bolt";
+
+        if (c.Contains("soporte") || c.Contains("red") ||
+            c.Contains("cómputo") || c.Contains("computo") ||
+            c.Contains("tecnología") || c.Contains("tecnologia"))
+            return "fa-desktop";
+
+        if (c.Contains("handyman") || c.Contains("reparac"))
+            return "fa-hammer";
+
+        if (c.Contains("limpieza"))
+            return "fa-tint";
+
+        if (c.Contains("pintura"))
+            return "fa-paint-brush";
+
+        if (c.Contains("cerraj"))
+            return "fa-key";
+
         return "fa-wrench";
     }
+
 }
 
 @section Styles {
-    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/4.7.0/css/font-awesome.min.css">
-    <link rel="stylesheet" href="~/css/home.css" asp-append-version="true" />
+    <link rel="stylesheet"
+          href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/4.7.0/css/font-awesome.min.css">
+
+    
+    <link rel="stylesheet"
+          href="~/css/home.css"
+          asp-append-version="true" />
+    
+
 }
 
-<!-- ============ HERO ============ -->
-<div class="hero-section">
+<!-- =========================================================
+     1. HERO / BUSCAR SERVICIO
+     ========================================================= -->
+
+<section class="hero-section">
+
+    
+    <div class="hero-overlay"></div>
+
     <div class="site-container">
         <div class="hero-content">
-            <h1>SOLUCIONES TÉCNICAS PARA TU HOGAR EN COSTA RICA.</h1>
-            <p>Técnicos calificados en fontanería, electricidad, cómputo y más. Precios fijos, pago seguro y garantía de servicio.</p>
-            <a asp-controller="SolicitudServicio" asp-action="Paso1Servicio" class="btn btn-brand btn-lg">
-                <i class="fa fa-search"></i> Buscar Servicio
-            </a>
-        </div>
-    </div>
-</div>
 
-<!-- ============ SERVICIOS DESTACADOS ============ -->
-<div class="services-section site-container">
-    <h2>Nuestros Servicios</h2>
+            <div class="hero-badge">
+                <i class="fa fa-check-circle"></i>
+                Servicios profesionales en Costa Rica
+            </div>
 
-    @if (Model != null && Model.Any())
-    {
-        <div class="row g-4">
-            @foreach (var servicio in Model)
-            {
-                <div class="col-12 col-sm-6 col-lg-3">
-                    <div class="service-card">
-                        <div class="service-icon">
-                            <i class="fa @IconoPara(servicio.Categoria?.NombreCategoria)"></i>
-                        </div>
-                        <h3>@servicio.NombreServicio</h3>
-                        <p>@servicio.Descripcion</p>
-                        <div class="service-price">
-                            Desde @servicio.TarifaDiagnosticoBase.ToString("N0") @servicio.Moneda
-                        </div>
-                        <a asp-controller="SolicitudesReserva" asp-action="Create" asp-route-servicioId="@servicio.ServicioID" class="btn btn-brand w-100">
-                            Agendar
-                        </a>
-                    </div>
+            <h1>
+                ENCUENTRA EL TÉCNICO QUE NECESITAS,
+                <span>CUANDO LO NECESITAS.</span>
+            </h1>
+
+            <p>
+                Conecta con técnicos calificados para servicios de
+                fontanería, electricidad, tecnología, reparaciones,
+                mantenimiento y mucho más.
+            </p>
+
+            <div class="hero-actions">
+
+                <a asp-controller="SolicitudServicio"
+                   asp-action="Paso1Servicio"
+                   class="btn btn-brand btn-lg hero-primary-btn">
+                    <i class="fa fa-search"></i>
+                    Buscar un servicio
+                </a>
+
+                <a href="#como-funciona"
+                   class="btn hero-secondary-btn">
+                    <i class="fa fa-play-circle"></i>
+                    ¿Cómo funciona?
+                </a>
+
+            </div>
+
+            <div class="hero-trust">
+
+                <div class="hero-trust-item">
+                    <i class="fa fa-users"></i>
+                    <span>Técnicos especializados</span>
                 </div>
-            }
-        </div>
-    }
-    else
-    {
-        <p class="text-muted">Todavía no hay servicios activos para mostrar.</p>
-    }
 
-    <div class="text-center mt-4">
-        <a asp-controller="Servicios" asp-action="Index" class="btn btn-outline-secondary btn-lg">
-            Ver todos los servicios
-        </a>
+                <div class="hero-trust-item">
+                    <i class="fa fa-map-marker"></i>
+                    <span>Servicios cerca de ti</span>
+                </div>
+
+                <div class="hero-trust-item">
+                    <i class="fa fa-shield"></i>
+                    <span>Servicio confiable</span>
+                </div>
+
+            </div>
+
+        </div>
     </div>
-</div>
+    
+
+</section>
+
+<!-- =========================================================
+     2. SERVICIOS DESTACADOS
+     ========================================================= -->
+
+<section id="servicios" class="services-section home-section">
+
+    
+    <div class="site-container">
+
+        <div class="section-heading text-center">
+
+            <span class="section-kicker">
+                ENCUENTRA LO QUE NECESITAS
+            </span>
+
+            <h2>Servicios destacados</h2>
+
+            <p>
+                Encuentra profesionales para resolver las necesidades
+                de tu hogar, negocio o tecnología.
+            </p>
+
+        </div>
+
+        @if (Model != null && Model.Any())
+        {
+            <div class="row g-4">
+
+                @foreach (var servicio in Model.Take(8))
+                {
+                    <div class="col-12 col-sm-6 col-lg-3">
+
+                        <div class="service-card">
+
+                            <div class="service-icon">
+                                <i class="fa @IconoPara(servicio.Categoria?.NombreCategoria)"></i>
+                            </div>
+
+                            <h3>
+                                @servicio.NombreServicio
+                            </h3>
+
+                            <p>
+                                @servicio.Descripcion
+                            </p>
+
+                            <div class="service-price">
+                                Desde
+                                @servicio.TarifaDiagnosticoBase.ToString("N0")
+                                @servicio.Moneda
+                            </div>
+
+                            <a asp-controller="SolicitudesReserva"
+                               asp-action="Create"
+                               asp-route-servicioId="@servicio.ServicioID"
+                               class="btn btn-brand w-100">
+                                <i class="fa fa-calendar-check-o"></i>
+                                Agendar
+                            </a>
+
+                        </div>
+
+                    </div>
+                }
+
+            </div>
+        }
+        else
+        {
+            <div class="empty-services">
+                <i class="fa fa-wrench"></i>
+
+                <h3>Servicios próximamente</h3>
+
+                <p>
+                    Estamos preparando nuestros servicios para ti.
+                </p>
+            </div>
+        }
+
+        <div class="section-action">
+
+            <a asp-controller="Servicios"
+               asp-action="Index"
+               class="btn btn-outline-secondary btn-lg">
+                <i class="fa fa-th-large"></i>
+                Ver todos los servicios
+            </a>
+
+        </div>
+
+    </div>
+    
+
+</section>
+
+<!-- =========================================================
+     3. ¿CÓMO FUNCIONA?
+     ========================================================= -->
+
+<section id="como-funciona" class="how-section home-section">
+
+    
+    <div class="site-container">
+
+        <div class="section-heading text-center">
+
+            <span class="section-kicker">
+                SIMPLE, RÁPIDO Y CONFIABLE
+            </span>
+
+            <h2>¿Cómo funciona CURLINGgo?</h2>
+
+            <p>
+                Solicitar un servicio profesional nunca había sido tan sencillo.
+            </p>
+
+        </div>
+
+        <div class="steps-container">
+
+            <div class="step-card">
+
+                <div class="step-number">
+                    01
+                </div>
+
+                <div class="step-icon">
+                    <i class="fa fa-search"></i>
+                </div>
+
+                <h3>Selecciona un servicio</h3>
+
+                <p>
+                    Elige la categoría y el servicio que necesitas.
+                </p>
+
+            </div>
+
+
+            <div class="step-card">
+
+                <div class="step-number">
+                    02
+                </div>
+
+                <div class="step-icon">
+                    <i class="fa fa-file-text-o"></i>
+                </div>
+
+                <h3>Cuéntanos qué necesitas</h3>
+
+                <p>
+                    Responde unas preguntas y describe el trabajo que necesitas realizar.
+                </p>
+
+            </div>
+
+
+            <div class="step-card">
+
+                <div class="step-number">
+                    03
+                </div>
+
+                <div class="step-icon">
+                    <i class="fa fa-map-marker"></i>
+                </div>
+
+                <h3>Indica tu ubicación</h3>
+
+                <p>
+                    Utilizamos tu ubicación para ayudarte a encontrar técnicos disponibles cerca de ti.
+                </p>
+
+            </div>
+
+
+            <div class="step-card">
+
+                <div class="step-number">
+                    04
+                </div>
+
+                <div class="step-icon">
+                    <i class="fa fa-user"></i>
+                </div>
+
+                <h3>Encuentra un técnico</h3>
+
+                <p>
+                    Los técnicos disponibles reciben tu solicitud y pueden aceptar el servicio.
+                </p>
+
+            </div>
+
+
+            <div class="step-card">
+
+                <div class="step-number">
+                    05
+                </div>
+
+                <div class="step-icon">
+                    <i class="fa fa-check"></i>
+                </div>
+
+                <h3>Realiza el servicio</h3>
+
+                <p>
+                    Coordina con el técnico y recibe el servicio solicitado.
+                </p>
+
+            </div>
+
+
+            <div class="step-card">
+
+                <div class="step-number">
+                    06
+                </div>
+
+                <div class="step-icon">
+                    <i class="fa fa-star"></i>
+                </div>
+
+                <h3>Califica la experiencia</h3>
+
+                <p>
+                    Al finalizar, comparte tu experiencia y ayuda a mejorar CURLINGgo.
+                </p>
+
+            </div>
+
+        </div>
+
+    </div>
+    
+
+</section>
+
+<!-- =========================================================
+     4. ¿POR QUÉ CURLINGgo?
+     ========================================================= -->
+
+<section class="why-section home-section">
+
+    
+    <div class="site-container">
+
+        <div class="section-heading text-center">
+
+            <span class="section-kicker">
+                NUESTRA PROPUESTA DE VALOR
+            </span>
+
+            <h2>¿Por qué CURLINGgo?</h2>
+
+            <p>
+                Queremos hacer más fácil, rápido y confiable la conexión
+                entre clientes y profesionales.
+            </p>
+
+        </div>
+
+        <div class="row g-4">
+
+            <div class="col-12 col-md-6 col-lg-3">
+
+                <div class="benefit-card">
+
+                    <div class="benefit-icon">
+                        <i class="fa fa-bolt"></i>
+                    </div>
+
+                    <h3>Rápido</h3>
+
+                    <p>
+                        Solicita un servicio y encuentra profesionales
+                        disponibles sin procesos complicados.
+                    </p>
+
+                </div>
+
+            </div>
+
+
+            <div class="col-12 col-md-6 col-lg-3">
+
+                <div class="benefit-card">
+
+                    <div class="benefit-icon">
+                        <i class="fa fa-map-marker"></i>
+                    </div>
+
+                    <h3>Cerca de ti</h3>
+
+                    <p>
+                        La ubicación nos ayuda a conectar tu solicitud
+                        con técnicos que trabajan en tu zona.
+                    </p>
+
+                </div>
+
+            </div>
+
+
+            <div class="col-12 col-md-6 col-lg-3">
+
+                <div class="benefit-card">
+
+                    <div class="benefit-icon">
+                        <i class="fa fa-users"></i>
+                    </div>
+
+                    <h3>Profesionales</h3>
+
+                    <p>
+                        Conectamos clientes con técnicos especializados
+                        en diferentes categorías de servicios.
+                    </p>
+
+                </div>
+
+            </div>
+
+
+            <div class="col-12 col-md-6 col-lg-3">
+
+                <div class="benefit-card">
+
+                    <div class="benefit-icon">
+                        <i class="fa fa-star"></i>
+                    </div>
+
+                    <h3>Reputación</h3>
+
+                    <p>
+                        Las calificaciones y reseñas ayudan a construir
+                        una comunidad basada en confianza.
+                    </p>
+
+                </div>
+
+            </div>
+
+        </div>
+
+    </div>
+    
+
+</section>
+
+<!-- =========================================================
+     5. TÉCNICOS DESTACADOS
+     ========================================================= -->
+
+<section class="technicians-section home-section">
+
+    
+    <div class="site-container">
+
+        <div class="section-heading text-center">
+
+            <span class="section-kicker">
+                PROFESIONALES A TU ALCANCE
+            </span>
+
+            <h2>Técnicos destacados</h2>
+
+            <p>
+                CURLINGgo está diseñado para ayudarte a encontrar
+                profesionales según sus especialidades y ubicación.
+            </p>
+
+        </div>
+
+        <div class="row g-4">
+
+            <div class="col-12 col-md-4">
+
+                <div class="technician-feature-card">
+
+                    <div class="technician-avatar">
+                        <i class="fa fa-user"></i>
+                    </div>
+
+                    <div class="technician-content">
+
+                        <span class="technician-label">
+                            PROFESIONAL
+                        </span>
+
+                        <h3>Técnicos especializados</h3>
+
+                        <p>
+                            Profesionales organizados por especialidad
+                            para ayudarte a encontrar el servicio adecuado.
+                        </p>
+
+                        <div class="technician-info">
+                            <i class="fa fa-wrench"></i>
+                            Diferentes especialidades
+                        </div>
+
+                    </div>
+
+                </div>
+
+            </div>
+
+
+            <div class="col-12 col-md-4">
+
+                <div class="technician-feature-card">
+
+                    <div class="technician-avatar">
+                        <i class="fa fa-map-marker"></i>
+                    </div>
+
+                    <div class="technician-content">
+
+                        <span class="technician-label">
+                            UBICACIÓN
+                        </span>
+
+                        <h3>Técnicos cerca de ti</h3>
+
+                        <p>
+                            La plataforma considera la ubicación para
+                            facilitar la asignación de servicios.
+                        </p>
+
+                        <div class="technician-info">
+                            <i class="fa fa-location-arrow"></i>
+                            Cobertura por zonas
+                        </div>
+
+                    </div>
+
+                </div>
+
+            </div>
+
+
+            <div class="col-12 col-md-4">
+
+                <div class="technician-feature-card">
+
+                    <div class="technician-avatar">
+                        <i class="fa fa-star"></i>
+                    </div>
+
+                    <div class="technician-content">
+
+                        <span class="technician-label">
+                            CALIFICACIÓN
+                        </span>
+
+                        <h3>Profesionales con reputación</h3>
+
+                        <p>
+                            Las calificaciones permiten construir una
+                            comunidad de profesionales confiables.
+                        </p>
+
+                        <div class="technician-info">
+                            <i class="fa fa-thumbs-up"></i>
+                            Sistema de calificaciones
+                        </div>
+
+                    </div>
+
+                </div>
+
+            </div>
+
+        </div>
+
+    </div>
+    
+
+</section>
+
+<!-- =========================================================
+     6. SEGURIDAD Y CONFIANZA
+     ========================================================= -->
+
+<section class="trust-section home-section">
+
+    
+    <div class="site-container">
+
+        <div class="trust-wrapper">
+
+            <div class="trust-content">
+
+                <span class="section-kicker">
+                    CONFIANZA Y SEGURIDAD
+                </span>
+
+                <h2>Tu confianza es parte del servicio.</h2>
+
+                <p>
+                    En CURLINGgo queremos construir una plataforma donde
+                    clientes y técnicos puedan interactuar de forma
+                    transparente y segura.
+                </p>
+
+                <div class="trust-list">
+
+                    <div class="trust-item">
+                        <div class="trust-item-icon">
+                            <i class="fa fa-check"></i>
+                        </div>
+
+                        <div>
+                            <h3>Perfiles de técnicos</h3>
+                            <p>
+                                Información y especialidades del profesional.
+                            </p>
+                        </div>
+                    </div>
+
+
+                    <div class="trust-item">
+                        <div class="trust-item-icon">
+                            <i class="fa fa-star"></i>
+                        </div>
+
+                        <div>
+                            <h3>Calificaciones</h3>
+                            <p>
+                                La experiencia de otros usuarios ayuda a
+                                conocer la reputación del profesional.
+                            </p>
+                        </div>
+                    </div>
+
+
+                    <div class="trust-item">
+                        <div class="trust-item-icon">
+                            <i class="fa fa-shield"></i>
+                        </div>
+
+                        <div>
+                            <h3>Proceso controlado</h3>
+                            <p>
+                                CURLINGgo organiza la solicitud, asignación
+                                y seguimiento del servicio.
+                            </p>
+                        </div>
+                    </div>
+
+                </div>
+
+            </div>
+
+
+            <div class="trust-visual">
+
+                <div class="trust-circle">
+
+                    <i class="fa fa-shield"></i>
+
+                </div>
+
+                <h3>Seguridad y confianza</h3>
+
+                <p>
+                    Una experiencia pensada para clientes y profesionales.
+                </p>
+
+            </div>
+
+        </div>
+
+    </div>
+    
+
+</section>
+
+<!-- =========================================================
+     7. SOLICITAR SERVICIO / CTA FINAL
+     ========================================================= -->
+
+<section class="cta-section">
+
+    
+    <div class="site-container">
+
+        <div class="cta-content">
+
+            <div class="cta-icon">
+                <i class="fa fa-wrench"></i>
+            </div>
+
+            <div class="cta-text">
+
+                <span>
+                    ¿NECESITAS AYUDA?
+                </span>
+
+                <h2>
+                    Encuentra el profesional que necesitas.
+                </h2>
+
+                <p>
+                    Cuéntanos qué necesitas y comienza tu solicitud
+                    de servicio con CURLINGgo.
+                </p>
+
+            </div>
+
+            <div class="cta-action">
+
+                <a asp-controller="SolicitudServicio"
+                   asp-action="Paso1Servicio"
+                   class="btn btn-brand btn-lg">
+                    <i class="fa fa-search"></i>
+                    Solicitar un servicio
+                </a>
+
+            </div>
+
+        </div>
+
+    </div>
+    
+
+</section>

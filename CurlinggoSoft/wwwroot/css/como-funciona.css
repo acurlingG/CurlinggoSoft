@@ -1,0 +1,917 @@
+﻿/* =========================================================
+CURLINGgo - ¿CÓMO FUNCIONA?
+========================================================= */
+
+.how-kicker {
+    display: inline-block;
+     color: var(--brand-orange);
+    font-size: .72rem;
+    font-weight: 800;
+    letter-spacing: .13em;
+    text-transform: uppercase;
+    margin-bottom: .7rem;
+    
+}
+
+/* =========================================================
+HERO
+========================================================= */
+
+.how-hero {
+    min-height: 470px;
+     display: flex;
+    align-items: center;
+    background: linear-gradient( 135deg, var(--brand-navy), #0b438a );
+    
+}
+
+.how-hero-content {
+    max-width: 780px;
+     padding: 5rem 0;
+    
+}
+
+.how-hero h1 {
+    color: #fff;
+     font-size: clamp(2.7rem, 5vw, 4rem);
+    line-height: 1.05;
+    font-weight: 400;
+    letter-spacing: -.03em;
+    margin: 0 0 1.25rem;
+    
+}
+
+    .how-hero h1 strong {
+        display: block;
+         font-weight: 800;
+        
+    }
+
+.how-hero p {
+    max-width: 680px;
+     color: rgba(255,255,255,.78);
+    font-size: 1.08rem;
+    line-height: 1.7;
+    margin-bottom: 1.75rem;
+    
+}
+
+.how-hero-actions {
+    display: flex;
+     gap: .8rem;
+    flex-wrap: wrap;
+    
+}
+
+/* =========================================================
+HEADINGS
+========================================================= */
+
+.section-heading {
+    max-width: 800px;
+     margin-bottom: 3rem;
+    
+}
+
+    .section-heading.centered {
+        text-align: center;
+         margin-left: auto;
+        margin-right: auto;
+        
+    }
+
+    .section-heading h2 {
+        color: var(--brand-navy);
+         font-size: clamp(2rem,4vw,2.8rem);
+        font-weight: 800;
+        line-height: 1.15;
+        margin: 0 0 1rem;
+        
+    }
+
+    .section-heading p {
+        color: #687482;
+         line-height: 1.7;
+        margin: 0;
+        
+    }
+
+/* =========================================================
+FLUJO GENERAL
+========================================================= */
+
+.process-overview {
+    padding: 5rem 0;
+     background: #fff;
+    
+}
+
+.main-flow {
+    display: flex;
+     align-items: center;
+    justify-content: center;
+    gap: 1.3rem;
+    max-width: 950px;
+    margin: auto;
+    
+}
+
+.flow-party,
+.flow-platform {
+    text-align: center;
+     width: 210px;
+    
+}
+
+.flow-party-icon,
+.flow-platform-icon {
+    width: 80px;
+    height: 80px;
+     display: flex;
+    align-items: center;
+    justify-content: center;
+    margin: 0 auto 1rem;
+    border-radius: 50%;
+    font-size: 1.8rem;
+    
+}
+
+.flow-party-icon {
+    background: var(--brand-orange-light);
+     color: var(--brand-orange);
+    
+}
+
+.flow-platform-icon {
+    background: var(--brand-navy);
+     color: #fff;
+    
+}
+
+.flow-party h3,
+.flow-platform h3 {
+    color: var(--brand-navy);
+     font-size: 1.15rem;
+    font-weight: 800;
+    margin-bottom: .3rem;
+    
+}
+
+.flow-party span,
+.flow-platform span {
+    display: block;
+     color: #788391;
+    font-size: .82rem;
+    line-height: 1.4;
+    
+}
+
+.flow-arrow {
+    color: var(--brand-orange);
+     font-size: 1.6rem;
+    
+}
+
+/* =========================================================
+CLIENTES
+========================================================= */
+
+.client-section {
+    padding: 5rem 0;
+     background: #f6f8fb;
+    
+}
+
+.client-process {
+    display: grid;
+     grid-template-columns: repeat(5, 1fr);
+    gap: 1rem;
+    
+}
+
+.client-step {
+    position: relative;
+     min-height: 260px;
+    padding: 1.5rem;
+    background: #fff;
+    border: 1px solid #e5e9ef;
+    border-radius: 14px;
+    box-shadow: 0 5px 15px rgba(2,34,95,.03);
+    
+}
+
+.step-number {
+    color: #dfe4ea;
+     font-size: 1.8rem;
+    font-weight: 900;
+    position: absolute;
+    top: 1rem;
+    right: 1rem;
+    
+}
+
+.step-icon {
+    width: 52px;
+    height: 52px;
+     display: flex;
+    align-items: center;
+    justify-content: center;
+    border-radius: 11px;
+    background: var(--brand-orange-light);
+    color: var(--brand-orange);
+    margin-bottom: 1.2rem;
+    
+}
+
+.client-step h3 {
+    color: var(--brand-navy);
+     font-size: 1rem;
+    font-weight: 800;
+    margin-bottom: .6rem;
+    
+}
+
+.client-step p {
+    color: #707b88;
+     font-size: .84rem;
+    line-height: 1.6;
+    margin: 0;
+    
+}
+
+/* =========================================================
+FLUJO VERTICAL
+========================================================= */
+
+.visual-process-section {
+    padding: 5rem 0;
+     background: #fff;
+    
+}
+
+.vertical-flow {
+    max-width: 760px;
+     margin: auto;
+    
+}
+
+.vertical-flow-item {
+    display: grid;
+     grid-template-columns: 70px 1fr;
+    gap: 1.5rem;
+    align-items: center;
+    
+}
+
+.vertical-flow-icon {
+    width: 65px;
+    height: 65px;
+     display: flex;
+    align-items: center;
+    justify-content: center;
+    border-radius: 50%;
+    background: var(--brand-navy);
+    color: #fff;
+    font-size: 1.25rem;
+    position: relative;
+    z-index: 1;
+    
+}
+
+.vertical-flow-content {
+    padding: 1.25rem 1.5rem;
+     border: 1px solid #e5e9ef;
+    border-radius: 12px;
+    background: #fff;
+    
+}
+
+    .vertical-flow-content > span {
+        color: var(--brand-orange);
+         font-size: .68rem;
+        font-weight: 800;
+        letter-spacing: .1em;
+        
+    }
+
+    .vertical-flow-content h3 {
+        color: var(--brand-navy);
+         font-size: 1.05rem;
+        font-weight: 800;
+        margin: .35rem 0 .4rem;
+        
+    }
+
+    .vertical-flow-content p {
+        color: #707b88;
+         font-size: .85rem;
+        line-height: 1.6;
+        margin: 0;
+        
+    }
+
+.vertical-flow-line {
+    width: 2px;
+     height: 35px;
+    background: #dfe4ea;
+    margin-left: 31px;
+    
+}
+
+/* =========================================================
+TÉCNICOS
+========================================================= */
+
+.technician-section {
+    padding: 5rem 0;
+     background: var(--brand-navy);
+    
+}
+
+.technician-heading {
+    max-width: 760px;
+     margin-bottom: 3rem;
+    
+}
+
+    .technician-heading h2 {
+        color: #fff;
+         font-size: clamp(2rem,4vw,2.8rem);
+        font-weight: 800;
+        line-height: 1.15;
+        margin: 0 0 1rem;
+        
+    }
+
+    .technician-heading p {
+        color: rgba(255,255,255,.7);
+         line-height: 1.7;
+        margin: 0;
+        
+    }
+
+.technician-process {
+    display: grid;
+     grid-template-columns: repeat(3, 1fr);
+    gap: 1rem;
+    
+}
+
+.technician-step {
+    position: relative;
+     padding: 1.7rem;
+    border: 1px solid rgba(255,255,255,.1);
+    border-radius: 14px;
+    background: rgba(255,255,255,.05);
+    
+}
+
+.technician-step-number {
+    color: rgba(255,255,255,.18);
+     font-size: 1.8rem;
+    font-weight: 900;
+    position: absolute;
+    top: 1rem;
+    right: 1.2rem;
+    
+}
+
+.technician-step > i {
+    color: var(--brand-orange);
+     font-size: 1.5rem;
+    margin-bottom: 1rem;
+    
+}
+
+.technician-step h3 {
+    color: #fff;
+     font-size: 1rem;
+    font-weight: 800;
+    margin-bottom: .5rem;
+    
+}
+
+.technician-step p {
+    color: rgba(255,255,255,.62);
+     font-size: .84rem;
+    line-height: 1.6;
+    margin: 0;
+    
+}
+
+/* =========================================================
+ASIGNACIÓN
+========================================================= */
+
+.assignment-section {
+    padding: 5rem 0;
+     background: #f6f8fb;
+    
+}
+
+.assignment-grid {
+    display: grid;
+     grid-template-columns: 1fr 1fr;
+    gap: 4rem;
+    align-items: center;
+    
+}
+
+.assignment-explanation h2 {
+    color: var(--brand-navy);
+     font-size: clamp(2rem,4vw,2.7rem);
+    font-weight: 800;
+    line-height: 1.15;
+    margin: 0 0 1rem;
+    
+}
+
+.assignment-explanation p {
+    color: #687482;
+     line-height: 1.7;
+    
+}
+
+/* Matching diagram */
+
+.matching-diagram {
+    max-width: 440px;
+     margin: auto;
+    text-align: center;
+    
+}
+
+.matching-input,
+.matching-engine {
+    padding: 1.3rem;
+     border-radius: 14px;
+    border: 1px solid #e1e6ec;
+    background: #fff;
+    box-shadow: 0 7px 20px rgba(2,34,95,.05);
+    
+}
+
+    .matching-input i,
+    .matching-engine i {
+        display: block;
+         font-size: 1.5rem;
+        color: var(--brand-orange);
+        margin-bottom: .5rem;
+        
+    }
+
+    .matching-input strong,
+    .matching-engine strong {
+        display: block;
+         color: var(--brand-navy);
+        font-size: 1rem;
+        
+    }
+
+    .matching-input span,
+    .matching-engine span {
+        display: block;
+         color: #788391;
+        font-size: .75rem;
+        margin-top: .25rem;
+        
+    }
+
+.matching-engine {
+    background: var(--brand-navy);
+     border: none;
+    
+}
+
+    .matching-engine strong {
+        color: #fff;
+    }
+
+    .matching-engine span {
+        color: rgba(255,255,255,.65);
+    }
+
+.matching-arrow {
+    padding: .65rem;
+     color: var(--brand-orange);
+    
+}
+
+.matching-results {
+    display: flex;
+     justify-content: center;
+    gap: .7rem;
+    
+}
+
+    .matching-results div {
+        flex: 1;
+         padding: 1rem .5rem;
+        border-radius: 10px;
+        background: #fff;
+        border: 1px solid #e1e6ec;
+        
+    }
+
+    .matching-results i {
+        display: block;
+         color: var(--brand-orange);
+        margin-bottom: .35rem;
+        
+    }
+
+    .matching-results span {
+        color: var(--brand-navy);
+         font-size: .75rem;
+        font-weight: 700;
+        
+    }
+
+/* =========================================================
+REALIZACIÓN
+========================================================= */
+
+.service-execution-section {
+    padding: 5rem 0;
+     background: #fff;
+    
+}
+
+.execution-timeline {
+    display: flex;
+     align-items: center;
+    justify-content: center;
+    max-width: 1000px;
+    margin: auto;
+    
+}
+
+.execution-item {
+    width: 190px;
+     text-align: center;
+    
+}
+
+.execution-icon {
+    width: 65px;
+    height: 65px;
+     display: flex;
+    align-items: center;
+    justify-content: center;
+    margin: auto auto 1rem;
+    border-radius: 50%;
+    background: var(--brand-orange-light);
+    color: var(--brand-orange);
+    font-size: 1.3rem;
+    
+}
+
+.execution-item h3 {
+    color: var(--brand-navy);
+     font-size: 1rem;
+    font-weight: 800;
+    margin-bottom: .4rem;
+    
+}
+
+.execution-item p {
+    color: #75808c;
+     font-size: .78rem;
+    line-height: 1.55;
+    margin: 0;
+    
+}
+
+.execution-connector {
+    width: 65px;
+     height: 2px;
+    background: #dfe4ea;
+    
+}
+
+/* =========================================================
+CALIFICACIÓN
+========================================================= */
+
+.rating-section {
+    padding: 5rem 0;
+     background: #f6f8fb;
+    
+}
+
+.rating-grid {
+    display: grid;
+     grid-template-columns: .8fr 1.2fr;
+    gap: 4rem;
+    align-items: center;
+    
+}
+
+.rating-visual {
+    display: flex;
+     justify-content: center;
+    
+}
+
+.rating-card {
+    width: 300px;
+     padding: 2rem;
+    border-radius: 18px;
+    background: #fff;
+    border: 1px solid #e3e7ed;
+    box-shadow: 0 18px 35px rgba(2,34,95,.08);
+    text-align: center;
+    
+}
+
+    .rating-card > span {
+        display: block;
+         color: #687482;
+        font-size: .85rem;
+        margin-bottom: 1rem;
+        
+    }
+
+.stars {
+    color: var(--brand-orange);
+     font-size: 1.7rem;
+    letter-spacing: .15rem;
+    margin-bottom: 1rem;
+    
+}
+
+.rating-card strong {
+    color: var(--brand-navy);
+     font-size: 1rem;
+    
+}
+
+.rating-content h2 {
+    color: var(--brand-navy);
+     font-size: clamp(2rem,4vw,2.7rem);
+    font-weight: 800;
+    line-height: 1.15;
+    margin: 0 0 1rem;
+    
+}
+
+.rating-content p {
+    color: #687482;
+     line-height: 1.7;
+    
+}
+
+.rating-benefits {
+    display: flex;
+     flex-direction: column;
+    gap: .7rem;
+    margin-top: 1.5rem;
+    
+}
+
+    .rating-benefits div {
+        display: flex;
+         align-items: center;
+        gap: .7rem;
+        
+    }
+
+    .rating-benefits i {
+        color: var(--brand-orange);
+    }
+
+    .rating-benefits span {
+        color: var(--brand-navy);
+         font-size: .85rem;
+        font-weight: 700;
+        
+    }
+
+/* =========================================================
+VALOR
+========================================================= */
+
+.value-section {
+    padding: 5rem 0;
+     background: #fff;
+    
+}
+
+.value-grid {
+    display: grid;
+     grid-template-columns: repeat(2, 1fr);
+    gap: 1.5rem;
+    max-width: 900px;
+    margin: auto;
+    
+}
+
+.value-column {
+    padding: 2rem;
+     border: 1px solid #e4e8ee;
+    border-radius: 15px;
+    
+}
+
+.value-column-header {
+    display: flex;
+     align-items: center;
+    gap: .8rem;
+    margin-bottom: 1.5rem;
+    
+}
+
+    .value-column-header i {
+        width: 48px;
+        height: 48px;
+         display: flex;
+        align-items: center;
+        justify-content: center;
+        border-radius: 10px;
+        background: var(--brand-orange-light);
+        color: var(--brand-orange);
+        
+    }
+
+    .value-column-header h3 {
+        color: var(--brand-navy);
+         font-size: 1.2rem;
+        font-weight: 800;
+        margin: 0;
+        
+    }
+
+.value-column ul {
+    list-style: none;
+     padding: 0;
+    margin: 0;
+    
+}
+
+.value-column li {
+    display: flex;
+     gap: .7rem;
+    color: #687482;
+    font-size: .85rem;
+    line-height: 1.5;
+    padding: .55rem 0;
+    border-bottom: 1px solid #edf0f3;
+    
+}
+
+    .value-column li:last-child {
+        border-bottom: none;
+    }
+
+    .value-column li i {
+        color: var(--brand-orange);
+         margin-top: .2rem;
+        
+    }
+
+/* =========================================================
+CIERRE
+========================================================= */
+
+.how-closing {
+    padding: 5rem 0;
+     background: linear-gradient( 135deg, var(--brand-navy), #0b438a );
+    
+}
+
+.how-closing-content {
+    max-width: 750px;
+     margin: auto;
+    text-align: center;
+    
+}
+
+    .how-closing-content > span {
+        color: var(--brand-orange);
+         font-size: .75rem;
+        font-weight: 800;
+        letter-spacing: .15em;
+        
+    }
+
+    .how-closing-content h2 {
+        color: #fff;
+         font-size: clamp(2rem,4vw,3rem);
+        line-height: 1.15;
+        font-weight: 800;
+        margin: .7rem 0 1rem;
+        
+    }
+
+    .how-closing-content p {
+        color: rgba(255,255,255,.7);
+         margin-bottom: 1.5rem;
+        
+    }
+
+/* =========================================================
+TABLET
+========================================================= */
+
+@media (max-width: 991.98px) {
+
+    
+    .client-process {
+        grid-template-columns: repeat(3, 1fr);
+    }
+
+    .technician-process {
+        grid-template-columns: repeat(2, 1fr);
+    }
+
+    .main-flow {
+        gap: .6rem;
+    }
+
+    .assignment-grid,
+    .rating-grid {
+        grid-template-columns: 1fr;
+    }
+
+    
+}
+
+/* =========================================================
+MOBILE
+========================================================= */
+
+@media (max-width: 767.98px) {
+
+    
+    .how-hero-content {
+        padding: 4rem 0;
+    }
+
+    .how-hero h1 {
+        font-size: 2.5rem;
+    }
+
+    .how-hero-actions {
+        flex-direction: column;
+        align-items: stretch;
+    }
+
+    .main-flow {
+        flex-direction: column;
+        gap: .7rem;
+    }
+
+    .flow-arrow {
+        transform: rotate(90deg);
+    }
+
+    .client-process {
+        grid-template-columns: 1fr;
+    }
+
+    .technician-process {
+        grid-template-columns: 1fr;
+    }
+
+    .assignment-grid {
+        gap: 2rem;
+    }
+
+    .matching-results {
+        flex-direction: column;
+    }
+
+    .execution-timeline {
+        flex-direction: column;
+        gap: 1.5rem;
+    }
+
+    .execution-connector {
+        width: 2px;
+        height: 35px;
+    }
+
+    .value-grid {
+        grid-template-columns: 1fr;
+    }
+
+    .rating-grid {
+        gap: 2.5rem;
+    }
+
+    .vertical-flow-item {
+        grid-template-columns: 55px 1fr;
+        gap: 1rem;
+    }
+
+    .vertical-flow-icon {
+        width: 55px;
+        height: 55px;
+    }
+
+    .vertical-flow-line {
+        margin-left: 26px;
+    }
+
+    
+}

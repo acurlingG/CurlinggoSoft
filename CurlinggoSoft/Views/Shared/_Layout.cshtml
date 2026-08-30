@@ -1,253 +1,1112 @@
 ﻿<!DOCTYPE html>
+
 <html lang="es">
+
 <head>
-    <meta charset="utf-8" />
-    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>@ViewData["Title"] - CurlinggoSoft</title>
-    <script type="importmap"></script>
-    <link rel="stylesheet" href="~/lib/bootstrap/dist/css/bootstrap.min.css" />
-    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/4.7.0/css/font-awesome.min.css">
-    <link rel="stylesheet" href="~/css/site.css" asp-append-version="true" />
-    <link rel="stylesheet" href="~/CurlinggoSoft.styles.css" asp-append-version="true" />
-    @await RenderSectionAsync("Styles", required: false)
+
+
+<meta charset="utf-8" />
+
+<meta name="viewport"
+      content="width=device-width, initial-scale=1.0" />
+
+<title>
+    @ViewData["Title"] - CURLINGgo
+</title>
+
+
+<!-- =========================================================
+     BOOTSTRAP
+     ========================================================= -->
+
+<link rel="stylesheet"
+      href="~/lib/bootstrap/dist/css/bootstrap.min.css" />
+
+
+<!-- =========================================================
+     FONT AWESOME
+     ========================================================= -->
+
+<link rel="stylesheet"
+      href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/4.7.0/css/font-awesome.min.css" />
+
+
+<!-- =========================================================
+     CSS GENERAL DEL SISTEMA
+     ========================================================= -->
+
+<link rel="stylesheet"
+      href="~/css/site.css"
+      asp-append-version="true" />
+
+
+<!-- =========================================================
+     CSS GENERADO POR ASP.NET
+     ========================================================= -->
+
+<link rel="stylesheet"
+      href="~/CurlinggoSoft.styles.css"
+      asp-append-version="true" />
+
+
+<!-- =========================================================
+     CSS ESPECÍFICO DE CADA VIEW
+     ========================================================= -->
+
+@await RenderSectionAsync("Styles", required: false)
+
+
 </head>
+
 <body>
-    <header>
-        <nav class="navbar navbar-expand-lg navbar-light bg-white border-bottom box-shadow mb-3">
-            <div class="site-container d-flex flex-wrap align-items-center">
-                <a class="navbar-brand" asp-area="" asp-controller="Home" asp-action="Index">
-                    <img src="~/images/logo-curlinggo.jpeg" alt="CURLINGgo" />
-                </a>
-                <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarMain" aria-controls="navbarMain"
-                        aria-expanded="false" aria-label="Toggle navigation">
-                    <span class="navbar-toggler-icon"></span>
-                </button>
-                <div class="collapse navbar-collapse" id="navbarMain">
-                    <ul class="navbar-nav me-auto align-items-lg-center">
+
+
+<!-- =========================================================
+     NAVBAR GLOBAL
+     ========================================================= -->
+
+<header>
+
+    <nav class="navbar navbar-expand-lg navbar-light bg-white border-bottom box-shadow">
+
+        <div class="site-container d-flex flex-wrap align-items-center">
+
+
+            <!-- =================================================
+                 LOGO
+                 ================================================= -->
+
+            <a class="navbar-brand"
+               asp-area=""
+               asp-controller="Home"
+               asp-action="Index">
+
+                <img src="~/images/logo-curlinggo.jpeg"
+                     alt="CURLINGgo"
+                     class="curlinggo-logo" />
+
+            </a>
+
+
+            <!-- =================================================
+                 BOTÓN MOBILE
+                 ================================================= -->
+
+            <button class="navbar-toggler"
+                    type="button"
+                    data-bs-toggle="collapse"
+                    data-bs-target="#navbarMain"
+                    aria-controls="navbarMain"
+                    aria-expanded="false"
+                    aria-label="Abrir menú">
+
+                <span class="navbar-toggler-icon"></span>
+
+            </button>
+
+
+            <!-- =================================================
+                 CONTENIDO DEL NAVBAR
+                 ================================================= -->
+
+            <div class="collapse navbar-collapse"
+                 id="navbarMain">
+
+
+                <!-- =================================================
+                     MENÚ PRINCIPAL
+                     ================================================= -->
+
+                <ul class="navbar-nav me-auto align-items-lg-center">
+
+
+                    <!-- =================================================
+                         INICIO
+                         ================================================= -->
+
+                    <li class="nav-item">
+
+                        <a class="nav-link"
+                           asp-controller="Home"
+                           asp-action="Index">
+
+                            <i class="fa fa-home"></i>
+                            Inicio
+
+                        </a>
+
+                    </li>
+
+
+                    <!-- =================================================
+                         MENÚ PÚBLICO
+                         ================================================= -->
+
+                    @if (!User.IsInRole("Admin"))
+                    {
+
+                        <!-- SERVICIOS -->
+
                         <li class="nav-item">
-                            <a class="nav-link" asp-area="" asp-controller="Home" asp-action="Index">Home</a>
+
+                            <a class="nav-link"
+                               asp-controller="Home"
+                               asp-action="Index"
+                               asp-fragment="servicios">
+
+                                <i class="fa fa-wrench"></i>
+                                Servicios
+
+                            </a>
+
                         </li>
 
-                        @if (!User.IsInRole("Admin"))
+
+                        <!-- CÓMO FUNCIONA -->
+
+                        <li class="nav-item">
+
+                            <a class="nav-link"
+                               asp-controller="Home"
+                               asp-action="ComoFunciona"
+                               asp-fragment="como-funciona">
+
+                                <i class="fa fa-question-circle"></i>
+                                ¿Cómo funciona?
+
+                            </a>
+
+                        </li>
+
+
+                        <!-- PARA TÉCNICOS -->
+
+                        @if (!User.IsInRole("Tecnico"))
                         {
+
                             <li class="nav-item">
-                                <a class="nav-link" asp-area="" asp-controller="Home" asp-action="Index">Servicios</a>
+
+                                <a class="nav-link"
+                                   asp-controller="SolicitudTecnico"
+                                   asp-action="Index">
+
+                                    <i class="fa fa-user-plus"></i>
+                                    Para Técnicos
+
+                                </a>
+
                             </li>
-                            <li class="nav-item">
-                                <a class="nav-link" asp-area="" asp-controller="Home" asp-action="Index">Precios</a>
-                            </li>
-                            <li class="nav-item">
-                                <a class="nav-link" asp-area="" asp-controller="Home" asp-action="Index">Blog</a>
-                            </li>
-                            <li class="nav-item">
-                                <a class="nav-link" asp-area="" asp-controller="Home" asp-action="Index">Contáctenos</a>
-                            </li>
-                            <li class="nav-item">
-                                <a class="nav-link" asp-area="" asp-controller="Home" asp-action="Index">About</a>
-                            </li>
-                            @if (!User.IsInRole("Tecnico"))
-                            {
-                                <li class="nav-item">
-                                    <a class="nav-link" asp-controller="SolicitudTecnico" asp-action="Index">
-                                        <i class="fa fa-user-plus"></i> Regístrese como Técnico
-                                    </a>
-                                </li>
-                            }
+
                         }
 
-                        @if (User.Identity != null && User.Identity.IsAuthenticated)
-                        {
-                            @if (User.IsInRole("Admin"))
-                            {
-                                <li class="nav-item">
-                                    <a class="nav-link" asp-controller="Admin" asp-action="Index"><i class="fa fa-tachometer"></i> Panel Admin</a>
-                                </li>
-                                <li class="nav-item">
-                                    <a class="nav-link" asp-controller="SolicitudTecnicoAdmin" asp-action="Index"><i class="fa fa-user-plus"></i> Solicitudes de Técnico</a>
-                                </li>
-                                <li class="nav-item dropdown">
-                                    <a class="nav-link dropdown-toggle" href="#" role="button" data-bs-toggle="dropdown" aria-expanded="false">
-                                        <i class="fa fa-map-marker"></i> Geografía
-                                    </a>
-                                    <ul class="dropdown-menu">
-                                        <li><a class="dropdown-item" asp-controller="Provincias" asp-action="Index">Provincias</a></li>
-                                        <li><a class="dropdown-item" asp-controller="Cantones" asp-action="Index">Cantones</a></li>
-                                        <li><a class="dropdown-item" asp-controller="Distritos" asp-action="Index">Distritos</a></li>
-                                    </ul>
-                                </li>
-                                <li class="nav-item dropdown">
-                                    <a class="nav-link dropdown-toggle" href="#" role="button" data-bs-toggle="dropdown" aria-expanded="false">
-                                        <i class="fa fa-wrench"></i> Catálogo Servicios
-                                    </a>
-                                    <ul class="dropdown-menu">
-                                        <li><a class="dropdown-item" asp-controller="CategoriasServicio" asp-action="Index">Categorías</a></li>
-                                        <li><a class="dropdown-item" asp-controller="SubcategoriasServicio" asp-action="Index">Subcategorías</a></li>
-                                        <li><a class="dropdown-item" asp-controller="Servicios" asp-action="Index">Servicios Base</a></li>
-                                        <li><a class="dropdown-item" asp-controller="TecnicoEspecialidades" asp-action="Index">Especialidades Técnicas</a></li>
-                                        <li><a class="dropdown-item" asp-controller="PreguntasServicio" asp-action="Index">Preguntas de Servicio</a></li>
-                                        <li><a class="dropdown-item" asp-controller="OpcionesPregunta" asp-action="Index">Opciones de Pregunta</a></li>
-                                    </ul>
-                                </li>
-                                <li class="nav-item dropdown">
-                                    <a class="nav-link dropdown-toggle" href="#" role="button" data-bs-toggle="dropdown" aria-expanded="false">
-                                        <i class="fa fa-cogs"></i> Parámetros
-                                    </a>
-                                    <ul class="dropdown-menu">
-                                        <li><a class="dropdown-item" asp-controller="MetodosPago" asp-action="Index">Métodos de Pago</a></li>
-                                        <li><a class="dropdown-item" asp-controller="EstadosReserva" asp-action="Index">Estados de Reserva</a></li>
-                                        <li><a class="dropdown-item" asp-controller="EstadosPago" asp-action="Index">Estados de Pago</a></li>
-                                        <li><a class="dropdown-item" asp-controller="EstadosOfertaTecnico" asp-action="Index">Estados de Oferta</a></li>
-                                        <li><a class="dropdown-item" asp-controller="TiposEvaluacion" asp-action="Index">Tipos de Evaluación</a></li>
-                                    </ul>
-                                </li>
-                                <li class="nav-item dropdown">
-                                    <a class="nav-link dropdown-toggle" href="#" role="button" data-bs-toggle="dropdown" aria-expanded="false">
-                                        <i class="fa fa-users"></i> Seguridad
-                                    </a>
-                                    <ul class="dropdown-menu">
-                                        <li><a class="dropdown-item" asp-controller="Usuarios" asp-action="Index">Usuarios Registrados</a></li>
-                                        <li><a class="dropdown-item" asp-controller="ClientesPerfil" asp-action="Index">Perfiles de Clientes</a></li>
-                                        <li><a class="dropdown-item" asp-controller="TecnicosPerfil" asp-action="Index">Perfiles Técnicos</a></li>
-                                        <li><a class="dropdown-item" asp-controller="DireccionesCliente" asp-action="Index">Direcciones de Cliente</a></li>
-                                        <li><a class="dropdown-item" asp-controller="DisponibilidadTecnico" asp-action="Index">Disponibilidad Técnica</a></li>
-                                        <li><a class="dropdown-item" asp-controller="Menus" asp-action="Index">Estructura de Menús</a></li>
-                                        <li><a class="dropdown-item" asp-controller="Permisos" asp-action="Index">Permisos del Sistema</a></li>
-                                        <li><a class="dropdown-item" asp-controller="MenuPermisos" asp-action="Index">Menú-Permisos</a></li>
-                                        <li><hr class="dropdown-divider" /></li>
-                                        <li><a class="dropdown-item" asp-controller="ConfiguracionDespacho" asp-action="Edit">Configuración de Despacho</a></li>
-                                    </ul>
-                                </li>
-                                <li class="nav-item dropdown">
-                                    <a class="nav-link dropdown-toggle" href="#" role="button" data-bs-toggle="dropdown" aria-expanded="false">
-                                        <i class="fa fa-calendar"></i> Reservas
-                                    </a>
-                                    <ul class="dropdown-menu">
-                                        <li><a class="dropdown-item" asp-controller="SolicitudesReserva" asp-action="Index">Solicitudes de Reserva</a></li>
-                                        <li><a class="dropdown-item" asp-controller="HistorialEstadosReserva" asp-action="Index">Historial de Estados</a></li>
-                                        <li><a class="dropdown-item" asp-controller="OfertasTecnico" asp-action="Index">Ofertas a Técnicos</a></li>
-                                        <li><a class="dropdown-item" asp-controller="RespuestasReserva" asp-action="Index">Respuestas de Reserva</a></li>
-                                        <li><a class="dropdown-item" asp-controller="RespuestasReservaOpciones" asp-action="Index">Respuestas Opción Múltiple</a></li>
-                                        <li><a class="dropdown-item" asp-controller="DetallesPrecioReserva" asp-action="Index">Detalle de Precio</a></li>
-                                        <li><a class="dropdown-item" asp-controller="Notificaciones" asp-action="Index">Notificaciones</a></li>
-                                    </ul>
-                                </li>
-                                <li class="nav-item dropdown">
-                                    <a class="nav-link dropdown-toggle" href="#" role="button" data-bs-toggle="dropdown" aria-expanded="false">
-                                        <i class="fa fa-money"></i> Pagos
-                                    </a>
-                                    <ul class="dropdown-menu">
-                                        <li><a class="dropdown-item" asp-controller="Pagos" asp-action="Index">Pagos</a></li>
-                                        <li><a class="dropdown-item" asp-controller="IntentosPago" asp-action="Index">Intentos de Pago</a></li>
-                                    </ul>
-                                </li>
-                                <li class="nav-item dropdown">
-                                    <a class="nav-link dropdown-toggle" href="#" role="button" data-bs-toggle="dropdown" aria-expanded="false">
-                                        <i class="fa fa-clipboard"></i> Auditoría
-                                    </a>
-                                    <ul class="dropdown-menu dropdown-menu-end">
-                                        <li><a class="dropdown-item" asp-controller="Evaluaciones" asp-action="Index">Evaluaciones</a></li>
-                                        <li><a class="dropdown-item" asp-controller="Auditoria" asp-action="Index">Auditoría</a></li>
-                                        <li><a class="dropdown-item" asp-controller="LogsIntervencionOperativa" asp-action="Index">Logs de Intervención</a></li>
-                                    </ul>
-                                </li>
-                            }
-                            @if (User.IsInRole("Cliente"))
-                            {
-                                <li class="nav-item">
-                                    <a class="nav-link" asp-controller="Cliente" asp-action="Index"><i class="fa fa-dashboard"></i> Mi Dashboard</a>
-                                </li>
-                                <li class="nav-item">
-                                    <a class="nav-link" asp-controller="SolicitudServicio" asp-action="Paso1Servicio"><i class="fa fa-plus-circle"></i> Solicitar Servicio</a>
-                                </li>
-                                <li class="nav-item">
-                                    <a class="nav-link" asp-controller="Cliente" asp-action="MisReservas"><i class="fa fa-calendar"></i> Mis Reservas</a>
-                                </li>
-                                <li class="nav-item">
-                                    <a class="nav-link" asp-controller="Cliente" asp-action="MisDirecciones"><i class="fa fa-map-marker"></i> Mis Direcciones</a>
-                                </li>
-                            }
-                            @if (User.IsInRole("Tecnico"))
-                            {
-                                <li class="nav-item">
-                                    <a class="nav-link" asp-controller="Tecnico" asp-action="Index"><i class="fa fa-dashboard"></i> Mi Panel</a>
-                                </li>
-                                <li class="nav-item">
-                                    <a class="nav-link" asp-controller="Tecnico" asp-action="OfertasDisponibles"><i class="fa fa-list"></i> Ofertas de Servicio</a>
-                                </li>
-                                <li class="nav-item">
-                                    <a class="nav-link" asp-controller="DisponibilidadTecnico" asp-action="Index"><i class="fa fa-clock-o"></i> Mi Disponibilidad</a>
-                                </li>
-                            }
-                        }
-                    </ul>
 
-                    <ul class="navbar-nav align-items-lg-center">
-                        @if (User.Identity != null && User.Identity.IsAuthenticated)
+                        <!-- NOSOTROS -->
+
+                        <li class="nav-item">
+
+                            <a class="nav-link"
+                               asp-controller="Home"
+                               asp-action="Nosotros"
+                               asp-fragment="nosotros">
+
+                                <i class="fa fa-building"></i>
+                                Nosotros
+
+                            </a>
+
+                        </li>
+
+
+                        <!-- CONTÁCTENOS -->
+
+                        <li class="nav-item">
+
+                            <a class="nav-link"
+                               asp-controller="Home"
+                               asp-action="Index"
+                               asp-fragment="contacto">
+
+                                <i class="fa fa-envelope"></i>
+                                Contáctenos
+
+                            </a>
+
+                        </li>
+
+                    }
+
+
+                    <!-- =================================================
+                         MENÚ USUARIOS AUTENTICADOS
+                         ================================================= -->
+
+                    @if (User.Identity != null &&
+                         User.Identity.IsAuthenticated)
+                    {
+
+                        <!-- =================================================
+                             ADMINISTRADOR
+                             ================================================= -->
+
+                        @if (User.IsInRole("Admin"))
                         {
+
                             <li class="nav-item">
-                                <span class="nav-link text-muted">
-                                    <i class="fa fa-user-circle"></i> Hola, @User.Identity.Name
-                                </span>
+
+                                <a class="nav-link"
+                                   asp-controller="Admin"
+                                   asp-action="Index">
+
+                                    <i class="fa fa-tachometer"></i>
+                                    Panel Admin
+
+                                </a>
+
                             </li>
+
+
                             <li class="nav-item">
-                                <form asp-controller="Account" asp-action="Logout" method="post" class="d-flex">
-                                    <button type="submit" class="nav-link btn btn-link">
-                                        <i class="fa fa-sign-out"></i> Cerrar sesión
-                                    </button>
-                                </form>
+
+                                <a class="nav-link"
+                                   asp-controller="SolicitudTecnicoAdmin"
+                                   asp-action="Index">
+
+                                    <i class="fa fa-user-plus"></i>
+                                    Solicitudes de Técnico
+
+                                </a>
+
                             </li>
+
+
+                            <!-- GEOGRAFÍA -->
+
+                            <li class="nav-item dropdown">
+
+                                <a class="nav-link dropdown-toggle"
+                                   href="#"
+                                   role="button"
+                                   data-bs-toggle="dropdown">
+
+                                    <i class="fa fa-map-marker"></i>
+                                    Geografía
+
+                                </a>
+
+                                <ul class="dropdown-menu">
+
+                                    <li>
+                                        <a class="dropdown-item"
+                                           asp-controller="Provincias"
+                                           asp-action="Index">
+
+                                            Provincias
+
+                                        </a>
+                                    </li>
+
+                                    <li>
+                                        <a class="dropdown-item"
+                                           asp-controller="Cantones"
+                                           asp-action="Index">
+
+                                            Cantones
+
+                                        </a>
+                                    </li>
+
+                                    <li>
+                                        <a class="dropdown-item"
+                                           asp-controller="Distritos"
+                                           asp-action="Index">
+
+                                            Distritos
+
+                                        </a>
+                                    </li>
+
+                                </ul>
+
+                            </li>
+
+
+                            <!-- CATÁLOGO SERVICIOS -->
+
+                            <li class="nav-item dropdown">
+
+                                <a class="nav-link dropdown-toggle"
+                                   href="#"
+                                   role="button"
+                                   data-bs-toggle="dropdown">
+
+                                    <i class="fa fa-wrench"></i>
+                                    Catálogo Servicios
+
+                                </a>
+
+                                <ul class="dropdown-menu">
+
+                                    <li>
+                                        <a class="dropdown-item"
+                                           asp-controller="CategoriasServicio"
+                                           asp-action="Index">
+
+                                            Categorías
+
+                                        </a>
+                                    </li>
+
+                                    <li>
+                                        <a class="dropdown-item"
+                                           asp-controller="SubcategoriasServicio"
+                                           asp-action="Index">
+
+                                            Subcategorías
+
+                                        </a>
+                                    </li>
+
+                                    <li>
+                                        <a class="dropdown-item"
+                                           asp-controller="Servicios"
+                                           asp-action="Index">
+
+                                            Servicios Base
+
+                                        </a>
+                                    </li>
+
+                                    <li>
+                                        <a class="dropdown-item"
+                                           asp-controller="TecnicoEspecialidades"
+                                           asp-action="Index">
+
+                                            Especialidades Técnicas
+
+                                        </a>
+                                    </li>
+
+                                    <li>
+                                        <a class="dropdown-item"
+                                           asp-controller="PreguntasServicio"
+                                           asp-action="Index">
+
+                                            Preguntas de Servicio
+
+                                        </a>
+                                    </li>
+
+                                    <li>
+                                        <a class="dropdown-item"
+                                           asp-controller="OpcionesPregunta"
+                                           asp-action="Index">
+
+                                            Opciones de Pregunta
+
+                                        </a>
+                                    </li>
+
+                                </ul>
+
+                            </li>
+
+
+                            <!-- PARÁMETROS -->
+
+                            <li class="nav-item dropdown">
+
+                                <a class="nav-link dropdown-toggle"
+                                   href="#"
+                                   role="button"
+                                   data-bs-toggle="dropdown">
+
+                                    <i class="fa fa-cogs"></i>
+                                    Parámetros
+
+                                </a>
+
+                                <ul class="dropdown-menu">
+
+                                    <li>
+                                        <a class="dropdown-item"
+                                           asp-controller="MetodosPago"
+                                           asp-action="Index">
+
+                                            Métodos de Pago
+
+                                        </a>
+                                    </li>
+
+                                    <li>
+                                        <a class="dropdown-item"
+                                           asp-controller="EstadosReserva"
+                                           asp-action="Index">
+
+                                            Estados de Reserva
+
+                                        </a>
+                                    </li>
+
+                                    <li>
+                                        <a class="dropdown-item"
+                                           asp-controller="EstadosPago"
+                                           asp-action="Index">
+
+                                            Estados de Pago
+
+                                        </a>
+                                    </li>
+
+                                    <li>
+                                        <a class="dropdown-item"
+                                           asp-controller="EstadosOfertaTecnico"
+                                           asp-action="Index">
+
+                                            Estados de Oferta
+
+                                        </a>
+                                    </li>
+
+                                    <li>
+                                        <a class="dropdown-item"
+                                           asp-controller="TiposEvaluacion"
+                                           asp-action="Index">
+
+                                            Tipos de Evaluación
+
+                                        </a>
+                                    </li>
+
+                                </ul>
+
+                            </li>
+
+
+                            <!-- SEGURIDAD -->
+
+                            <li class="nav-item dropdown">
+
+                                <a class="nav-link dropdown-toggle"
+                                   href="#"
+                                   role="button"
+                                   data-bs-toggle="dropdown">
+
+                                    <i class="fa fa-users"></i>
+                                    Seguridad
+
+                                </a>
+
+                                <ul class="dropdown-menu">
+
+                                    <li>
+                                        <a class="dropdown-item"
+                                           asp-controller="Usuarios"
+                                           asp-action="Index">
+
+                                            Usuarios Registrados
+
+                                        </a>
+                                    </li>
+
+                                    <li>
+                                        <a class="dropdown-item"
+                                           asp-controller="ClientesPerfil"
+                                           asp-action="Index">
+
+                                            Perfiles de Clientes
+
+                                        </a>
+                                    </li>
+
+                                    <li>
+                                        <a class="dropdown-item"
+                                           asp-controller="TecnicosPerfil"
+                                           asp-action="Index">
+
+                                            Perfiles Técnicos
+
+                                        </a>
+                                    </li>
+
+                                    <li>
+                                        <a class="dropdown-item"
+                                           asp-controller="DireccionesCliente"
+                                           asp-action="Index">
+
+                                            Direcciones de Cliente
+
+                                        </a>
+                                    </li>
+
+                                    <li>
+                                        <a class="dropdown-item"
+                                           asp-controller="DisponibilidadTecnico"
+                                           asp-action="Index">
+
+                                            Disponibilidad Técnica
+
+                                        </a>
+                                    </li>
+
+                                    <li>
+                                        <a class="dropdown-item"
+                                           asp-controller="Menus"
+                                           asp-action="Index">
+
+                                            Estructura de Menús
+
+                                        </a>
+                                    </li>
+
+                                    <li>
+                                        <a class="dropdown-item"
+                                           asp-controller="Permisos"
+                                           asp-action="Index">
+
+                                            Permisos del Sistema
+
+                                        </a>
+                                    </li>
+
+                                    <li>
+                                        <a class="dropdown-item"
+                                           asp-controller="MenuPermisos"
+                                           asp-action="Index">
+
+                                            Menú-Permisos
+
+                                        </a>
+                                    </li>
+
+                                    <li>
+                                        <hr class="dropdown-divider" />
+                                    </li>
+
+                                    <li>
+                                        <a class="dropdown-item"
+                                           asp-controller="ConfiguracionDespacho"
+                                           asp-action="Edit">
+
+                                            Configuración de Despacho
+
+                                        </a>
+                                    </li>
+
+                                </ul>
+
+                            </li>
+
+
+                            <!-- RESERVAS -->
+
+                            <li class="nav-item dropdown">
+
+                                <a class="nav-link dropdown-toggle"
+                                   href="#"
+                                   role="button"
+                                   data-bs-toggle="dropdown">
+
+                                    <i class="fa fa-calendar"></i>
+                                    Reservas
+
+                                </a>
+
+                                <ul class="dropdown-menu">
+
+                                    <li>
+                                        <a class="dropdown-item"
+                                           asp-controller="SolicitudesReserva"
+                                           asp-action="Index">
+
+                                            Solicitudes de Reserva
+
+                                        </a>
+                                    </li>
+
+                                    <li>
+                                        <a class="dropdown-item"
+                                           asp-controller="HistorialEstadosReserva"
+                                           asp-action="Index">
+
+                                            Historial de Estados
+
+                                        </a>
+                                    </li>
+
+                                    <li>
+                                        <a class="dropdown-item"
+                                           asp-controller="OfertasTecnico"
+                                           asp-action="Index">
+
+                                            Ofertas a Técnicos
+
+                                        </a>
+                                    </li>
+
+                                    <li>
+                                        <a class="dropdown-item"
+                                           asp-controller="RespuestasReserva"
+                                           asp-action="Index">
+
+                                            Respuestas de Reserva
+
+                                        </a>
+                                    </li>
+
+                                    <li>
+                                        <a class="dropdown-item"
+                                           asp-controller="RespuestasReservaOpciones"
+                                           asp-action="Index">
+
+                                            Respuestas Opción Múltiple
+
+                                        </a>
+                                    </li>
+
+                                    <li>
+                                        <a class="dropdown-item"
+                                           asp-controller="DetallesPrecioReserva"
+                                           asp-action="Index">
+
+                                            Detalle de Precio
+
+                                        </a>
+                                    </li>
+
+                                    <li>
+                                        <a class="dropdown-item"
+                                           asp-controller="Notificaciones"
+                                           asp-action="Index">
+
+                                            Notificaciones
+
+                                        </a>
+                                    </li>
+
+                                </ul>
+
+                            </li>
+
+
+                            <!-- PAGOS -->
+
+                            <li class="nav-item dropdown">
+
+                                <a class="nav-link dropdown-toggle"
+                                   href="#"
+                                   role="button"
+                                   data-bs-toggle="dropdown">
+
+                                    <i class="fa fa-money"></i>
+                                    Pagos
+
+                                </a>
+
+                                <ul class="dropdown-menu">
+
+                                    <li>
+                                        <a class="dropdown-item"
+                                           asp-controller="Pagos"
+                                           asp-action="Index">
+
+                                            Pagos
+
+                                        </a>
+                                    </li>
+
+                                    <li>
+                                        <a class="dropdown-item"
+                                           asp-controller="IntentosPago"
+                                           asp-action="Index">
+
+                                            Intentos de Pago
+
+                                        </a>
+                                    </li>
+
+                                </ul>
+
+                            </li>
+
+
+                            <!-- AUDITORÍA -->
+
+                            <li class="nav-item dropdown">
+
+                                <a class="nav-link dropdown-toggle"
+                                   href="#"
+                                   role="button"
+                                   data-bs-toggle="dropdown">
+
+                                    <i class="fa fa-clipboard"></i>
+                                    Auditoría
+
+                                </a>
+
+                                <ul class="dropdown-menu dropdown-menu-end">
+
+                                    <li>
+                                        <a class="dropdown-item"
+                                           asp-controller="Evaluaciones"
+                                           asp-action="Index">
+
+                                            Evaluaciones
+
+                                        </a>
+                                    </li>
+
+                                    <li>
+                                        <a class="dropdown-item"
+                                           asp-controller="Auditoria"
+                                           asp-action="Index">
+
+                                            Auditoría
+
+                                        </a>
+                                    </li>
+
+                                    <li>
+                                        <a class="dropdown-item"
+                                           asp-controller="LogsIntervencionOperativa"
+                                           asp-action="Index">
+
+                                            Logs de Intervención
+
+                                        </a>
+                                    </li>
+
+                                </ul>
+
+                            </li>
+
                         }
-                        else
+
+
+                        <!-- =================================================
+                             CLIENTE
+                             ================================================= -->
+
+                        @if (User.IsInRole("Cliente"))
                         {
+
                             <li class="nav-item">
-                                <a class="nav-link" asp-area="" asp-controller="Account" asp-action="Login">Login</a>
+
+                                <a class="nav-link"
+                                   asp-controller="Cliente"
+                                   asp-action="Index">
+
+                                    <i class="fa fa-dashboard"></i>
+                                    Mi Dashboard
+
+                                </a>
+
                             </li>
+
+
+                            <li class="nav-item">
+
+                                <a class="nav-link"
+                                   asp-controller="SolicitudServicio"
+                                   asp-action="Paso1Servicio">
+
+                                    <i class="fa fa-plus-circle"></i>
+                                    Solicitar Servicio
+
+                                </a>
+
+                            </li>
+
+
+                            <li class="nav-item">
+
+                                <a class="nav-link"
+                                   asp-controller="Cliente"
+                                   asp-action="MisReservas">
+
+                                    <i class="fa fa-calendar"></i>
+                                    Mis Reservas
+
+                                </a>
+
+                            </li>
+
+
+                            <li class="nav-item">
+
+                                <a class="nav-link"
+                                   asp-controller="Cliente"
+                                   asp-action="MisDirecciones">
+
+                                    <i class="fa fa-map-marker"></i>
+                                    Mis Direcciones
+
+                                </a>
+
+                            </li>
+
                         }
-                    </ul>
-                </div>
+
+
+                        <!-- =================================================
+                             TÉCNICO
+                             ================================================= -->
+
+                        @if (User.IsInRole("Tecnico"))
+                        {
+
+                            <li class="nav-item">
+
+                                <a class="nav-link"
+                                   asp-controller="Tecnico"
+                                   asp-action="Index">
+
+                                    <i class="fa fa-dashboard"></i>
+                                    Mi Panel
+
+                                </a>
+
+                            </li>
+
+
+                            <li class="nav-item">
+
+                                <a class="nav-link"
+                                   asp-controller="Tecnico"
+                                   asp-action="OfertasDisponibles">
+
+                                    <i class="fa fa-list"></i>
+                                    Ofertas de Servicio
+
+                                </a>
+
+                            </li>
+
+
+                            <li class="nav-item">
+
+                                <a class="nav-link"
+                                   asp-controller="DisponibilidadTecnico"
+                                   asp-action="Index">
+
+                                    <i class="fa fa-clock-o"></i>
+                                    Mi Disponibilidad
+
+                                </a>
+
+                            </li>
+
+                        }
+
+                    }
+
+                </ul>
+
+
+                <!-- =========================================================
+                     MENÚ DERECHO
+                     ========================================================= -->
+
+                <ul class="navbar-nav align-items-lg-center">
+
+
+                    @if (User.Identity != null &&
+                         User.Identity.IsAuthenticated)
+                    {
+
+                        <li class="nav-item">
+
+                            <span class="nav-link text-muted">
+
+                                <i class="fa fa-user-circle"></i>
+
+                                Hola, @User.Identity.Name
+
+                            </span>
+
+                        </li>
+
+
+                        <li class="nav-item">
+
+                            <form asp-controller="Account"
+                                  asp-action="Logout"
+                                  method="post"
+                                  class="d-flex">
+
+                                <button type="submit"
+                                        class="nav-link btn btn-link">
+
+                                    <i class="fa fa-sign-out"></i>
+
+                                    Cerrar sesión
+
+                                </button>
+
+                            </form>
+
+                        </li>
+
+                    }
+                    else
+                    {
+
+                        <!-- BOTÓN PRINCIPAL -->
+
+                        <li class="nav-item me-lg-2 mb-2 mb-lg-0">
+
+                            <a asp-controller="SolicitudServicio"
+                               asp-action="Paso1Servicio"
+                               class="btn btn-brand">
+
+                                <i class="fa fa-search"></i>
+                                Solicitar un servicio
+
+                            </a>
+
+                        </li>
+
+
+                        <!-- LOGIN -->
+
+                        <li class="nav-item">
+
+                            <a class="nav-link"
+                               asp-controller="Account"
+                               asp-action="Login">
+
+                                <i class="fa fa-sign-in"></i>
+                                Iniciar sesión
+
+                            </a>
+
+                        </li>
+
+                    }
+
+                </ul>
+
             </div>
-        </nav>
-    </header>
+
+        </div>
+
+    </nav>
+
+</header>
+
+
+<!-- =========================================================
+     CONTENIDO DE CADA VIEW
+     ========================================================= -->
+
+<main role="main">
+
+    @RenderBody()
+
+</main>
+
+
+<!-- =========================================================
+     FOOTER GLOBAL
+     ========================================================= -->
+
+<footer class="site-footer">
 
     <div class="site-container">
-        <main role="main" class="pb-3">
-            @RenderBody()
-        </main>
+
+        <div class="footer-content">
+
+            <div>
+
+                <strong>
+                    CURLINGgo Technologies
+                </strong>
+
+                <p>
+                    Servicios técnicos bajo demanda en Costa Rica.
+                </p>
+
+            </div>
+
+
+            <div>
+
+                <span>
+                    &copy; @DateTime.Now.Year CURLINGgo Technologies
+                </span>
+
+            </div>
+
+        </div>
+
     </div>
 
-    <footer class="border-top footer text-muted">
-        <div class="site-container">
-            <p>&copy; Todos los derechos reservados 2026 CURLINGgo Technologies - <a asp-area="" asp-controller="Home" asp-action="Privacy">Privacy</a></p>
-        </div>
-    </footer>
-    <script src="~/lib/jquery/dist/jquery.min.js"></script>
-    <script src="~/lib/bootstrap/dist/js/bootstrap.bundle.min.js"></script>
-    <script src="~/js/site.js" asp-append-version="true"></script>
-    @if (User.Identity != null && User.Identity.IsAuthenticated)
-    {
-        <script src="https://cdnjs.cloudflare.com/ajax/libs/microsoft-signalr/8.0.0/signalr.min.js"></script>
-        <script>
-            // Conexión SignalR única y compartida por toda la página, para
-            // que las distintas partials (badge de ofertas, chats de
-            // reserva, etc.) no abran cada una su propia conexión al hub.
-            // Cualquier script puede:
-            //   - Esperar a que esté lista: await window.curlinggoConnectionReady
-            //   - Registrar handlers: window.curlinggoConnection.on('Evento', fn)
-            //   - Invocar métodos: window.curlinggoConnection.invoke('Metodo', ...)
-            (function () {
-                if (window.curlinggoConnection) return; // ya inicializada (layout aplicado una sola vez, pero por seguridad)
+</footer>
 
-                const connection = new signalR.HubConnectionBuilder()
+
+<!-- =========================================================
+     JAVASCRIPT
+     ========================================================= -->
+
+<script src="~/lib/jquery/dist/jquery.min.js"></script>
+
+<script src="~/lib/bootstrap/dist/js/bootstrap.bundle.min.js"></script>
+
+<script src="~/js/site.js"
+        asp-append-version="true"></script>
+
+
+<!-- =========================================================
+     SIGNALR
+     ========================================================= -->
+
+@if (User.Identity != null &&
+     User.Identity.IsAuthenticated)
+{
+
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/microsoft-signalr/8.0.0/signalr.min.js"></script>
+
+    <script>
+
+        (function () {
+
+            if (window.curlinggoConnection) {
+                return;
+            }
+
+            const connection =
+                new signalR.HubConnectionBuilder()
                     .withUrl('/hubs/notificaciones')
                     .withAutomaticReconnect()
                     .build();
 
-                window.curlinggoConnection = connection;
-                window.curlinggoConnectionReady = connection.start()
-                    .catch(err => console.error('Error conectando SignalR:', err));
-            })();
-        </script>
-    }
-    @await RenderSectionAsync("Scripts", required: false)
+            window.curlinggoConnection =
+                connection;
+
+            window.curlinggoConnectionReady =
+                connection.start()
+                    .catch(function (err) {
+
+                        console.error(
+                            'Error conectando SignalR:',
+                            err
+                        );
+
+                    });
+
+        })();
+
+    </script>
+
+}
+
+
+<!-- =========================================================
+     SCRIPTS ESPECÍFICOS DE CADA VIEW
+     ========================================================= -->
+
+@await RenderSectionAsync("Scripts", required: false)
+
+
 </body>
+
 </html>
