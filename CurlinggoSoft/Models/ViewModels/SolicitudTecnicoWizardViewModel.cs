@@ -113,6 +113,11 @@ namespace CurlinggoSoft.Models.ViewModels
 
         public string? NombreServicio { get; set; }
 
+        // NUEVO: para que Paso3.cshtml pueda mostrar la categoría también en
+        // las especialidades precargadas (antes solo se llenaba al agregar
+        // una nueva desde el dropdown, dejando "undefined" en las existentes).
+        public string? NombreCategoria { get; set; }
+
         [Range(0, 60, ErrorMessage = "Los años de experiencia deben estar entre 0 y 60")]
         [Display(Name = "Años de Experiencia")]
         public int AniosExperiencia { get; set; }

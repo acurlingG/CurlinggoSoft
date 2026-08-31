@@ -116,7 +116,10 @@ namespace CurlinggoSoft.Controllers
                 await _context.Database.ExecuteSqlInterpolatedAsync(
                     $"EXEC dbo.usp_SolicitudTecnico_Aprobar @SolicitudTecnicoID = {id}, @RevisadoPor = {revisadoPor}");
 
-                TempData["Success"] = "¡Solicitud aprobada con éxito! El perfil del técnico ha sido creado y el rol de Identity asignado.";
+                var solicitudAprobada = await _context.SolicitudesTecnico.FindAsync(id);
+                TempData["Success"] = solicitudAprobada?.TipoSolicitud == "CAMBIO"
+                    ? "¡Cambio aprobado con éxito! Los servicios y la zona del técnico fueron actualizados."
+                    : "¡Solicitud aprobada con éxito! El perfil del técnico ha sido creado y el rol de Identity asignado.";
             }
             catch (SqlException ex)
             {

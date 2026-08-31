@@ -18,6 +18,9 @@ namespace CurlinggoSoft.Controllers
     //    cuando la solicitud es aprobada (usp_SolicitudTecnico_Aprobar).
     //  - El progreso se guarda incrementalmente en SolicitudTecnico para
     //    soportar "Guardar y salir" / retomar más tarde.
+    //  - TipoSolicitud distingue una alta nueva ("NUEVO", secuencia completa
+    //    1-8) de una solicitud de cambio de un técnico ya aprobado ("CAMBIO",
+    //    solo navega 3 -> 5 -> 8). Ver SiguientePasoTrasGuardar().
     [Authorize]
     public class SolicitudTecnicoController : Controller
     {
@@ -44,7 +47,7 @@ namespace CurlinggoSoft.Controllers
         public async Task<IActionResult> Index()
         {
             // Si el usuario está logueado y ya tiene una solicitud "viva"
-            // (no rechazada/cancelada), lo mandamos directo a retomarla.
+            // (no rechazada/cancelada/aprobada), lo mandamos directo a retomarla.
             if (User.Identity?.IsAuthenticated == true)
             {
                 var usuarioId = _userManager.GetUserId(User);
@@ -52,7 +55,9 @@ namespace CurlinggoSoft.Controllers
                     .Include(s => s.EstadoSolicitud)
                     .Where(s => s.UsuarioID == usuarioId)
                     .OrderByDescending(s => s.FechaCreacion)
-                    .FirstOrDefaultAsync(s => s.EstadoSolicitud!.Codigo != "RECHAZADA" && s.EstadoSolicitud!.Codigo != "CANCELADA");
+                    .FirstOrDefaultAsync(s => s.EstadoSolicitud!.Codigo != "RECHAZADA"
+                        && s.EstadoSolicitud!.Codigo != "CANCELADA"
+                        && s.EstadoSolicitud!.Codigo != "APROBADA");
 
                 if (solicitudExistente != null)
                 {
@@ -86,7 +91,9 @@ namespace CurlinggoSoft.Controllers
                     .Include(s => s.EstadoSolicitud)
                     .Where(s => s.UsuarioID == usuarioId)
                     .OrderByDescending(s => s.FechaCreacion)
-                    .FirstOrDefaultAsync(s => s.EstadoSolicitud!.Codigo != "RECHAZADA" && s.EstadoSolicitud!.Codigo != "CANCELADA");
+                    .FirstOrDefaultAsync(s => s.EstadoSolicitud!.Codigo != "RECHAZADA"
+                        && s.EstadoSolicitud!.Codigo != "CANCELADA"
+                        && s.EstadoSolicitud!.Codigo != "APROBADA");
 
                 if (solicitud == null)
                 {
@@ -107,6 +114,103 @@ namespace CurlinggoSoft.Controllers
             return RedirectToAction(nameof(Paso), new { paso = 2 });
         }
 
+
+
+        // ---------------------------------------------------------------
+        // Solicitud de CAMBIO: un técnico ya aprobado pide agregar/quitar
+        // servicios o actualizar su zona oficial de cobertura. A diferencia
+        // de Comenzar(), no crea cuenta ni Usuario nuevo — parte de su
+        // TecnicoPerfil/TecnicoEspecialidades vigentes.
+        // ---------------------------------------------------------------
+        [HttpPost]
+        [Authorize(Roles = "Tecnico")]
+        [ValidateAntiForgeryToken]
+        public async Task<IActionResult> SolicitudCambio()
+        {
+            var usuarioId = _userManager.GetUserId(User)!;
+
+            // Debe ser un técnico ya aprobado (con TecnicoPerfil), no un aspirante.
+            var perfilVigente = await _context.TecnicosPerfil
+                .FirstOrDefaultAsync(p => p.TecnicoID == usuarioId);
+
+            if (perfilVigente == null)
+            {
+                TempData["Error"] = "Solo un técnico ya aprobado puede solicitar cambios.";
+                return RedirectToAction("Index", "Tecnico");
+            }
+
+            // Si ya tiene una solicitud de CAMBIO viva (no rechazada/cancelada/aprobada), la retoma.
+            var solicitudViva = await _context.SolicitudesTecnico
+                .Include(s => s.EstadoSolicitud)
+                .Where(s => s.UsuarioID == usuarioId && s.TipoSolicitud == "CAMBIO")
+                .OrderByDescending(s => s.FechaCreacion)
+                .FirstOrDefaultAsync(s => s.EstadoSolicitud!.Codigo != "RECHAZADA"
+                                        && s.EstadoSolicitud!.Codigo != "CANCELADA"
+                                        && s.EstadoSolicitud!.Codigo != "APROBADA");
+
+            if (solicitudViva != null)
+            {
+                HttpContext.Session.SetString(SesionSolicitudKey, solicitudViva.SolicitudTecnicoID.ToString());
+                return RedirectToAction(nameof(Paso), new { paso = 3 });
+            }
+
+            var estadoBorrador = await _context.EstadosSolicitudTecnico
+                .FirstOrDefaultAsync(e => e.Codigo == "BORRADOR");
+            if (estadoBorrador == null)
+            {
+                throw new InvalidOperationException("No se encontró el estado 'BORRADOR' en la base de datos.");
+            }
+
+            var usuario = await _context.Usuarios.FirstOrDefaultAsync(u => u.UsuarioID == usuarioId);
+
+            var nuevaSolicitud = new SolicitudTecnico
+            {
+                UsuarioID = usuarioId,
+                TipoSolicitud = "CAMBIO",
+                EstadoSolicitudTecnicoID = estadoBorrador.EstadoSolicitudTecnicoID,
+                CodigoSolicitud = GenerarCodigoSolicitud(),
+                Identificacion = perfilVigente.IdentificacionCedula,
+                FechaCreacion = DateTime.Now,
+                FechaUltimaActualizacion = DateTime.Now
+            };
+            _context.SolicitudesTecnico.Add(nuevaSolicitud);
+            await _context.SaveChangesAsync();
+
+            // Copiar especialidades vigentes -> borrador de cambio (punto de partida
+            // para que el técnico agregue/quite desde lo que ya tenía).
+            var especialidadesVigentes = await _context.TecnicoEspecialidades
+                .Where(e => e.TecnicoID == usuarioId)
+                .ToListAsync();
+
+            foreach (var esp in especialidadesVigentes)
+            {
+                _context.SolicitudTecnicoEspecialidades.Add(new SolicitudTecnicoEspecialidad
+                {
+                    SolicitudTecnicoID = nuevaSolicitud.SolicitudTecnicoID,
+                    ServicioID = esp.ServicioID,
+                    AniosExperiencia = esp.AniosExperiencia
+                });
+            }
+
+            // Copiar la zona oficial vigente (TecnicosPerfil solo maneja una) -> borrador.
+            if (perfilVigente.ProvinciaCoberturaID.HasValue && perfilVigente.CantonCoberturaID.HasValue)
+            {
+                _context.SolicitudTecnicoCobertura.Add(new SolicitudTecnicoCobertura
+                {
+                    SolicitudTecnicoID = nuevaSolicitud.SolicitudTecnicoID,
+                    ProvinciaID = perfilVigente.ProvinciaCoberturaID.Value,
+                    CantonID = perfilVigente.CantonCoberturaID.Value,
+                    DistritoID = null
+                });
+            }
+
+            await _context.SaveChangesAsync();
+
+            HttpContext.Session.SetString(SesionSolicitudKey, nuevaSolicitud.SolicitudTecnicoID.ToString());
+            return RedirectToAction(nameof(Paso), new { paso = 3 });
+        }
+
+
         // ---------------------------------------------------------------
         // Navegación genérica por paso (GET)
         // ---------------------------------------------------------------
@@ -116,6 +220,13 @@ namespace CurlinggoSoft.Controllers
             if (paso < 1 || paso > 8) return NotFound();
 
             var solicitud = await ObtenerSolicitudEnProgresoAsync();
+
+            // Una solicitud de CAMBIO solo navega Especialidades(3)/Cobertura(5)/Confirmación(8).
+            if (solicitud != null && solicitud.TipoSolicitud == "CAMBIO" && paso != 3 && paso != 5 && paso != 8)
+            {
+                return RedirectToAction(nameof(Paso), new { paso = 3 });
+            }
+
             var modelo = new SolicitudTecnicoWizardViewModel { PasoActual = paso };
 
             if (solicitud != null)
@@ -345,6 +456,29 @@ namespace CurlinggoSoft.Controllers
                     }
                     return View("Paso3", vm);
                 }
+                // Rechazar el mismo ServicioID repetido antes de tocar la BD
+                var duplicados = especialidadesSeleccionadas
+                    .GroupBy(e => e.ServicioID)
+                    .Where(g => g.Count() > 1)
+                    .Select(g => g.Key)
+                    .ToList();
+
+                if (duplicados.Any())
+                {
+                    ModelState.AddModelError(string.Empty, "No puede seleccionar el mismo servicio más de una vez.");
+                    var solicitud = await ObtenerSolicitudEnProgresoAsync();
+                    var vm = new SolicitudTecnicoWizardViewModel
+                    {
+                        PasoActual = 3,
+                        Especialidades = new EspecialidadesStepViewModel { Categorias = await ObtenerCategoriasConServiciosAsync() }
+                    };
+                    if (solicitud != null)
+                    {
+                        vm.SolicitudTecnicoID = solicitud.SolicitudTecnicoID;
+                        vm.CodigoSolicitud = solicitud.CodigoSolicitud;
+                    }
+                    return View("Paso3", vm);
+                }
 
                 var solicitudActual = await ObtenerSolicitudEnProgresoAsync();
                 if (solicitudActual == null)
@@ -375,7 +509,7 @@ namespace CurlinggoSoft.Controllers
                 await _context.SaveChangesAsync();
 
                 HttpContext.Session.SetString(SesionSolicitudKey, solicitudActual.SolicitudTecnicoID.ToString());
-                return RedirectToAction(nameof(Paso), new { paso = 4 });
+                return RedirectToAction(nameof(Paso), new { paso = SiguientePasoTrasGuardar(3, solicitudActual.TipoSolicitud) });
             }
             catch (Exception ex)
             {
@@ -397,6 +531,10 @@ namespace CurlinggoSoft.Controllers
 
         // ---------------------------------------------------------------
         // Paso 4: Movilidad
+        // Secuencia NUEVO: 4 (Movilidad) -> 5 (Cobertura).
+        // NOTA: este paso NUNCA se ejecuta para una solicitud CAMBIO (el
+        // guard en Paso() ya lo bloquea), así que su redirect de éxito
+        // siempre es fijo a 5 — no necesita distinguir tipo.
         // ---------------------------------------------------------------
         [HttpPost]
         [AllowAnonymous]
@@ -458,7 +596,11 @@ namespace CurlinggoSoft.Controllers
             {
                 ModelState.Remove(key);
             }
-
+            // Exigir al menos una zona, igual que Paso3 exige una especialidad
+            if (modelo.Cobertura.ZonasSeleccionadas == null || !modelo.Cobertura.ZonasSeleccionadas.Any())
+            {
+                ModelState.AddModelError(string.Empty, "Debe agregar al menos una zona de cobertura.");
+            }
             if (!ModelState.IsValid)
             {
                 modelo.PasoActual = 5;
@@ -496,7 +638,7 @@ namespace CurlinggoSoft.Controllers
                 solicitud.FechaUltimaActualizacion = DateTime.Now;
 
                 await _context.SaveChangesAsync();
-                return RedirectToAction(nameof(Paso), new { paso = 6 });
+                return RedirectToAction(nameof(Paso), new { paso = SiguientePasoTrasGuardar(5, solicitud.TipoSolicitud) });
             }
             catch (Exception ex)
             {
@@ -508,6 +650,7 @@ namespace CurlinggoSoft.Controllers
 
         // ---------------------------------------------------------------
         // Paso 6: Seguro y Accesibilidad
+        // NOTA: nunca se ejecuta para CAMBIO (bloqueado en Paso()); redirect fijo.
         // ---------------------------------------------------------------
         [HttpPost]
         [AllowAnonymous]
@@ -555,6 +698,7 @@ namespace CurlinggoSoft.Controllers
 
         // ---------------------------------------------------------------
         // Paso 7: Documentos
+        // NOTA: nunca se ejecuta para CAMBIO (bloqueado en Paso()); redirect fijo.
         // ---------------------------------------------------------------
         [HttpPost]
         [AllowAnonymous]
@@ -713,6 +857,27 @@ namespace CurlinggoSoft.Controllers
         // ---------------------------------------------------------------
 
         /// <summary>
+        /// Calcula a qué paso redirigir después de guardar uno exitosamente.
+        /// NUEVO sigue la secuencia 1-8 completa. CAMBIO solo navega 3 -> 5 -> 8.
+        /// Úsalo únicamente en los redirects de éxito de GuardarPaso3 y
+        /// GuardarPaso5 (los únicos pasos que un CAMBIO realmente ejecuta
+        /// antes de Paso8, que ya maneja su propio flujo sin pasar por aquí).
+        /// </summary>
+        private static int SiguientePasoTrasGuardar(int pasoGuardado, string tipoSolicitud)
+        {
+            if (tipoSolicitud == "CAMBIO")
+            {
+                return pasoGuardado switch
+                {
+                    3 => 5,
+                    5 => 8,
+                    _ => pasoGuardado + 1 // no debería ocurrir en CAMBIO; resguardo
+                };
+            }
+            return pasoGuardado + 1;
+        }
+
+        /// <summary>
         /// Obtiene la solicitud en progreso desde la sesión.
         /// </summary>
         private async Task<SolicitudTecnico?> ObtenerSolicitudEnProgresoAsync()
@@ -725,7 +890,7 @@ namespace CurlinggoSoft.Controllers
                 .AsSplitQuery()
                 .Include(s => s.Usuario)
                 .Include(s => s.EstadoSolicitud)
-                .Include(s => s.Especialidades).ThenInclude(e => e.Servicio)
+                .Include(s => s.Especialidades).ThenInclude(e => e.Servicio).ThenInclude(sv => sv.Categoria)
                 .Include(s => s.Cobertura).ThenInclude(c => c.Provincia)
                 .Include(s => s.Cobertura).ThenInclude(c => c.Canton)
                 .Include(s => s.Cobertura).ThenInclude(c => c.Distrito)
@@ -784,6 +949,7 @@ namespace CurlinggoSoft.Controllers
                     {
                         ServicioID = e.ServicioID,
                         NombreServicio = e.Servicio?.NombreServicio,
+                        NombreCategoria = e.Servicio?.Categoria?.NombreCategoria,
                         AniosExperiencia = e.AniosExperiencia,
                         DescripcionExperiencia = e.DescripcionExperiencia
                     }).ToList();

@@ -5,6 +5,9 @@
 <div class="container py-4">
     <h2 class="mb-1">Solicitud <small class="text-muted">@Model.CodigoSolicitud</small></h2>
     <span class="badge bg-secondary mb-3">@Model.EstadoSolicitud?.Nombre</span>
+    <span class="badge @(Model.TipoSolicitud == "CAMBIO" ? "bg-info text-dark" : "bg-secondary") mb-3">
+        @(Model.TipoSolicitud == "CAMBIO" ? "Cambio de Técnico Existente" : "Alta Nueva")
+    </span>
 
     @if (TempData["Success"] != null)
     {
@@ -113,7 +116,7 @@
             }
 
             <form asp-action="Aprobar" asp-route-id="@Model.SolicitudTecnicoID" method="post" class="d-inline"
-                  onsubmit="return confirm('¿Está seguro de aprobar esta solicitud? Esto le otorgará el perfil y rol de Técnico al usuario.');">
+                  onsubmit="return confirm('@(Model.TipoSolicitud == "CAMBIO" ? "¿Está seguro de aprobar este cambio? Se actualizarán los servicios y la zona del técnico." : "¿Está seguro de aprobar esta solicitud? Esto le otorgará el perfil y rol de Técnico al usuario.")');">
                 @Html.AntiForgeryToken()
                 <button type="submit" class="btn btn-success">
                     <i class="fa fa-check-circle"></i> Aprobar Solicitud

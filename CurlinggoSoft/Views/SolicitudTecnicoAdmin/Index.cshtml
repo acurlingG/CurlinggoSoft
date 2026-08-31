@@ -33,6 +33,7 @@
         <thead>
             <tr>
                 <th>Código</th>
+                <th>Tipo</th>
                 <th>Aspirante</th>
                 <th>Estado</th>
                 <th>Fecha Envío</th>
@@ -44,6 +45,11 @@
             {
                 <tr>
                     <td>@s.CodigoSolicitud</td>
+                    <td>
+                        <span class="badge @(s.TipoSolicitud == "CAMBIO" ? "bg-info text-dark" : "bg-secondary")">
+                            @(s.TipoSolicitud == "CAMBIO" ? "Cambio" : "Nuevo")
+                        </span>
+                    </td>
                     <td>@(s.Usuario?.Nombre) @(s.Usuario?.Apellidos) <br /><small class="text-muted">@s.Usuario?.Email</small></td>
                     <td><span class="badge bg-secondary">@s.EstadoSolicitud?.Nombre</span></td>
                     <td>@(s.FechaEnvio?.ToString("dd/MM/yyyy HH:mm") ?? "-")</td>

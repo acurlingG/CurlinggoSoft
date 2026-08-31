@@ -26,6 +26,11 @@ namespace CurlinggoSoft.Models
         [Required]
         [Display(Name = "Estado")]
         public int EstadoSolicitudTecnicoID { get; set; }
+        
+        [Required]
+        [StringLength(10)]
+        [Display(Name = "Tipo de Solicitud")]
+        public string TipoSolicitud { get; set; } = "NUEVO";
 
         [StringLength(30)]
         [Display(Name = "Identificación")]

@@ -144,10 +144,18 @@
             btn.addEventListener('click', function () { btn.closest('tr').remove(); });
         });
 
-        document.getElementById('formPaso5').addEventListener('submit', function () {
+        document.getElementById('formPaso5').addEventListener('submit', function (e) {
+             var filas = document.querySelectorAll('#tablaZonas tbody tr');
+
+    // NUEVO: bloquear el envío si no hay ninguna zona agregada
+    if (filas.length === 0) {
+        e.preventDefault();
+        alert('Debe agregar al menos una zona de cobertura.');
+        return;
+    }
             var contenedor = document.getElementById('contenedor-zonas-ocultas');
             contenedor.innerHTML = '';
-            var filas = document.querySelectorAll('#tablaZonas tbody tr');
+           
             filas.forEach(function (fila, idx) {
                 ['provincia', 'canton', 'distrito'].forEach(function (campo) {
                     var input = document.createElement('input');

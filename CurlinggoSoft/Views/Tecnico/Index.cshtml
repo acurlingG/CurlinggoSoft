@@ -50,19 +50,29 @@
         <p class="small mt-2 mb-0" id="estadoCobertura"></p>
     </div>
 
-    <div class="row mb-4">
-        <div class="col-md-6">
+       <div class="row mb-4">
+        <div class="col-md-4">
             <div class="card shadow-sm p-3 text-center">
                 <h5>Radar de Ofertas <span id="badgeOfertas" class="badge bg-danger d-none">0</span></h5>
                 <p class="text-muted small">Consulta solicitudes cercanas pendientes de aceptar.</p>
                 <a asp-action="OfertasDisponibles" class="btn btn-primary btn-sm">Ver Ofertas Disponibles</a>
             </div>
         </div>
-        <div class="col-md-6">
+        <div class="col-md-4">
             <div class="card shadow-sm p-3 text-center">
                 <h5>Mi Disponibilidad Horaria</h5>
                 <p class="text-muted small">Configura los días y horas que laboras.</p>
                 <a asp-controller="DisponibilidadTecnico" asp-action="Index" class="btn btn-outline-secondary btn-sm">Configurar Horarios</a>
+            </div>
+        </div>
+        <div class="col-md-4">
+            <div class="card shadow-sm p-3 text-center">
+                <h5>Mis Servicios y Zona</h5>
+                <p class="text-muted small">Agrega o quita servicios, o actualiza tu zona oficial. Requiere aprobación.</p>
+                <form asp-controller="SolicitudTecnico" asp-action="SolicitudCambio" method="post" class="d-inline">
+                    @Html.AntiForgeryToken()
+                    <button type="submit" class="btn btn-outline-primary btn-sm">Solicitar Cambios</button>
+                </form>
             </div>
         </div>
     </div>
