@@ -1,4 +1,5 @@
 <Solution>
   <Project Path="CURLINGgo.API/CURLINGgo.API.csproj" Id="e1685c08-b0b6-40aa-9385-4d1f25bc3c11" />
+  <Project Path="CURLINGgo.Mobile/CURLINGgo.Mobile.csproj" Id="84f2ca15-ba11-4f31-8b16-5f3e3c97929f" />
   <Project Path="CurlinggoSoft/CurlinggoSoft.csproj" />
 </Solution>

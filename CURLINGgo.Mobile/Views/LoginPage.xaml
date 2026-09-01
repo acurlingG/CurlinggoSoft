@@ -1,0 +1,62 @@
+<?xml version="1.0" encoding="utf-8" ?>
+<ContentPage xmlns="http://schemas.microsoft.com/dotnet/2021/maui"
+             xmlns:x="http://schemas.microsoft.com/winfx/2009/xaml"
+             xmlns:vm="clr-namespace:CURLINGgo.Mobile.ViewModels"
+             x:Class="CURLINGgo.Mobile.Views.LoginPage"
+             Title="Iniciar Sesión"
+             BackgroundColor="#F4F6F9">
+
+    <ScrollView>
+        <VerticalStackLayout Padding="30" Spacing="20" VerticalOptions="Center">
+
+            <!-- Logo CURLINGgo -->
+            <Image Source="curlinggo.png"
+                   HeightRequest="100"
+                   Aspect="AspectFit"
+                   HorizontalOptions="Center"
+                   Margin="0,20,0,10" />
+
+            <Label Text="Bienvenido de nuevo" 
+                   FontSize="16" 
+                   TextColor="#666666" 
+                   HorizontalOptions="Center" 
+                   Margin="0,0,0,10"/>
+
+            <!-- Campo Usuario -->
+            <Border StrokeShape="RoundRectangle 10" Padding="5,0">
+                <Entry Text="{Binding Usuario}" 
+                       Placeholder="Usuario o correo electrónico" 
+                       Keyboard="Email" />
+            </Border>
+
+            <!-- Campo Contraseña -->
+            <Border StrokeShape="RoundRectangle 10" Padding="5,0">
+                <Entry Text="{Binding Password}" 
+                       Placeholder="Contraseña" 
+                       IsPassword="True" />
+            </Border>
+
+            <!-- Mensaje de Error -->
+            <Label Text="{Binding MensajeError}" 
+                   TextColor="Red" 
+                   HorizontalOptions="Center" />
+
+            <!-- Indicador de Carga -->
+            <ActivityIndicator IsRunning="{Binding IsBusy}" 
+                               IsVisible="{Binding IsBusy}" 
+                               Color="#1A2B4C" 
+                               HorizontalOptions="Center" />
+
+            <!-- Botón Iniciar Sesión -->
+            <Button Text="Iniciar Sesión" 
+                    Command="{Binding IniciarSesionCommand}" 
+                    BackgroundColor="#1A2B4C" 
+                    TextColor="White" 
+                    CornerRadius="10" 
+                    HeightRequest="50" 
+                    Margin="0,10,0,0" />
+
+        </VerticalStackLayout>
+    </ScrollView>
+
+</ContentPage>
