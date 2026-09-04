@@ -26,6 +26,7 @@ namespace CurlinggoSoft.Models
         public DbSet<TecnicoPerfil> TecnicosPerfil { get; set; }
         public DbSet<DireccionCliente> DireccionesCliente { get; set; }
         public DbSet<DisponibilidadTecnico> DisponibilidadTecnico { get; set; }
+        public DbSet<TecnicoCobertura> TecnicoCoberturas { get; set; }
         public DbSet<Menu> Menus { get; set; }
         public DbSet<Permiso> Permisos { get; set; }
         public DbSet<MenuPermiso> MenuPermisos { get; set; }

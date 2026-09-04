@@ -7,21 +7,73 @@
 <div class="container my-4">
     <h2 class="fw-bold mb-3"><i class="fa fa-map-marker"></i> Mis Direcciones Guardadas</h2>
 
+    @if (TempData["Success"] != null)
+    {
+        <div class="alert alert-success alert-dismissible fade show" role="alert">
+            <i class="fa fa-check-circle"></i> @TempData["Success"]
+            <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Cerrar"></button>
+        </div>
+    }
+
+    @if (TempData["Error"] != null)
+    {
+        <div class="alert alert-danger alert-dismissible fade show" role="alert">
+            <i class="fa fa-exclamation-circle"></i> @TempData["Error"]
+            <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Cerrar"></button>
+        </div>
+    }
+
     @if (!Model.Any())
     {
-        <div class="alert alert-warning">No tienes direcciones registradas todavía. Se guardarán automáticamente cuando solicites un servicio.</div>
+        <div class="alert alert-warning">
+            <i class="fa fa-info-circle"></i> No tienes direcciones registradas todavía. Se guardarán automáticamente cuando solicites un servicio.
+        </div>
     }
     else
     {
         <div class="row">
             @foreach (var dir in Model)
             {
-                <div class="col-md-4 mb-3">
+                <div class="col-md-6 mb-3">
                     <div class="card shadow-sm h-100">
                         <div class="card-body">
-                            <h5 class="card-title fw-bold">@dir.NombreDireccion</h5>
-                            <p class="card-text text-muted small mb-1"><strong>Provincia/Cantón/Distrito:</strong> ID: @dir.ProvinciaID / @dir.CantonID / @dir.DistritoID</p>
-                            <p class="card-text">@dir.DireccionExacta</p>
+                            <h5 class="card-title fw-bold">
+                                <i class="fa fa-home"></i> @dir.NombreDireccion
+                            </h5>
+                            <hr />
+                            <p class="card-text mb-2">
+                                <strong>Dirección:</strong><br/>
+                                <code>@dir.DireccionExacta</code>
+                            </p>
+                            <p class="card-text small text-muted mb-3">
+                                <strong>Ubicación:</strong><br/>
+                                @dir.Provincia?.Nombre / @dir.Canton?.Nombre / @dir.Distrito?.Nombre
+                            </p>
+
+                            <div class="btn-group w-100" role="group">
+                                <a asp-action="EditarDireccion" asp-route-id="@dir.DireccionID" 
+                                   class="btn btn-sm btn-warning" title="Editar dirección">
+                                    <i class="fa fa-edit"></i> Editar
+                                </a>
+
+                                <form asp-action="DeshabilitarDireccion" asp-route-id="@dir.DireccionID" 
+                                      method="post" style="display:inline;" 
+                                      onsubmit="return confirm('¿Desactivar esta dirección?');">
+                                    @Html.AntiForgeryToken()
+                                    <button type="submit" class="btn btn-sm btn-secondary" title="Deshabilitar dirección">
+                                        <i class="fa fa-minus-circle"></i> Deshabilitar
+                                    </button>
+                                </form>
+
+                                <form asp-action="EliminarDireccion" asp-route-id="@dir.DireccionID" 
+                                      method="post" style="display:inline;" 
+                                      onsubmit="return confirm('¿Eliminar esta dirección permanentemente?');">
+                                    @Html.AntiForgeryToken()
+                                    <button type="submit" class="btn btn-sm btn-danger" title="Eliminar dirección">
+                                        <i class="fa fa-trash"></i> Eliminar
+                                    </button>
+                                </form>
+                            </div>
                         </div>
                     </div>
                 </div>

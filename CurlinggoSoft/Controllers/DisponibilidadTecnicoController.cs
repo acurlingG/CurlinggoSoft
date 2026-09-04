@@ -1,11 +1,22 @@
+using Microsoft.AspNetCore.Authorization;
+using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 using CurlinggoSoft.Models;
+using System.Security.Claims;
 
+// ADMIN SOLAMENTE: Gestión centralizada de disponibilidad de todos los técnicos
+[Authorize(Roles = "Admin")]
 public class DisponibilidadTecnicoController : Controller
 {
     private readonly ApplicationDbContext _context;
-    public DisponibilidadTecnicoController(ApplicationDbContext context) => _context = context;
+    private readonly UserManager<IdentityUser> _userManager;
+
+    public DisponibilidadTecnicoController(ApplicationDbContext context, UserManager<IdentityUser> userManager)
+    {
+        _context = context;
+        _userManager = userManager;
+    }
 
     // GET: /DisponibilidadTecnico/Index?tecnicoId=xxx
     // Se agrega filtro por t\u00e9cnico (usando su Usuario asociado para mostrar

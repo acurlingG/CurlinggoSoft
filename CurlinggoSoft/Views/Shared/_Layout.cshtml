@@ -885,8 +885,8 @@
                             <li class="nav-item">
 
                                 <a class="nav-link"
-                                   asp-controller="DisponibilidadTecnico"
-                                   asp-action="Index">
+                                   asp-controller="Tecnico"
+                                   asp-action="MiDisponibilidad">
 
                                     <i class="fa fa-clock-o"></i>
                                     Mi Disponibilidad
@@ -922,6 +922,22 @@
                                 Hola, @User.Identity.Name
 
                             </span>
+
+                        </li>
+
+
+                        <li class="nav-item">
+
+                            <a class="nav-link"
+                               asp-controller="Account"
+                               asp-action="ChangePassword"
+                               title="Cambiar tu contraseña">
+
+                                <i class="fa fa-key"></i>
+
+                                Cambiar Contraseña
+
+                            </a>
 
                         </li>
 

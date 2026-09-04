@@ -1,0 +1,213 @@
+@model CurlinggoSoft.Models.DireccionCliente
+
+@{
+    ViewData["Title"] = "Editar Dirección";
+}
+
+<div class="container my-4">
+    <div class="row justify-content-center">
+        <div class="col-md-8">
+            <div class="card shadow-sm border-0">
+                <div class="card-header bg-warning text-dark">
+                    <h5 class="mb-0">
+                        <i class="fa fa-edit"></i> Editar Dirección
+                    </h5>
+                </div>
+
+                <div class="card-body">
+                    @if (!ViewData.ModelState.IsValid)
+                    {
+                        <div class="alert alert-danger alert-dismissible fade show" role="alert">
+                            <strong><i class="fa fa-exclamation-triangle"></i> Errores encontrados:</strong>
+                            <ul class="mb-0 mt-2">
+                                @foreach (var modelState in ViewData.ModelState.Values)
+                                {
+                                    @foreach (var error in modelState.Errors)
+                                    {
+                                        <li>@error.ErrorMessage</li>
+                                    }
+                                }
+                            </ul>
+                            <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Cerrar"></button>
+                        </div>
+                    }
+
+                    <form method="post" asp-action="EditarDireccion">
+                        <input type="hidden" asp-for="DireccionID" />
+                        <input type="hidden" asp-for="ClienteID" />
+
+                        <!-- Nombre de la Dirección -->
+                        <div class="mb-3">
+                            <label asp-for="NombreDireccion" class="form-label">
+                                <i class="fa fa-home"></i> Nombre de la Dirección
+                            </label>
+                            <input asp-for="NombreDireccion" class="form-control" placeholder="Ej: Casa, Oficina, etc..." required />
+                            <span asp-validation-for="NombreDireccion" class="text-danger small"></span>
+                            <small class="form-text text-muted d-block">
+                                Un nombre descriptivo para identificar este lugar
+                            </small>
+                        </div>
+
+                        <!-- Provincia -->
+                        <div class="mb-3">
+                            <label asp-for="ProvinciaID" class="form-label">
+                                <i class="fa fa-map"></i> Provincia
+                            </label>
+                            <select asp-for="ProvinciaID" class="form-select" required 
+                                    onchange="CargarCantones(this.value)">
+                                <option value="0">-- Selecciona una Provincia --</option>
+                                @if (ViewBag.Provincias != null)
+                                {
+                                    @foreach (var prov in ViewBag.Provincias)
+                                    {
+                                        <option value="@prov.ProvinciaID" 
+                                                selected="@(prov.ProvinciaID == Model.ProvinciaID)">
+                                            @prov.Nombre
+                                        </option>
+                                    }
+                                }
+                            </select>
+                            <span asp-validation-for="ProvinciaID" class="text-danger small"></span>
+                        </div>
+
+                        <!-- Cantón -->
+                        <div class="mb-3">
+                            <label asp-for="CantonID" class="form-label">
+                                <i class="fa fa-map-o"></i> Cantón
+                            </label>
+                            <select asp-for="CantonID" class="form-select" required 
+                                    onchange="CargarDistritos(this.value)">
+                                <option value="0">-- Selecciona un Cantón --</option>
+                                @if (ViewBag.Cantones != null)
+                                {
+                                    @foreach (var canton in ViewBag.Cantones)
+                                    {
+                                        <option value="@canton.CantonID" 
+                                                selected="@(canton.CantonID == Model.CantonID)">
+                                            @canton.Nombre
+                                        </option>
+                                    }
+                                }
+                            </select>
+                            <span asp-validation-for="CantonID" class="text-danger small"></span>
+                        </div>
+
+                        <!-- Distrito -->
+                        <div class="mb-3">
+                            <label asp-for="DistritoID" class="form-label">
+                                <i class="fa fa-map-pin"></i> Distrito
+                            </label>
+                            <select asp-for="DistritoID" class="form-select" required>
+                                <option value="0">-- Selecciona un Distrito --</option>
+                                @if (ViewBag.Distritos != null)
+                                {
+                                    @foreach (var distrito in ViewBag.Distritos)
+                                    {
+                                        <option value="@distrito.DistritoID" 
+                                                selected="@(distrito.DistritoID == Model.DistritoID)">
+                                            @distrito.Nombre
+                                        </option>
+                                    }
+                                }
+                            </select>
+                            <span asp-validation-for="DistritoID" class="text-danger small"></span>
+                        </div>
+
+                        <!-- Dirección Exacta -->
+                        <div class="mb-3">
+                            <label asp-for="DireccionExacta" class="form-label">
+                                <i class="fa fa-street-view"></i> Dirección Exacta
+                            </label>
+                            <textarea asp-for="DireccionExacta" class="form-control" rows="3" 
+                                      placeholder="Ej: Calle Principal #123, Apto 45..." required></textarea>
+                            <span asp-validation-for="DireccionExacta" class="text-danger small"></span>
+                            <small class="form-text text-muted d-block">
+                                Proporciona detalles específicos para que el técnico pueda encontrarte fácilmente
+                            </small>
+                        </div>
+
+                        <!-- Activa -->
+                        <div class="mb-3 form-check">
+                            <input asp-for="Activa" class="form-check-input" type="checkbox" id="activaCheckbox" />
+                            <label asp-for="Activa" class="form-check-label">
+                                <i class="fa fa-check-circle"></i> Dirección Activa
+                            </label>
+                            <small class="form-text text-muted d-block">
+                                Desactiva para que no aparezca en tus direcciones disponibles
+                            </small>
+                        </div>
+
+                        <!-- Botones de acción -->
+                        <div class="d-grid gap-2 mt-4">
+                            <button type="submit" class="btn btn-primary btn-lg">
+                                <i class="fa fa-save"></i> Guardar Cambios
+                            </button>
+                            <a asp-action="MisDirecciones" class="btn btn-outline-secondary">
+                                <i class="fa fa-times"></i> Cancelar
+                            </a>
+                        </div>
+                    </form>
+                </div>
+            </div>
+
+            <!-- Info adicional -->
+            <div class="card card-body bg-light border-0 mt-4">
+                <p class="mb-0 small">
+                    <i class="fa fa-info-circle text-info"></i>
+                    <strong>Nota:</strong> Asegúrate de que los datos sean correctos. 
+                    Esta dirección será utilizada para solicitar servicios de técnicos.
+                </p>
+            </div>
+        </div>
+    </div>
+</div>
+
+@section Scripts {
+    <script>
+        // Cargar Cantones cuando se cambia Provincia
+        async function CargarCantones(provinciaId) {
+            if (!provinciaId || provinciaId === "0") {
+                document.querySelector('[name="CantonID"]').innerHTML = '<option value="0">-- Selecciona un Cantón --</option>';
+                document.querySelector('[name="DistritoID"]').innerHTML = '<option value="0">-- Selecciona un Distrito --</option>';
+                return;
+            }
+
+            try {
+                // Asume que hay una API endpoint para obtener cantones
+                // Si no existe, los cantones deben venir del controlador
+                const select = document.querySelector('[name="CantonID"]');
+                // Los cantones ya están precargados por el controlador
+            } catch (error) {
+                console.error('Error:', error);
+            }
+        }
+
+        // Cargar Distritos cuando se cambia Cantón
+        async function CargarDistritos(cantonId) {
+            if (!cantonId || cantonId === "0") {
+                document.querySelector('[name="DistritoID"]').innerHTML = '<option value="0">-- Selecciona un Distrito --</option>';
+                return;
+            }
+
+            try {
+                // Los distritos ya están precargados por el controlador
+            } catch (error) {
+                console.error('Error:', error);
+            }
+        }
+
+        // Inicializar Cantones y Distritos al cargar
+        document.addEventListener('DOMContentLoaded', function () {
+            const provinciaId = document.querySelector('[name="ProvinciaID"]').value;
+            const cantonId = document.querySelector('[name="CantonID"]').value;
+
+            if (provinciaId && provinciaId !== "0") {
+                CargarCantones(provinciaId);
+            }
+
+            if (cantonId && cantonId !== "0") {
+                CargarDistritos(cantonId);
+            }
+        });
+    </script>
+}

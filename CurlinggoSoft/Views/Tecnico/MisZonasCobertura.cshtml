@@ -1,0 +1,121 @@
+@model IEnumerable<CurlinggoSoft.Models.TecnicoCobertura>
+
+@{
+    ViewData["Title"] = "Mis Zonas de Cobertura";
+}
+
+<div class="container my-4">
+    <div class="row align-items-center mb-3">
+        <div class="col">
+            <h2 class="fw-bold mb-0"><i class="fa fa-map"></i> Mis Zonas de Cobertura</h2>
+        </div>
+        <div class="col-auto">
+            <a asp-action="AgregarZonaCobertura" class="btn btn-success">
+                <i class="fa fa-plus"></i> Agregar Zona
+            </a>
+        </div>
+    </div>
+
+    @if (TempData["Success"] != null)
+    {
+        <div class="alert alert-success alert-dismissible fade show" role="alert">
+            <i class="fa fa-check-circle"></i> @TempData["Success"]
+            <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Cerrar"></button>
+        </div>
+    }
+
+    @if (TempData["Error"] != null)
+    {
+        <div class="alert alert-danger alert-dismissible fade show" role="alert">
+            <i class="fa fa-exclamation-circle"></i> @TempData["Error"]
+            <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Cerrar"></button>
+        </div>
+    }
+
+    @if (!Model.Any())
+    {
+        <div class="alert alert-warning">
+            <i class="fa fa-info-circle"></i> No tienes zonas de cobertura registradas. Agrega al menos una para recibir solicitudes en esa área.
+        </div>
+    }
+    else
+    {
+        <div class="row">
+            @foreach (var zona in Model)
+            {
+                <div class="col-md-6 mb-3">
+                    <div class="card shadow-sm h-100 @(zona.Activa ? "border-success" : "border-secondary opacity-75")">
+                        <div class="card-header @(zona.Activa ? "bg-success text-white" : "bg-secondary text-white")">
+                            <div class="d-flex justify-content-between align-items-center">
+                                <h5 class="mb-0">
+                                    <i class="fa fa-map-marker"></i> 
+                                    @zona.Provincia?.Nombre
+                                </h5>
+                                <span class="badge @(zona.Activa ? "bg-light text-success" : "bg-light text-secondary")">
+                                    @(zona.Activa ? "Activa" : "Inactiva")
+                                </span>
+                            </div>
+                        </div>
+
+                        <div class="card-body">
+                            <dl class="row mb-3">
+                                <dt class="col-5">Provincia:</dt>
+                                <dd class="col-7">@zona.Provincia?.Nombre</dd>
+
+                                <dt class="col-5">Cantón:</dt>
+                                <dd class="col-7">@zona.Canton?.Nombre</dd>
+
+                                @if (zona.Distrito != null)
+                                {
+                                    <dt class="col-5">Distrito:</dt>
+                                    <dd class="col-7">@zona.Distrito.Nombre</dd>
+                                }
+
+                                @if (zona.RadioCoberturaKm.HasValue)
+                                {
+                                    <dt class="col-5">Radio:</dt>
+                                    <dd class="col-7">@zona.RadioCoberturaKm km</dd>
+                                }
+
+                                <dt class="col-5">Creación:</dt>
+                                <dd class="col-7">
+                                    <small class="text-muted">
+                                        @zona.FechaCreacion.ToString("dd/MM/yyyy HH:mm")
+                                    </small>
+                                </dd>
+                            </dl>
+
+                            <div class="btn-group w-100" role="group">
+                                <a asp-action="EditarZonaCobertura" asp-route-id="@zona.TecnicoCoberturaID"
+                                   class="btn btn-sm btn-warning" title="Editar zona">
+                                    <i class="fa fa-edit"></i> Editar
+                                </a>
+
+                                @if (zona.Activa)
+                                {
+                                    <form asp-action="DesactivarZonaCobertura" asp-route-id="@zona.TecnicoCoberturaID"
+                                          method="post" style="display:inline;"
+                                          onsubmit="return confirm('¿Desactivar esta zona de cobertura?');">
+                                        @Html.AntiForgeryToken()
+                                        <button type="submit" class="btn btn-sm btn-secondary" title="Desactivar zona">
+                                            <i class="fa fa-eye-slash"></i> Desactivar
+                                        </button>
+                                    </form>
+                                }
+
+                                <form asp-action="EliminarZonaCobertura" asp-route-id="@zona.TecnicoCoberturaID"
+                                      method="post" style="display:inline;"
+                                      onsubmit="return confirm('¿Eliminar esta zona de cobertura permanentemente?');">
+                                    @Html.AntiForgeryToken()
+                                    <button type="submit" class="btn btn-sm btn-danger" title="Eliminar zona">
+                                        <i class="fa fa-trash"></i> Eliminar
+                                    </button>
+                                </form>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            }
+        </div>
+    }
+</div>

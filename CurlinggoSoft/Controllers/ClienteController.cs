@@ -32,7 +32,7 @@ namespace CurlinggoSoft.Controllers
                 .Include(r => r.Servicio)
                 .Include(r => r.EstadoReserva)
                 .Where(r => r.ClienteID == clienteId)
-                .OrderByDescending(r => r.FechaHoraSolicitud)
+                .OrderByDescending(r => r.ReservaID)
                 .Take(5)
                 .ToListAsync();
 
@@ -50,7 +50,7 @@ namespace CurlinggoSoft.Controllers
                 .Include(r => r.EstadoReserva)
                 .Include(r => r.Tecnico)
                 .Where(r => r.ClienteID == clienteId)
-                .OrderByDescending(r => r.FechaHoraSolicitud)
+                .OrderByDescending(r => r.ReservaID)
                 .ToListAsync();
 
             return View(reservas);
@@ -68,6 +68,132 @@ namespace CurlinggoSoft.Controllers
                 .ToListAsync();
 
             return View(direcciones);
+        }
+
+        // GET: /Cliente/EditarDireccion/{id}
+        [HttpGet]
+        public async Task<IActionResult> EditarDireccion(long? id)
+        {
+            if (id == null) return NotFound();
+
+            var clienteId = _userManager.GetUserId(User);
+            var direccion = await _context.DireccionesCliente
+                .Include(d => d.Provincia)
+                .Include(d => d.Canton)
+                .Include(d => d.Distrito)
+                .FirstOrDefaultAsync(d => d.DireccionID == id && d.ClienteID == clienteId);
+
+            if (direccion == null)
+                return Unauthorized();
+
+            // Cargar datos para dropdowns
+            ViewBag.Provincias = await _context.Provincias.ToListAsync();
+            ViewBag.Cantones = direccion.ProvinciaID > 0 
+                ? await _context.Cantones.Where(c => c.ProvinciaID == direccion.ProvinciaID).ToListAsync()
+                : new List<Canton>();
+            ViewBag.Distritos = direccion.CantonID > 0
+                ? await _context.Distritos.Where(d => d.CantonID == direccion.CantonID).ToListAsync()
+                : new List<Distrito>();
+
+            return View(direccion);
+        }
+
+        // POST: /Cliente/EditarDireccion/{id}
+        [HttpPost]
+        [ValidateAntiForgeryToken]
+        public async Task<IActionResult> EditarDireccion(long? id, 
+            [Bind("DireccionID,ClienteID,NombreDireccion,ProvinciaID,CantonID,DistritoID,DireccionExacta,Activa")] DireccionCliente modelo)
+        {
+            if (id != modelo.DireccionID)
+                return NotFound();
+
+            var clienteId = _userManager.GetUserId(User);
+            if (modelo.ClienteID != clienteId)
+                return Unauthorized();
+
+            if (ModelState.IsValid)
+            {
+                try
+                {
+                    _context.Update(modelo);
+                    await _context.SaveChangesAsync();
+                    TempData["Success"] = "Dirección actualizada correctamente.";
+                    return RedirectToAction(nameof(MisDirecciones));
+                }
+                catch (DbUpdateConcurrencyException)
+                {
+                    if (!_context.DireccionesCliente.Any(d => d.DireccionID == modelo.DireccionID))
+                        return NotFound();
+                    throw;
+                }
+            }
+
+            ViewBag.Provincias = await _context.Provincias.ToListAsync();
+            ViewBag.Cantones = modelo.ProvinciaID > 0
+                ? await _context.Cantones.Where(c => c.ProvinciaID == modelo.ProvinciaID).ToListAsync()
+                : new List<Canton>();
+            ViewBag.Distritos = modelo.CantonID > 0
+                ? await _context.Distritos.Where(d => d.CantonID == modelo.CantonID).ToListAsync()
+                : new List<Distrito>();
+
+            return View(modelo);
+        }
+
+        // POST: /Cliente/EliminarDireccion/{id}
+        [HttpPost]
+        [ValidateAntiForgeryToken]
+        public async Task<IActionResult> EliminarDireccion(long? id)
+        {
+            if (id == null) return NotFound();
+
+            var clienteId = _userManager.GetUserId(User);
+            var direccion = await _context.DireccionesCliente
+                .FirstOrDefaultAsync(d => d.DireccionID == id && d.ClienteID == clienteId);
+
+            if (direccion == null)
+                return Unauthorized();
+
+            try
+            {
+                _context.DireccionesCliente.Remove(direccion);
+                await _context.SaveChangesAsync();
+                TempData["Success"] = "Dirección eliminada correctamente.";
+            }
+            catch (Exception ex)
+            {
+                TempData["Error"] = $"Error al eliminar: {ex.Message}";
+            }
+
+            return RedirectToAction(nameof(MisDirecciones));
+        }
+
+        // POST: /Cliente/DeshabilitarDireccion/{id}
+        [HttpPost]
+        [ValidateAntiForgeryToken]
+        public async Task<IActionResult> DeshabilitarDireccion(long? id)
+        {
+            if (id == null) return NotFound();
+
+            var clienteId = _userManager.GetUserId(User);
+            var direccion = await _context.DireccionesCliente
+                .FirstOrDefaultAsync(d => d.DireccionID == id && d.ClienteID == clienteId);
+
+            if (direccion == null)
+                return Unauthorized();
+
+            try
+            {
+                direccion.Activa = false;
+                _context.Update(direccion);
+                await _context.SaveChangesAsync();
+                TempData["Success"] = "Dirección deshabilitada correctamente.";
+            }
+            catch (Exception ex)
+            {
+                TempData["Error"] = $"Error al deshabilitar: {ex.Message}";
+            }
+
+            return RedirectToAction(nameof(MisDirecciones));
         }
 
         // GET: /Cliente/CalificarTecnico?reservaId=123

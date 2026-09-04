@@ -1,0 +1,170 @@
+@model CurlinggoSoft.Models.TecnicoCobertura
+
+@{
+    ViewData["Title"] = "Agregar Zona de Cobertura";
+}
+
+<div class="container my-4">
+    <div class="row justify-content-center">
+        <div class="col-md-8">
+            <div class="card shadow-sm border-0">
+                <div class="card-header bg-success text-white">
+                    <h5 class="mb-0">
+                        <i class="fa fa-plus-circle"></i> Agregar Nueva Zona de Cobertura
+                    </h5>
+                </div>
+
+                <div class="card-body">
+                    @if (!ViewData.ModelState.IsValid)
+                    {
+                        <div class="alert alert-danger alert-dismissible fade show" role="alert">
+                            <strong><i class="fa fa-exclamation-triangle"></i> Errores encontrados:</strong>
+                            <ul class="mb-0 mt-2">
+                                @foreach (var modelState in ViewData.ModelState.Values)
+                                {
+                                    @foreach (var error in modelState.Errors)
+                                    {
+                                        <li>@error.ErrorMessage</li>
+                                    }
+                                }
+                            </ul>
+                            <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Cerrar"></button>
+                        </div>
+                    }
+
+                    <form method="post" asp-action="AgregarZonaCobertura">
+                        <!-- Provincia -->
+                        <div class="mb-3">
+                            <label asp-for="ProvinciaID" class="form-label">
+                                <i class="fa fa-map"></i> Provincia
+                            </label>
+                            <select asp-for="ProvinciaID" class="form-select" required
+                                    onchange="CargarCantones(this.value)">
+                                <option value="0">-- Selecciona una Provincia --</option>
+                                @if (ViewBag.Provincias != null)
+                                {
+                                    @foreach (var prov in ViewBag.Provincias)
+                                    {
+                                        <option value="@prov.ProvinciaID">@prov.Nombre</option>
+                                    }
+                                }
+                            </select>
+                            <span asp-validation-for="ProvinciaID" class="text-danger small"></span>
+                        </div>
+
+                        <!-- Cantón -->
+                        <div class="mb-3">
+                            <label asp-for="CantonID" class="form-label">
+                                <i class="fa fa-map-o"></i> Cantón
+                            </label>
+                            <select asp-for="CantonID" class="form-select" required
+                                    onchange="CargarDistritos(this.value)">
+                                <option value="0">-- Selecciona un Cantón --</option>
+                                @if (ViewBag.Cantones != null)
+                                {
+                                    @foreach (var canton in ViewBag.Cantones)
+                                    {
+                                        <option value="@canton.CantonID">@canton.Nombre</option>
+                                    }
+                                }
+                            </select>
+                            <span asp-validation-for="CantonID" class="text-danger small"></span>
+                        </div>
+
+                        <!-- Distrito (Opcional) -->
+                        <div class="mb-3">
+                            <label asp-for="DistritoID" class="form-label">
+                                <i class="fa fa-map-pin"></i> Distrito (Opcional)
+                            </label>
+                            <select asp-for="DistritoID" class="form-select">
+                                <option value="">-- Sin especificar --</option>
+                                @if (ViewBag.Distritos != null)
+                                {
+                                    @foreach (var distrito in ViewBag.Distritos)
+                                    {
+                                        <option value="@distrito.DistritoID">@distrito.Nombre</option>
+                                    }
+                                }
+                            </select>
+                            <small class="form-text text-muted d-block">
+                                Deja en blanco si deseas cubrir todo el cantón
+                            </small>
+                        </div>
+
+                        <!-- Radio de Cobertura -->
+                        <div class="mb-3">
+                            <label asp-for="RadioCoberturaKm" class="form-label">
+                                <i class="fa fa-compass"></i> Radio de Cobertura (km)
+                            </label>
+                            <input asp-for="RadioCoberturaKm" type="number" step="0.5" class="form-control"
+                                   placeholder="Ej: 5.5" />
+                            <small class="form-text text-muted d-block">
+                                Distancia máxima desde tu ubicación para atender solicitudes
+                            </small>
+                            <span asp-validation-for="RadioCoberturaKm" class="text-danger small"></span>
+                        </div>
+
+                        <div class="d-grid gap-2 d-sm-flex justify-content-sm-end">
+                            <a href="@Url.Action("MisZonasCobertura")" class="btn btn-secondary">
+                                <i class="fa fa-times"></i> Cancelar
+                            </a>
+                            <button type="submit" class="btn btn-success">
+                                <i class="fa fa-save"></i> Guardar Zona
+                            </button>
+                        </div>
+                    </form>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+@section Scripts {
+    <script>
+        function CargarCantones(provinciaId) {
+            if (!provinciaId || provinciaId == "0") {
+                document.querySelector('select[name="CantonID"]').innerHTML = 
+                    '<option value="0">-- Selecciona un Cantón --</option>';
+                document.querySelector('select[name="DistritoID"]').innerHTML = 
+                    '<option value="">-- Sin especificar --</option>';
+                return;
+            }
+
+            fetch(`/Tecnico/ObtenerCantones?provinciaId=${provinciaId}`)
+                .then(response => response.json())
+                .then(data => {
+                    const cantonSelect = document.querySelector('select[name="CantonID"]');
+                    cantonSelect.innerHTML = '<option value="0">-- Selecciona un Cantón --</option>';
+                    data.forEach(canton => {
+                        const option = document.createElement('option');
+                        option.value = canton.cantonID;
+                        option.textContent = canton.nombre;
+                        cantonSelect.appendChild(option);
+                    });
+                })
+                .catch(error => console.error('Error:', error));
+        }
+
+        function CargarDistritos(cantonId) {
+            if (!cantonId || cantonId == "0") {
+                document.querySelector('select[name="DistritoID"]').innerHTML = 
+                    '<option value="">-- Sin especificar --</option>';
+                return;
+            }
+
+            fetch(`/Tecnico/ObtenerDistritos?cantonId=${cantonId}`)
+                .then(response => response.json())
+                .then(data => {
+                    const distritoSelect = document.querySelector('select[name="DistritoID"]');
+                    distritoSelect.innerHTML = '<option value="">-- Sin especificar --</option>';
+                    data.forEach(distrito => {
+                        const option = document.createElement('option');
+                        option.value = distrito.distritoID;
+                        option.textContent = distrito.nombre;
+                        distritoSelect.appendChild(option);
+                    });
+                })
+                .catch(error => console.error('Error:', error));
+        }
+    </script>
+}

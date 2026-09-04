@@ -1,0 +1,43 @@
+@* Menu de Usuario Autenticado - Cambio de Contraseña *@
+
+@if (User.Identity?.IsAuthenticated ?? false)
+{
+    <li class="nav-item dropdown">
+        <a class="nav-link dropdown-toggle" 
+           href="#" 
+           id="usuarioDropdown" 
+           role="button" 
+           data-bs-toggle="dropdown" 
+           aria-expanded="false">
+            <i class="fa fa-user-circle"></i>
+            Mi Cuenta
+        </a>
+        <ul class="dropdown-menu dropdown-menu-end" aria-labelledby="usuarioDropdown">
+
+            <!-- CAMBIAR CONTRASEÑA -->
+            <li>
+                <a class="dropdown-item" 
+                   asp-controller="Account" 
+                   asp-action="ChangePassword">
+                    <i class="fa fa-key"></i>
+                    Cambiar Contraseña
+                </a>
+            </li>
+
+            <li><hr class="dropdown-divider"></li>
+
+            <!-- CERRAR SESIÓN -->
+            <li>
+                <form asp-controller="Account" 
+                      asp-action="Logout" 
+                      method="post" 
+                      class="d-inline">
+                    <button type="submit" class="dropdown-item">
+                        <i class="fa fa-sign-out"></i>
+                        Cerrar Sesión
+                    </button>
+                </form>
+            </li>
+        </ul>
+    </li>
+}

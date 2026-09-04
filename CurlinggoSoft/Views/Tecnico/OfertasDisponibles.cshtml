@@ -31,6 +31,7 @@
                 <table class="table table-hover align-middle">
                     <thead class="table-dark">
                         <tr>
+                            <th>Código Reserva</th>
                             <th>Servicio</th>
                             <th>Descripción del Problema</th>
                             <th>Distancia Aprox.</th>
@@ -42,6 +43,7 @@
                         @foreach (var oferta in Model)
                         {
                             <tr>
+                                <td><strong><code>@oferta.Reserva?.CodigoReservaFormato</code></strong></td>
                                 <td><strong>@(oferta.Reserva?.Servicio?.NombreServicio ?? "Servicio Técnico")</strong></td>
                                 <td>@oferta.Reserva?.DescripcionProblema</td>
                                 <td>@(oferta.DistanciaMetros.HasValue ? $"{oferta.DistanciaMetros.Value / 1000:N1} km" : "Zona asignada")</td>

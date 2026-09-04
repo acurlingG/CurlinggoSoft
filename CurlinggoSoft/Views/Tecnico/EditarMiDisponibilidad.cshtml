@@ -1,0 +1,123 @@
+@model CurlinggoSoft.Models.DisponibilidadTecnico
+
+@{
+    ViewData["Title"] = "Editar Mi Disponibilidad";
+
+    string NombreDia(byte dia) => dia switch
+    {
+        1 => "Lunes",
+        2 => "Martes",
+        3 => "Miércoles",
+        4 => "Jueves",
+        5 => "Viernes",
+        6 => "Sábado",
+        7 => "Domingo",
+        _ => "Desconocido"
+    };
+}
+
+<div class="container my-4">
+    <div class="row justify-content-center">
+        <div class="col-md-6">
+            <div class="card shadow-sm border-0">
+                <div class="card-header bg-warning text-dark">
+                    <h5 class="mb-0">
+                        <i class="fa fa-edit"></i> Editar Disponibilidad
+                    </h5>
+                </div>
+
+                <div class="card-body">
+                    @if (!ViewData.ModelState.IsValid)
+                    {
+                        <div class="alert alert-danger alert-dismissible fade show" role="alert">
+                            <strong><i class="fa fa-exclamation-triangle"></i> Errores encontrados:</strong>
+                            <ul class="mb-0 mt-2">
+                                @foreach (var modelState in ViewData.ModelState.Values)
+                                {
+                                    @foreach (var error in modelState.Errors)
+                                    {
+                                        <li>@error.ErrorMessage</li>
+                                    }
+                                }
+                            </ul>
+                            <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Cerrar"></button>
+                        </div>
+                    }
+
+                    <form method="post" asp-action="EditarMiDisponibilidad">
+                        <input type="hidden" asp-for="DisponibilidadID" />
+                        <input type="hidden" asp-for="TecnicoID" />
+                        <input type="hidden" asp-for="DiaSemana" />
+
+                        <!-- Día de la semana (solo lectura) -->
+                        <div class="mb-3">
+                            <label class="form-label">
+                                <i class="fa fa-calendar"></i> Día de la Semana
+                            </label>
+                            <div class="form-control-plaintext fw-bold">
+                                @NombreDia(Model.DiaSemana)
+                            </div>
+                            <small class="text-muted d-block">
+                                Este campo no puede modificarse. Contacta con el administrador si necesitas cambiar el día.
+                            </small>
+                        </div>
+
+                        <!-- Hora Inicio -->
+                        <div class="mb-3">
+                            <label asp-for="HoraInicio" class="form-label">
+                                <i class="fa fa-arrow-right"></i> Hora Inicio
+                            </label>
+                            <input asp-for="HoraInicio" class="form-control" type="time" required />
+                            <span asp-validation-for="HoraInicio" class="text-danger small"></span>
+                            <small class="form-text text-muted d-block">
+                                Formato: HH:MM (24 horas)
+                            </small>
+                        </div>
+
+                        <!-- Hora Fin -->
+                        <div class="mb-3">
+                            <label asp-for="HoraFin" class="form-label">
+                                <i class="fa fa-arrow-left"></i> Hora Fin
+                            </label>
+                            <input asp-for="HoraFin" class="form-control" type="time" required />
+                            <span asp-validation-for="HoraFin" class="text-danger small"></span>
+                            <small class="form-text text-muted d-block">
+                                Formato: HH:MM (24 horas) - Debe ser mayor que hora inicio
+                            </small>
+                        </div>
+
+                        <!-- Activa -->
+                        <div class="mb-3 form-check">
+                            <input asp-for="Activa" class="form-check-input" type="checkbox" id="activaCheckbox" />
+                            <label asp-for="Activa" class="form-check-label">
+                                <i class="fa fa-check-circle"></i> Horario Activo
+                            </label>
+                            <small class="form-text text-muted d-block">
+                                Desactiva para indicar que NO estás disponible en este horario
+                            </small>
+                        </div>
+
+                        <!-- Botones de acción -->
+                        <div class="d-grid gap-2 mt-4">
+                            <button type="submit" class="btn btn-primary btn-lg">
+                                <i class="fa fa-save"></i> Guardar Cambios
+                            </button>
+                            <a asp-action="MiDisponibilidad" class="btn btn-outline-secondary">
+                                <i class="fa fa-times"></i> Cancelar
+                            </a>
+                        </div>
+                    </form>
+                </div>
+            </div>
+
+            <!-- Info adicional -->
+            <div class="card card-body bg-light border-0 mt-4">
+                <p class="mb-0 small">
+                    <i class="fa fa-info-circle text-info"></i>
+                    <strong>Nota:</strong> Los cambios que hagas aquí afectarán cuándo recibes ofertas de servicios. 
+                    Asegúrate de que tus horarios sean precisos.
+                </p>
+            </div>
+        </div>
+    </div>
+</div>

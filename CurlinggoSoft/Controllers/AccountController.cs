@@ -22,6 +22,10 @@ namespace CurlinggoSoft.Controllers
             _emailService = emailService;
         }
 
+        // ====================================
+        // LOGIN
+        // ====================================
+
         [HttpGet]
         [AllowAnonymous]
         public IActionResult Login(string? returnUrl = null)
@@ -90,6 +94,10 @@ namespace CurlinggoSoft.Controllers
             return View("~/Views/Login/Index.cshtml");
         }
 
+        // ====================================
+        // VERIFICACIÓN DE 2FA
+        // ====================================
+
         [HttpGet]
         [AllowAnonymous]
         public async Task<IActionResult> VerifyCode(string? returnUrl = null)
@@ -152,35 +160,107 @@ namespace CurlinggoSoft.Controllers
             return View("~/Views/Login/VerifyCode.cshtml");
         }
 
+        // ====================================
+        // CAMBIO DE CONTRASEÑA
+        // ====================================
+
+        [HttpGet]
+        [Authorize]
+        public IActionResult ChangePassword()
+        {
+            return View("~/Views/Account/ChangePassword.cshtml");
+        }
+
+        [HttpPost]
+        [Authorize]
+        [ValidateAntiForgeryToken]
+        public async Task<IActionResult> ChangePassword(
+            string currentPassword,
+            string newPassword,
+            string confirmPassword)
+        {
+            // Validaciones de entrada
+            if (string.IsNullOrWhiteSpace(currentPassword))
+            {
+                ModelState.AddModelError(nameof(currentPassword), "La contraseña actual es obligatoria.");
+            }
+
+            if (string.IsNullOrWhiteSpace(newPassword))
+            {
+                ModelState.AddModelError(nameof(newPassword), "La contraseña nueva es obligatoria.");
+            }
+
+            if (string.IsNullOrWhiteSpace(confirmPassword))
+            {
+                ModelState.AddModelError(nameof(confirmPassword), "La confirmación de contraseña es obligatoria.");
+            }
+
+            if ((newPassword ?? string.Empty) != confirmPassword)
+            {
+                ModelState.AddModelError(nameof(confirmPassword), "Las contraseñas nuevas no coinciden.");
+            }
+
+            if ((newPassword ?? string.Empty).Length < 6)
+            {
+                ModelState.AddModelError(nameof(newPassword), "La contraseña debe tener al menos 6 caracteres.");
+            }
+
+            if (!ModelState.IsValid)
+            {
+                return View("~/Views/Account/ChangePassword.cshtml");
+            }
+
+            // Obtener usuario actual
+            var usuario = await _userManager.GetUserAsync(User);
+            if (usuario == null)
+            {
+                return Unauthorized();
+            }
+
+            // Cambiar contraseña
+            var result = await _userManager.ChangePasswordAsync(usuario, currentPassword, newPassword ?? string.Empty);
+
+            if (result.Succeeded)
+            {
+                await _emailService.SendLoginAlertAsync(
+                    usuario.Email!,
+                    usuario.UserName!,
+                    exitoso: true,
+                    motivo: "Tu contraseña fue cambiada exitosamente");
+
+                TempData["Success"] = "Tu contraseña ha sido actualizada correctamente. Por tu seguridad, deberás iniciar sesión nuevamente.";
+                await _signInManager.SignOutAsync();
+                return RedirectToAction("Login");
+            }
+
+            // Mostrar errores de Identity
+            foreach (var error in result.Errors)
+            {
+                ModelState.AddModelError(string.Empty, error.Description);
+            }
+
+            ModelState.AddModelError(string.Empty, "No se pudo cambiar la contraseña. Verifica que la contraseña actual sea correcta.");
+            return View("~/Views/Account/ChangePassword.cshtml");
+        }
+
+        // ====================================
+        // CIERRE DE SESIÓN
+        // ====================================
+
         [HttpPost]
         [ValidateAntiForgeryToken]
         public async Task<IActionResult> Logout()
         {
             await _signInManager.SignOutAsync();
-            return RedirectToAction("Login", "Account");
+            TempData["Success"] = "Has cerrado sesión exitosamente.";
+            return RedirectToAction("Login");
         }
 
-        public IActionResult RecoverPassword()
-        {
-            return View("~/Views/Login/RecoverPassword.cshtml");
-        }
+        // ====================================
+        // MÉTODOS AUXILIARES PRIVADOS
+        // ====================================
 
-        private async Task<IActionResult> RedirigirSegunRolAsync(IdentityUser identityUser, string? returnUrl)
-        {
-            if (!string.IsNullOrEmpty(returnUrl) && Url.IsLocalUrl(returnUrl))
-            {
-                return Redirect(returnUrl);
-            }
-
-            if (await _userManager.IsInRoleAsync(identityUser, "Admin"))
-            {
-                return RedirectToAction("Index", "Admin");
-            }
-
-            return RedirectToAction("Index", "Home");
-        }
-
-        private static string OcultarCorreo(string? email)
+        private string OcultarCorreo(string? email)
         {
             if (string.IsNullOrEmpty(email) || !email.Contains('@'))
             {
@@ -191,6 +271,27 @@ namespace CurlinggoSoft.Controllers
             var usuarioParte = partes[0];
             var visible = usuarioParte.Length <= 2 ? usuarioParte : usuarioParte[..2];
             return $"{visible}***@{partes[1]}";
+        }
+
+        private async Task<IActionResult> RedirigirSegunRolAsync(IdentityUser identityUser, string? returnUrl)
+        {
+            if (!string.IsNullOrEmpty(returnUrl) && Url.IsLocalUrl(returnUrl))
+            {
+                return Redirect(returnUrl);
+            }
+
+            var roles = await _userManager.GetRolesAsync(identityUser);
+
+            if (roles.Contains("Admin"))
+                return RedirectToAction("Index", "Admin");
+
+            if (roles.Contains("Tecnico"))
+                return RedirectToAction("Index", "Tecnico");
+
+            if (roles.Contains("Cliente"))
+                return RedirectToAction("Index", "Cliente");
+
+            return RedirectToAction("Index", "Home");
         }
     }
 }

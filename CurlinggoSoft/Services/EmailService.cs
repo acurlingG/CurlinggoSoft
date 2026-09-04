@@ -83,6 +83,29 @@ namespace CurlinggoSoft.Services
             var username = smtpSettings["Username"];
             var password = smtpSettings["Password"];
 
+            // Validar que los parámetros SMTP estén configurados
+            if (string.IsNullOrWhiteSpace(host))
+            {
+                var errorMsg = "Configuración SMTP inválida: Host no configurado";
+                _logger.LogError(errorMsg);
+                if (lanzarSiFalla)
+                {
+                    throw new InvalidOperationException(errorMsg);
+                }
+                return;
+            }
+
+            if (string.IsNullOrWhiteSpace(username) || string.IsNullOrWhiteSpace(password))
+            {
+                var errorMsg = "Configuración SMTP inválida: Usuario o contraseña no configurados";
+                _logger.LogError(errorMsg);
+                if (lanzarSiFalla)
+                {
+                    throw new InvalidOperationException(errorMsg);
+                }
+                return;
+            }
+
             try
             {
                 using var client = new SmtpClient(host, port)

@@ -38,7 +38,7 @@ namespace CurlinggoSoft.Controllers
                 .Include(r => r.Servicio)
                 .Include(r => r.EstadoReserva)
                 .Where(r => r.TecnicoID == TecnicoId)
-                .OrderByDescending(r => r.FechaHoraProgramada)
+                .OrderByDescending(r => r.ReservaID)
                 .ToListAsync();
 
             return View(trabajos);

@@ -122,5 +122,10 @@ namespace CurlinggoSoft.Models
 
         [ForeignKey("EstadoReservaID")]
         public virtual EstadoReserva? EstadoReserva { get; set; }
+
+        // Propiedad computada: Código de reserva legible (formato CR-NNNNNN)
+        // NO se mapea a BD, solo se usa en vistas
+        [NotMapped]
+        public string CodigoReservaFormato => $"CR-{ReservaID:D6}";
     }
 }
